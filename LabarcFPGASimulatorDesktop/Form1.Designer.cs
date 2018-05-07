@@ -37,13 +37,13 @@
             this.pictureBoxSwi5 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSwi6 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSwi7 = new System.Windows.Forms.PictureBox();
-            this.pictureBox10 = new System.Windows.Forms.PictureBox();
-            this.pictureBox9 = new System.Windows.Forms.PictureBox();
-            this.pictureBox8 = new System.Windows.Forms.PictureBox();
-            this.pictureBox7 = new System.Windows.Forms.PictureBox();
-            this.pictureBox6 = new System.Windows.Forms.PictureBox();
-            this.pictureBox5 = new System.Windows.Forms.PictureBox();
-            this.pictureBox4 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLed0 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLed1 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLed2 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLed3 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLed4 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLed5 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxLed6 = new System.Windows.Forms.PictureBox();
             this.pictureBoxLed7 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSegment7 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSegment5 = new System.Windows.Forms.PictureBox();
@@ -64,13 +64,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi5)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi7)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed0)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed2)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed3)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed5)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed6)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed7)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment7)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment5)).BeginInit();
@@ -189,75 +189,75 @@
             this.pictureBoxSwi7.Tag = "";
             this.pictureBoxSwi7.Click += new System.EventHandler(this.SwitchClick_Click);
             // 
-            // pictureBox10
+            // pictureBoxLed0
             // 
-            this.pictureBox10.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
-            this.pictureBox10.Location = new System.Drawing.Point(428, 236);
-            this.pictureBox10.Name = "pictureBox10";
-            this.pictureBox10.Size = new System.Drawing.Size(24, 40);
-            this.pictureBox10.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox10.TabIndex = 20;
-            this.pictureBox10.TabStop = false;
+            this.pictureBoxLed0.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
+            this.pictureBoxLed0.Location = new System.Drawing.Point(428, 236);
+            this.pictureBoxLed0.Name = "pictureBoxLed0";
+            this.pictureBoxLed0.Size = new System.Drawing.Size(24, 40);
+            this.pictureBoxLed0.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxLed0.TabIndex = 20;
+            this.pictureBoxLed0.TabStop = false;
             // 
-            // pictureBox9
+            // pictureBoxLed1
             // 
-            this.pictureBox9.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
-            this.pictureBox9.Location = new System.Drawing.Point(396, 236);
-            this.pictureBox9.Name = "pictureBox9";
-            this.pictureBox9.Size = new System.Drawing.Size(24, 40);
-            this.pictureBox9.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox9.TabIndex = 19;
-            this.pictureBox9.TabStop = false;
+            this.pictureBoxLed1.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
+            this.pictureBoxLed1.Location = new System.Drawing.Point(396, 236);
+            this.pictureBoxLed1.Name = "pictureBoxLed1";
+            this.pictureBoxLed1.Size = new System.Drawing.Size(24, 40);
+            this.pictureBoxLed1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxLed1.TabIndex = 19;
+            this.pictureBoxLed1.TabStop = false;
             // 
-            // pictureBox8
+            // pictureBoxLed2
             // 
-            this.pictureBox8.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
-            this.pictureBox8.Location = new System.Drawing.Point(364, 236);
-            this.pictureBox8.Name = "pictureBox8";
-            this.pictureBox8.Size = new System.Drawing.Size(24, 40);
-            this.pictureBox8.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox8.TabIndex = 18;
-            this.pictureBox8.TabStop = false;
+            this.pictureBoxLed2.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
+            this.pictureBoxLed2.Location = new System.Drawing.Point(364, 236);
+            this.pictureBoxLed2.Name = "pictureBoxLed2";
+            this.pictureBoxLed2.Size = new System.Drawing.Size(24, 40);
+            this.pictureBoxLed2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxLed2.TabIndex = 18;
+            this.pictureBoxLed2.TabStop = false;
             // 
-            // pictureBox7
+            // pictureBoxLed3
             // 
-            this.pictureBox7.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
-            this.pictureBox7.Location = new System.Drawing.Point(332, 236);
-            this.pictureBox7.Name = "pictureBox7";
-            this.pictureBox7.Size = new System.Drawing.Size(24, 40);
-            this.pictureBox7.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox7.TabIndex = 17;
-            this.pictureBox7.TabStop = false;
+            this.pictureBoxLed3.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
+            this.pictureBoxLed3.Location = new System.Drawing.Point(332, 236);
+            this.pictureBoxLed3.Name = "pictureBoxLed3";
+            this.pictureBoxLed3.Size = new System.Drawing.Size(24, 40);
+            this.pictureBoxLed3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxLed3.TabIndex = 17;
+            this.pictureBoxLed3.TabStop = false;
             // 
-            // pictureBox6
+            // pictureBoxLed4
             // 
-            this.pictureBox6.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
-            this.pictureBox6.Location = new System.Drawing.Point(300, 236);
-            this.pictureBox6.Name = "pictureBox6";
-            this.pictureBox6.Size = new System.Drawing.Size(24, 40);
-            this.pictureBox6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox6.TabIndex = 16;
-            this.pictureBox6.TabStop = false;
+            this.pictureBoxLed4.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
+            this.pictureBoxLed4.Location = new System.Drawing.Point(300, 236);
+            this.pictureBoxLed4.Name = "pictureBoxLed4";
+            this.pictureBoxLed4.Size = new System.Drawing.Size(24, 40);
+            this.pictureBoxLed4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxLed4.TabIndex = 16;
+            this.pictureBoxLed4.TabStop = false;
             // 
-            // pictureBox5
+            // pictureBoxLed5
             // 
-            this.pictureBox5.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
-            this.pictureBox5.Location = new System.Drawing.Point(268, 236);
-            this.pictureBox5.Name = "pictureBox5";
-            this.pictureBox5.Size = new System.Drawing.Size(24, 40);
-            this.pictureBox5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox5.TabIndex = 15;
-            this.pictureBox5.TabStop = false;
+            this.pictureBoxLed5.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
+            this.pictureBoxLed5.Location = new System.Drawing.Point(268, 236);
+            this.pictureBoxLed5.Name = "pictureBoxLed5";
+            this.pictureBoxLed5.Size = new System.Drawing.Size(24, 40);
+            this.pictureBoxLed5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxLed5.TabIndex = 15;
+            this.pictureBoxLed5.TabStop = false;
             // 
-            // pictureBox4
+            // pictureBoxLed6
             // 
-            this.pictureBox4.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
-            this.pictureBox4.Location = new System.Drawing.Point(236, 236);
-            this.pictureBox4.Name = "pictureBox4";
-            this.pictureBox4.Size = new System.Drawing.Size(24, 40);
-            this.pictureBox4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox4.TabIndex = 14;
-            this.pictureBox4.TabStop = false;
+            this.pictureBoxLed6.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.ledOn;
+            this.pictureBoxLed6.Location = new System.Drawing.Point(236, 236);
+            this.pictureBoxLed6.Name = "pictureBoxLed6";
+            this.pictureBoxLed6.Size = new System.Drawing.Size(24, 40);
+            this.pictureBoxLed6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxLed6.TabIndex = 14;
+            this.pictureBoxLed6.TabStop = false;
             // 
             // pictureBoxLed7
             // 
@@ -278,6 +278,7 @@
             this.pictureBoxSegment7.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxSegment7.TabIndex = 11;
             this.pictureBoxSegment7.TabStop = false;
+            this.pictureBoxSegment7.Tag = "p";
             // 
             // pictureBoxSegment5
             // 
@@ -288,6 +289,7 @@
             this.pictureBoxSegment5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxSegment5.TabIndex = 10;
             this.pictureBoxSegment5.TabStop = false;
+            this.pictureBoxSegment5.Tag = "v";
             // 
             // pictureBoxSegment3
             // 
@@ -298,6 +300,7 @@
             this.pictureBoxSegment3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxSegment3.TabIndex = 5;
             this.pictureBoxSegment3.TabStop = false;
+            this.pictureBoxSegment3.Tag = "h";
             // 
             // pictureBoxSegment6
             // 
@@ -308,6 +311,7 @@
             this.pictureBoxSegment6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxSegment6.TabIndex = 6;
             this.pictureBoxSegment6.TabStop = false;
+            this.pictureBoxSegment6.Tag = "h";
             // 
             // pictureBoxSegment0
             // 
@@ -319,6 +323,7 @@
             this.pictureBoxSegment0.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxSegment0.TabIndex = 4;
             this.pictureBoxSegment0.TabStop = false;
+            this.pictureBoxSegment0.Tag = "h";
             // 
             // pictureBoxSegment4
             // 
@@ -329,6 +334,7 @@
             this.pictureBoxSegment4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxSegment4.TabIndex = 9;
             this.pictureBoxSegment4.TabStop = false;
+            this.pictureBoxSegment4.Tag = "v";
             // 
             // pictureBoxSegment2
             // 
@@ -339,6 +345,7 @@
             this.pictureBoxSegment2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxSegment2.TabIndex = 8;
             this.pictureBoxSegment2.TabStop = false;
+            this.pictureBoxSegment2.Tag = "v";
             // 
             // pictureBoxSegment1
             // 
@@ -349,6 +356,7 @@
             this.pictureBoxSegment1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBoxSegment1.TabIndex = 7;
             this.pictureBoxSegment1.TabStop = false;
+            this.pictureBoxSegment1.Tag = "v";
             // 
             // pictureBox3
             // 
@@ -397,13 +405,13 @@
             this.Controls.Add(this.pictureBoxSwi5);
             this.Controls.Add(this.pictureBoxSwi6);
             this.Controls.Add(this.pictureBoxSwi7);
-            this.Controls.Add(this.pictureBox10);
-            this.Controls.Add(this.pictureBox9);
-            this.Controls.Add(this.pictureBox8);
-            this.Controls.Add(this.pictureBox7);
-            this.Controls.Add(this.pictureBox6);
-            this.Controls.Add(this.pictureBox5);
-            this.Controls.Add(this.pictureBox4);
+            this.Controls.Add(this.pictureBoxLed0);
+            this.Controls.Add(this.pictureBoxLed1);
+            this.Controls.Add(this.pictureBoxLed2);
+            this.Controls.Add(this.pictureBoxLed3);
+            this.Controls.Add(this.pictureBoxLed4);
+            this.Controls.Add(this.pictureBoxLed5);
+            this.Controls.Add(this.pictureBoxLed6);
             this.Controls.Add(this.pictureBoxLed7);
             this.Controls.Add(this.pictureBoxSegment7);
             this.Controls.Add(this.pictureBoxSegment5);
@@ -428,13 +436,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi5)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi7)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox10)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox9)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox8)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox7)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox6)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox5)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed0)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed2)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed3)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed5)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed6)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxLed7)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment7)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment5)).EndInit();
@@ -466,13 +474,13 @@
         private System.Windows.Forms.PictureBox pictureBoxSegment7;
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.PictureBox pictureBoxLed7;
-        private System.Windows.Forms.PictureBox pictureBox4;
-        private System.Windows.Forms.PictureBox pictureBox5;
-        private System.Windows.Forms.PictureBox pictureBox6;
-        private System.Windows.Forms.PictureBox pictureBox7;
-        private System.Windows.Forms.PictureBox pictureBox8;
-        private System.Windows.Forms.PictureBox pictureBox9;
-        private System.Windows.Forms.PictureBox pictureBox10;
+        private System.Windows.Forms.PictureBox pictureBoxLed6;
+        private System.Windows.Forms.PictureBox pictureBoxLed5;
+        private System.Windows.Forms.PictureBox pictureBoxLed4;
+        private System.Windows.Forms.PictureBox pictureBoxLed3;
+        private System.Windows.Forms.PictureBox pictureBoxLed2;
+        private System.Windows.Forms.PictureBox pictureBoxLed1;
+        private System.Windows.Forms.PictureBox pictureBoxLed0;
         private System.Windows.Forms.PictureBox pictureBoxSwi7;
         private System.Windows.Forms.PictureBox pictureBoxSwi6;
         private System.Windows.Forms.PictureBox pictureBoxSwi5;

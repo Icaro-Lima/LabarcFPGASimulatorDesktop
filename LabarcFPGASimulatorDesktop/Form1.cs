@@ -13,6 +13,7 @@ namespace LabarcFPGASimulatorDesktop
     public partial class Form1 : Form
     {
         private PictureBox[] SWI;
+        private PictureBox[] LED;
         private PictureBox[] SEG;
 
         public Form1()
@@ -22,17 +23,29 @@ namespace LabarcFPGASimulatorDesktop
             SWI = new PictureBox[]
             {
                 pictureBoxSwi0,
-                pictureBoxSwi3,
-                pictureBoxSwi6,
                 pictureBoxSwi1,
                 pictureBoxSwi2,
+                pictureBoxSwi3,
                 pictureBoxSwi4,
                 pictureBoxSwi5,
+                pictureBoxSwi6,
                 pictureBoxSwi7
             };
             Array.ForEach(SWI, element => SwiInit(element));
 
-            SEG = new PictureBox[] 
+            LED = new PictureBox[]
+            {
+                pictureBoxLed0,
+                pictureBoxLed1,
+                pictureBoxLed2,
+                pictureBoxLed3,
+                pictureBoxLed4,
+                pictureBoxLed5,
+                pictureBoxLed6,
+                pictureBoxLed7
+            };
+
+            SEG = new PictureBox[]
             {
                 pictureBoxSegment0,
                 pictureBoxSegment3,
@@ -44,6 +57,7 @@ namespace LabarcFPGASimulatorDesktop
                 pictureBoxSegment7
             };
             Array.ForEach(SEG, element => SegmentInit(element));
+            Array.Sort(SEG, (a, b) => a.Name.CompareTo(b.Name));
         }
 
         private void SwiInit(PictureBox pictureBoxSwi)
@@ -64,10 +78,33 @@ namespace LabarcFPGASimulatorDesktop
             pictureBoxSegment.Location = pos;
         }
 
+        private void SetLEDState(int led, bool state)
+        {
+            LED[led].Image = state ? Properties.Resources.ledOn : Properties.Resources.ledOff;
+        }
+
+        private void SetSEGState(int seg, bool state)
+        {
+            if ((string)(SEG[seg].Tag) == "h")
+            {
+                SEG[seg].Image = state ? Properties.Resources.segmentHorizontalOn : Properties.Resources.segmentHorizontalOff;
+            }
+            else if ((string)(SEG[seg].Tag) == "v")
+            {
+                SEG[seg].Image = state ? Properties.Resources.segmentVerticalOn : Properties.Resources.segmentVerticalOff;
+            }
+            else
+            {
+                SEG[seg].Image = state ? Properties.Resources.segmentPointOn : Properties.Resources.segmentPointOff;
+            }
+        }
+
         private void SwitchClick_Click(object sender, EventArgs e)
         {
             PictureBox actual = (PictureBox)sender;
-            
+
+            int index = actual.Name[actual.Name.Length - 1] - 48;
+
             if ((bool)actual.Tag)
             {
                 actual.Image = Properties.Resources.slideswitchOff;
