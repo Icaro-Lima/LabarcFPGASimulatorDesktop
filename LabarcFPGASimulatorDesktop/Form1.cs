@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -19,6 +20,7 @@ namespace LabarcFPGASimulatorDesktop
 
         private string defaultVerilogTemplate;
         private SaveFileDialog saveFileDialog;
+        private OpenFileDialog openFileDialog;
 
         public Form1()
         {
@@ -65,6 +67,9 @@ namespace LabarcFPGASimulatorDesktop
 
             defaultVerilogTemplate = textEditorControl1.Text;
             saveFileDialog = new SaveFileDialog();
+            openFileDialog = new OpenFileDialog();
+
+            CheckVerilator();
         }
 
         private void SwiInit(PictureBox pictureBoxSwi)
@@ -123,34 +128,131 @@ namespace LabarcFPGASimulatorDesktop
             actual.Tag = !(bool)actual.Tag;
         }
 
-        private void textEditorControl1_Load(object sender, EventArgs e)
+        private void TextEditorControl1_Load(object sender, EventArgs e)
         {
             FileSyntaxModeProvider fileSyntaxModeProvider = new FileSyntaxModeProvider(Application.StartupPath);
             HighlightingManager.Manager.AddSyntaxModeFileProvider(fileSyntaxModeProvider);
             textEditorControl1.SetHighlighting("Verilog");
         }
 
-        private void buttonDefault_Click(object sender, EventArgs e)
+        /// <summary>
+        /// Salva o código escrito pelo usuário.
+        /// </summary>
+        /// <returns>Retorna true caso o usuário escolha um nome de arquivo válido.</returns>
+        private bool SaveCode()
+        {
+            saveFileDialog.Filter = "SystemVerilog|*.sv|Verilog|*.v||*.*";
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                using (System.IO.StreamWriter writer = new System.IO.StreamWriter(saveFileDialog.FileName, false))
+                {
+                    writer.WriteLine(textEditorControl1.Text);
+                    writer.Close();
+                }
+
+                textBoxLogs.AppendText("Código salvo em: " + saveFileDialog.FileName + Environment.NewLine);
+                return true;
+            }
+
+            textBoxLogs.AppendText("Não foi possível salvar, o usuário cancelou a ação." + Environment.NewLine);
+            return false;
+        }
+
+        private void ButtonReset_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("Deseja salvar antes?", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1);
             if (result == DialogResult.Yes)
             {
-                saveFileDialog.Filter = "SystemVerilog|*.sv|Verilog|*.v||*.*";
-                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                if (SaveCode())
                 {
-                    using (System.IO.StreamWriter writer = new System.IO.StreamWriter(saveFileDialog.FileName, false))
-                    {
-                        writer.WriteLine(textEditorControl1.Text);
-                        writer.Close();
-                    }
-
                     textEditorControl1.Text = defaultVerilogTemplate;
+                    textBoxLogs.AppendText("Código salvo e resetado para o padrão." + Environment.NewLine);
                 }
             }
             else if (result == DialogResult.No)
             {
                 textEditorControl1.Text = defaultVerilogTemplate;
+                textBoxLogs.AppendText("Código resetado para o padrão sem salvar." + Environment.NewLine);
             }
+            else
+            {
+                textBoxLogs.AppendText("Não foi possível resetar, o usuário cancelou a ação." + Environment.NewLine);
+            }
+        }
+
+        private void LoadCode()
+        {
+            openFileDialog.Filter = "SystemVerilog|*sv|Verilog|*v||*.*";
+            DialogResult result = openFileDialog.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                using (System.IO.StreamReader reader = new System.IO.StreamReader(openFileDialog.FileName))
+                {
+                    textEditorControl1.Text = reader.ReadToEnd();
+                    reader.Close();
+                }
+
+                textBoxLogs.AppendText("Código carregado a partir de : " + openFileDialog.FileName + Environment.NewLine);
+            }
+            else
+            {
+                textBoxLogs.AppendText("Não foi possível carregar, o usuário cancelou a ação." + Environment.NewLine);
+            }
+        }
+
+        private void ButtonLoadCode_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Gostaria de salvar o código atual antes?", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1);
+            if (result == DialogResult.Yes)
+            {
+                if (SaveCode())
+                {
+                    LoadCode();
+                }
+            }
+            else if (result == DialogResult.No)
+            {
+                LoadCode();
+            }
+            else
+            {
+                textBoxLogs.AppendText("Não foi possível carregar, o usuário cancelou a ação." + Environment.NewLine);
+            }
+        }
+
+        private void CheckVerilator()
+        {
+            try
+            {
+                ProcessStartInfo processStartInfo = new ProcessStartInfo("verilator", "--version")
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false
+                };
+                Process p = Process.Start(processStartInfo);
+                if (p.WaitForExit(1000))
+                {
+                    textBoxLogs.AppendText("Olá, detectei que você configurou corretamente o verilator, posso estar errado, mas não fui configurado para refletir sobre." + Environment.NewLine);
+                    textBoxLogs.AppendText(Environment.NewLine + p.StandardOutput.ReadToEnd() + Environment.NewLine + Environment.NewLine);
+                }
+                else
+                {
+                    textBoxLogs.AppendText("O verilator demorou mais de 1s para executar, pode ter algo bem errado." + Environment.NewLine);
+                }
+                p.Close();
+            }
+            catch
+            {
+                textBoxLogs.AppendText("Você precisa configurar o verilator nas suas variáveis de ambiente." + Environment.NewLine);
+            }
+        }
+
+        private void ButtonBuildAndRun_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

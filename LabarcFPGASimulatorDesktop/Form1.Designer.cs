@@ -57,7 +57,10 @@
             this.pictureBoxSegment1 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.buttonDefault = new System.Windows.Forms.Button();
+            this.buttonReset = new System.Windows.Forms.Button();
+            this.buttonLoadCode = new System.Windows.Forms.Button();
+            this.textBoxLogs = new System.Windows.Forms.TextBox();
+            this.buttonBuildAndRun = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi1)).BeginInit();
@@ -89,14 +92,17 @@
             // 
             // textEditorControl1
             // 
+            this.textEditorControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textEditorControl1.IsReadOnly = false;
             this.textEditorControl1.Location = new System.Drawing.Point(660, 12);
             this.textEditorControl1.Name = "textEditorControl1";
-            this.textEditorControl1.Size = new System.Drawing.Size(497, 585);
+            this.textEditorControl1.Size = new System.Drawing.Size(497, 748);
             this.textEditorControl1.TabIndex = 29;
             this.textEditorControl1.Text = "module Main(\r\n  input logic [7:0] SWI,\r\n  output logic [7:0] LED,\r\n  output logic" +
-    " [7:0]\r\n SEG\r\n);\r\n\r\n// Seu código aqui:\r\n\r\nendmodule";
-            this.textEditorControl1.Load += new System.EventHandler(this.textEditorControl1_Load);
+    " [7:0] SEG\r\n);\r\n\r\n// Seu código aqui:\r\n\r\nendmodule";
+            this.textEditorControl1.Load += new System.EventHandler(this.TextEditorControl1_Load);
             // 
             // pictureBox3
             // 
@@ -418,23 +424,63 @@
             this.pictureBox1.TabIndex = 12;
             this.pictureBox1.TabStop = false;
             // 
-            // buttonDefault
+            // buttonReset
             // 
-            this.buttonDefault.Location = new System.Drawing.Point(660, 603);
-            this.buttonDefault.Name = "buttonDefault";
-            this.buttonDefault.Size = new System.Drawing.Size(75, 30);
-            this.buttonDefault.TabIndex = 30;
-            this.buttonDefault.Text = "Resetar";
-            this.buttonDefault.UseVisualStyleBackColor = true;
-            this.buttonDefault.Click += new System.EventHandler(this.buttonDefault_Click);
+            this.buttonReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonReset.Location = new System.Drawing.Point(664, 766);
+            this.buttonReset.Name = "buttonReset";
+            this.buttonReset.Size = new System.Drawing.Size(75, 30);
+            this.buttonReset.TabIndex = 30;
+            this.buttonReset.Text = "Resetar";
+            this.buttonReset.UseVisualStyleBackColor = true;
+            this.buttonReset.Click += new System.EventHandler(this.ButtonReset_Click);
+            // 
+            // buttonLoadCode
+            // 
+            this.buttonLoadCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonLoadCode.Location = new System.Drawing.Point(745, 766);
+            this.buttonLoadCode.Name = "buttonLoadCode";
+            this.buttonLoadCode.Size = new System.Drawing.Size(75, 30);
+            this.buttonLoadCode.TabIndex = 31;
+            this.buttonLoadCode.Text = "Carregar";
+            this.buttonLoadCode.UseVisualStyleBackColor = true;
+            this.buttonLoadCode.Click += new System.EventHandler(this.ButtonLoadCode_Click);
+            // 
+            // textBoxLogs
+            // 
+            this.textBoxLogs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.textBoxLogs.BackColor = System.Drawing.SystemColors.WindowText;
+            this.textBoxLogs.Font = new System.Drawing.Font("Consolas", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxLogs.ForeColor = System.Drawing.SystemColors.Window;
+            this.textBoxLogs.Location = new System.Drawing.Point(0, 664);
+            this.textBoxLogs.Multiline = true;
+            this.textBoxLogs.Name = "textBoxLogs";
+            this.textBoxLogs.ReadOnly = true;
+            this.textBoxLogs.Size = new System.Drawing.Size(658, 132);
+            this.textBoxLogs.TabIndex = 32;
+            // 
+            // buttonBuildAndRun
+            // 
+            this.buttonBuildAndRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonBuildAndRun.AutoSize = true;
+            this.buttonBuildAndRun.Location = new System.Drawing.Point(1050, 766);
+            this.buttonBuildAndRun.Name = "buttonBuildAndRun";
+            this.buttonBuildAndRun.Size = new System.Drawing.Size(107, 30);
+            this.buttonBuildAndRun.TabIndex = 33;
+            this.buttonBuildAndRun.Text = "Build and Run";
+            this.buttonBuildAndRun.UseVisualStyleBackColor = true;
+            this.buttonBuildAndRun.Click += new System.EventHandler(this.ButtonBuildAndRun_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1169, 808);
-            this.Controls.Add(this.buttonDefault);
+            this.Controls.Add(this.buttonBuildAndRun);
+            this.Controls.Add(this.textBoxLogs);
+            this.Controls.Add(this.buttonLoadCode);
+            this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.textEditorControl1);
             this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.pictureBoxSwi0);
@@ -528,7 +574,10 @@
         private System.Windows.Forms.PictureBox pictureBoxSwi2;
         private System.Windows.Forms.PictureBox pictureBoxSwi3;
         private ICSharpCode.TextEditor.TextEditorControl textEditorControl1;
-        private System.Windows.Forms.Button buttonDefault;
+        private System.Windows.Forms.Button buttonReset;
+        private System.Windows.Forms.Button buttonLoadCode;
+        private System.Windows.Forms.TextBox textBoxLogs;
+        private System.Windows.Forms.Button buttonBuildAndRun;
     }
 }
 
