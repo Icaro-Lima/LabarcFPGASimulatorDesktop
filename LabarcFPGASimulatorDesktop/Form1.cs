@@ -17,6 +17,9 @@ namespace LabarcFPGASimulatorDesktop
         private PictureBox[] LED;
         private PictureBox[] SEG;
 
+        private string defaultVerilogTemplate;
+        private SaveFileDialog saveFileDialog;
+
         public Form1()
         {
             InitializeComponent();
@@ -59,6 +62,9 @@ namespace LabarcFPGASimulatorDesktop
             };
             Array.ForEach(SEG, element => SegmentInit(element));
             Array.Sort(SEG, (a, b) => a.Name.CompareTo(b.Name));
+
+            defaultVerilogTemplate = textEditorControl1.Text;
+            saveFileDialog = new SaveFileDialog();
         }
 
         private void SwiInit(PictureBox pictureBoxSwi)
@@ -122,6 +128,29 @@ namespace LabarcFPGASimulatorDesktop
             FileSyntaxModeProvider fileSyntaxModeProvider = new FileSyntaxModeProvider(Application.StartupPath);
             HighlightingManager.Manager.AddSyntaxModeFileProvider(fileSyntaxModeProvider);
             textEditorControl1.SetHighlighting("Verilog");
+        }
+
+        private void buttonDefault_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Deseja salvar antes?", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1);
+            if (result == DialogResult.Yes)
+            {
+                saveFileDialog.Filter = "SystemVerilog|*.sv|Verilog|*.v||*.*";
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    using (System.IO.StreamWriter writer = new System.IO.StreamWriter(saveFileDialog.FileName, false))
+                    {
+                        writer.WriteLine(textEditorControl1.Text);
+                        writer.Close();
+                    }
+
+                    textEditorControl1.Text = defaultVerilogTemplate;
+                }
+            }
+            else if (result == DialogResult.No)
+            {
+                textEditorControl1.Text = defaultVerilogTemplate;
+            }
         }
     }
 }

@@ -29,6 +29,8 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            this.textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSwi0 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSwi1 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSwi2 = new System.Windows.Forms.PictureBox();
@@ -53,10 +55,10 @@
             this.pictureBoxSegment4 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSegment2 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSegment1 = new System.Windows.Forms.PictureBox();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
+            this.buttonDefault = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi2)).BeginInit();
@@ -81,10 +83,31 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment1)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
+            // 
+            // textEditorControl1
+            // 
+            this.textEditorControl1.IsReadOnly = false;
+            this.textEditorControl1.Location = new System.Drawing.Point(660, 12);
+            this.textEditorControl1.Name = "textEditorControl1";
+            this.textEditorControl1.Size = new System.Drawing.Size(497, 585);
+            this.textEditorControl1.TabIndex = 29;
+            this.textEditorControl1.Text = "module Main(\r\n  input logic [7:0] SWI,\r\n  output logic [7:0] LED,\r\n  output logic" +
+    " [7:0]\r\n SEG\r\n);\r\n\r\n// Seu código aqui:\r\n\r\nendmodule";
+            this.textEditorControl1.Load += new System.EventHandler(this.textEditorControl1_Load);
+            // 
+            // pictureBox3
+            // 
+            this.pictureBox3.BackColor = System.Drawing.SystemColors.Control;
+            this.pictureBox3.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.segments;
+            this.pictureBox3.Location = new System.Drawing.Point(263, 12);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(128, 192);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox3.TabIndex = 3;
+            this.pictureBox3.TabStop = false;
             // 
             // pictureBoxSwi0
             // 
@@ -374,17 +397,6 @@
             this.pictureBoxSegment1.TabStop = false;
             this.pictureBoxSegment1.Tag = "v";
             // 
-            // pictureBox3
-            // 
-            this.pictureBox3.BackColor = System.Drawing.SystemColors.Control;
-            this.pictureBox3.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.segments;
-            this.pictureBox3.Location = new System.Drawing.Point(263, 12);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(128, 192);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox3.TabIndex = 3;
-            this.pictureBox3.TabStop = false;
-            // 
             // pictureBox2
             // 
             this.pictureBox2.BackColor = System.Drawing.SystemColors.Control;
@@ -406,15 +418,15 @@
             this.pictureBox1.TabIndex = 12;
             this.pictureBox1.TabStop = false;
             // 
-            // textEditorControl1
+            // buttonDefault
             // 
-            this.textEditorControl1.IsReadOnly = false;
-            this.textEditorControl1.Location = new System.Drawing.Point(660, 12);
-            this.textEditorControl1.Name = "textEditorControl1";
-            this.textEditorControl1.Size = new System.Drawing.Size(497, 646);
-            this.textEditorControl1.TabIndex = 29;
-            this.textEditorControl1.Text = "textEditorControl1";
-            this.textEditorControl1.Load += new System.EventHandler(this.textEditorControl1_Load);
+            this.buttonDefault.Location = new System.Drawing.Point(660, 603);
+            this.buttonDefault.Name = "buttonDefault";
+            this.buttonDefault.Size = new System.Drawing.Size(75, 30);
+            this.buttonDefault.TabIndex = 30;
+            this.buttonDefault.Text = "Resetar";
+            this.buttonDefault.UseVisualStyleBackColor = true;
+            this.buttonDefault.Click += new System.EventHandler(this.buttonDefault_Click);
             // 
             // Form1
             // 
@@ -422,6 +434,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.ClientSize = new System.Drawing.Size(1169, 808);
+            this.Controls.Add(this.buttonDefault);
             this.Controls.Add(this.textEditorControl1);
             this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.pictureBoxSwi0);
@@ -453,6 +466,7 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi2)).EndInit();
@@ -477,7 +491,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment1)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
@@ -515,6 +528,7 @@
         private System.Windows.Forms.PictureBox pictureBoxSwi2;
         private System.Windows.Forms.PictureBox pictureBoxSwi3;
         private ICSharpCode.TextEditor.TextEditorControl textEditorControl1;
+        private System.Windows.Forms.Button buttonDefault;
     }
 }
 
