@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ICSharpCode.TextEditor.Document;
 
 namespace LabarcFPGASimulatorDesktop
 {
@@ -114,6 +115,13 @@ namespace LabarcFPGASimulatorDesktop
                 actual.Image = Properties.Resources.slideswitchOn;
             }
             actual.Tag = !(bool)actual.Tag;
+        }
+
+        private void textEditorControl1_Load(object sender, EventArgs e)
+        {
+            FileSyntaxModeProvider fileSyntaxModeProvider = new FileSyntaxModeProvider(Application.StartupPath);
+            HighlightingManager.Manager.AddSyntaxModeFileProvider(fileSyntaxModeProvider);
+            textEditorControl1.SetHighlighting("Verilog");
         }
     }
 }

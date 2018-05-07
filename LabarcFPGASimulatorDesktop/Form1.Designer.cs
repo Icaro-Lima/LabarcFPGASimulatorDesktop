@@ -56,6 +56,7 @@
             this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi2)).BeginInit();
@@ -87,6 +88,7 @@
             // 
             // pictureBoxSwi0
             // 
+            this.pictureBoxSwi0.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi0.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi0.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
             this.pictureBoxSwi0.Location = new System.Drawing.Point(600, 64);
@@ -100,6 +102,7 @@
             // 
             // pictureBoxSwi1
             // 
+            this.pictureBoxSwi1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi1.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
             this.pictureBoxSwi1.Location = new System.Drawing.Point(536, 64);
@@ -113,6 +116,7 @@
             // 
             // pictureBoxSwi2
             // 
+            this.pictureBoxSwi2.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi2.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi2.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
             this.pictureBoxSwi2.Location = new System.Drawing.Point(472, 64);
@@ -126,6 +130,7 @@
             // 
             // pictureBoxSwi3
             // 
+            this.pictureBoxSwi3.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi3.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi3.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
             this.pictureBoxSwi3.Location = new System.Drawing.Point(408, 64);
@@ -139,6 +144,7 @@
             // 
             // pictureBoxSwi4
             // 
+            this.pictureBoxSwi4.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi4.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi4.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
             this.pictureBoxSwi4.Location = new System.Drawing.Point(216, 64);
@@ -152,6 +158,7 @@
             // 
             // pictureBoxSwi5
             // 
+            this.pictureBoxSwi5.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi5.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi5.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
             this.pictureBoxSwi5.Location = new System.Drawing.Point(152, 64);
@@ -165,6 +172,7 @@
             // 
             // pictureBoxSwi6
             // 
+            this.pictureBoxSwi6.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi6.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi6.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
             this.pictureBoxSwi6.Location = new System.Drawing.Point(88, 64);
@@ -178,6 +186,7 @@
             // 
             // pictureBoxSwi7
             // 
+            this.pictureBoxSwi7.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi7.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi7.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
             this.pictureBoxSwi7.Location = new System.Drawing.Point(24, 64);
@@ -271,6 +280,7 @@
             // 
             // pictureBoxSegment7
             // 
+            this.pictureBoxSegment7.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment7.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.segmentPointOn;
             this.pictureBoxSegment7.Location = new System.Drawing.Point(361, 155);
             this.pictureBoxSegment7.Name = "pictureBoxSegment7";
@@ -282,6 +292,7 @@
             // 
             // pictureBoxSegment5
             // 
+            this.pictureBoxSegment5.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment5.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment5.Image")));
             this.pictureBoxSegment5.Location = new System.Drawing.Point(287, 54);
             this.pictureBoxSegment5.Name = "pictureBoxSegment5";
@@ -293,6 +304,7 @@
             // 
             // pictureBoxSegment3
             // 
+            this.pictureBoxSegment3.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment3.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment3.Image")));
             this.pictureBoxSegment3.Location = new System.Drawing.Point(296, 156);
             this.pictureBoxSegment3.Name = "pictureBoxSegment3";
@@ -304,6 +316,7 @@
             // 
             // pictureBoxSegment6
             // 
+            this.pictureBoxSegment6.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment6.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment6.Image")));
             this.pictureBoxSegment6.Location = new System.Drawing.Point(296, 101);
             this.pictureBoxSegment6.Name = "pictureBoxSegment6";
@@ -327,6 +340,7 @@
             // 
             // pictureBoxSegment4
             // 
+            this.pictureBoxSegment4.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment4.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment4.Image")));
             this.pictureBoxSegment4.Location = new System.Drawing.Point(287, 109);
             this.pictureBoxSegment4.Name = "pictureBoxSegment4";
@@ -338,6 +352,7 @@
             // 
             // pictureBoxSegment2
             // 
+            this.pictureBoxSegment2.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment2.Image")));
             this.pictureBoxSegment2.Location = new System.Drawing.Point(344, 109);
             this.pictureBoxSegment2.Name = "pictureBoxSegment2";
@@ -349,6 +364,7 @@
             // 
             // pictureBoxSegment1
             // 
+            this.pictureBoxSegment1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment1.Image")));
             this.pictureBoxSegment1.Location = new System.Drawing.Point(344, 54);
             this.pictureBoxSegment1.Name = "pictureBoxSegment1";
@@ -360,7 +376,7 @@
             // 
             // pictureBox3
             // 
-            this.pictureBox3.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBox3.BackColor = System.Drawing.SystemColors.Control;
             this.pictureBox3.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.segments;
             this.pictureBox3.Location = new System.Drawing.Point(263, 12);
             this.pictureBox3.Name = "pictureBox3";
@@ -371,7 +387,7 @@
             // 
             // pictureBox2
             // 
-            this.pictureBox2.BackColor = System.Drawing.Color.Transparent;
+            this.pictureBox2.BackColor = System.Drawing.SystemColors.Control;
             this.pictureBox2.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.board_background;
             this.pictureBox2.Location = new System.Drawing.Point(8, 8);
             this.pictureBox2.Name = "pictureBox2";
@@ -384,19 +400,30 @@
             // 
             this.pictureBox1.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.fpga_background;
             this.pictureBox1.Location = new System.Drawing.Point(-4, 0);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(0);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(658, 658);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.pictureBox1.TabIndex = 12;
             this.pictureBox1.TabStop = false;
             // 
+            // textEditorControl1
+            // 
+            this.textEditorControl1.IsReadOnly = false;
+            this.textEditorControl1.Location = new System.Drawing.Point(660, 12);
+            this.textEditorControl1.Name = "textEditorControl1";
+            this.textEditorControl1.Size = new System.Drawing.Size(497, 646);
+            this.textEditorControl1.TabIndex = 29;
+            this.textEditorControl1.Text = "textEditorControl1";
+            this.textEditorControl1.Load += new System.EventHandler(this.textEditorControl1_Load);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(654, 573);
+            this.ClientSize = new System.Drawing.Size(1169, 808);
+            this.Controls.Add(this.textEditorControl1);
+            this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.pictureBoxSwi0);
             this.Controls.Add(this.pictureBoxSwi1);
             this.Controls.Add(this.pictureBoxSwi2);
@@ -421,13 +448,11 @@
             this.Controls.Add(this.pictureBoxSegment4);
             this.Controls.Add(this.pictureBoxSegment2);
             this.Controls.Add(this.pictureBoxSegment1);
-            this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.pictureBox1);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
-            this.TransparencyKey = System.Drawing.Color.White;
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi2)).EndInit();
@@ -489,6 +514,7 @@
         private System.Windows.Forms.PictureBox pictureBoxSwi1;
         private System.Windows.Forms.PictureBox pictureBoxSwi2;
         private System.Windows.Forms.PictureBox pictureBoxSwi3;
+        private ICSharpCode.TextEditor.TextEditorControl textEditorControl1;
     }
 }
 
