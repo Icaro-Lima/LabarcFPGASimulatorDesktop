@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{D4FE344D-6B01-471E-893B-074B915EF1F4}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>LabarcFPGASimulatorDesktop</RootNamespace>
+    <AssemblyName>LabarcFPGASimulatorDesktop</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.Designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\709770ca-7a73-40cd-ac29-95d71868883c.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\fcba52d2-1277-4d55-9e39-e2db011da6ed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bbd58a3c-a863-4e8b-a5df-eace40694b46.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\403e5b99-a659-4156-abd9-4ec8b9c03b92.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\17e731b2-71de-4c7d-a456-2e502452c196.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\1445d9e7-d109-46c7-a3f5-d939c1fe8e60.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bba72870-9949-4c36-9259-0d56aca23a1c.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\c129ab0b-475e-410b-9301-0befbb5b1a8d.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\cfe82701-c985-46dd-827c-990bf36f884e.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\3bfcb259-7b1c-4ea1-9758-1f363f82d72b.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\74404c8d-cc69-4648-a130-c95ab279af59.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bdbe5625-fa4b-4b3e-82cd-c9673667da52.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\0035ffc7-2479-49a1-9c7a-190fe34d5445.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
