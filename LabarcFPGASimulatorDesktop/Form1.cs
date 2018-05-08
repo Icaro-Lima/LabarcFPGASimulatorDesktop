@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
+﻿using ICSharpCode.TextEditor.Document;
+using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using ICSharpCode.TextEditor.Document;
 
 namespace LabarcFPGASimulatorDesktop
 {
@@ -19,14 +12,23 @@ namespace LabarcFPGASimulatorDesktop
         private PictureBox[] LED;
         private PictureBox[] SEG;
 
+        /// <summary>
+        /// String que guarda o template padrão da caixa de texto usada para codificar, o valor inicial desta é definido pelo valor inicial da caixa de texto.
+        /// </summary>
         private string defaultVerilogTemplate;
         private SaveFileDialog saveFileDialog;
         private OpenFileDialog openFileDialog;
 
         private Process MainVerilogProcess;
 
+        /// <summary>
+        /// Apenas um enumerador de tipos de log de texto para ser utilizada na caixa de texto console.
+        /// </summary>
         private enum LogType { Normal = 0, GoodNews = 1, Warning = 2, Error = 3 };
 
+        /// <summary>
+        /// Apenas o sinal atual do clock.
+        /// </summary>
         private int clock;
 
         public Form1()
@@ -102,6 +104,12 @@ namespace LabarcFPGASimulatorDesktop
             pictureBoxSegment.Location = pos;
         }
 
+        /// <summary>
+        /// Escrever na caixa de texto console.
+        /// </summary>
+        /// <param name="text">O texto que deve ser escrito.</param>
+        /// <param name="type">O tipo de texto que deve ser escrito(varia a cor).</param>
+        /// <param name="endl">Deixe true para que uma quebra de linha seja adicionada automaticamente.</param>
         private void Log(string text, LogType type, bool endl = true)
         {
             Color color = Color.Purple;
@@ -137,6 +145,9 @@ namespace LabarcFPGASimulatorDesktop
             richTextBoxConsoleLog.ScrollToCaret();
         }
 
+        /// <summary>
+        /// Verifica com heurística se você tem o comando g++ funcionando corretamente.
+        /// </summary>
         private void CheckGPP()
         {
             try
@@ -151,7 +162,7 @@ namespace LabarcFPGASimulatorDesktop
                 Process p = Process.Start(processStartInfo);
                 if (p.WaitForExit(1000))
                 {
-                    Log("Comando g++ bem configurado. [Conjectura]", LogType.GoodNews);
+                    Log("Comando g++ bem configurado. [heurística]", LogType.GoodNews);
                 }
                 else
                 {
@@ -165,6 +176,9 @@ namespace LabarcFPGASimulatorDesktop
             }
         }
 
+        /// <summary>
+        /// Verifica com heurística se tem o comando verilator funcionando corretamente.
+        /// </summary>
         private void CheckVerilator()
         {
             try
@@ -179,7 +193,7 @@ namespace LabarcFPGASimulatorDesktop
                 Process p = Process.Start(processStartInfo);
                 if (p.WaitForExit(1000))
                 {
-                    Log("Verilator bem configurado. [Conjectura]", LogType.GoodNews);
+                    Log("Verilator bem configurado. [heurística]", LogType.GoodNews);
                 }
                 else
                 {
@@ -193,11 +207,21 @@ namespace LabarcFPGASimulatorDesktop
             }
         }
 
+        /// <summary>
+        /// Seta o estado de um determinado led.
+        /// </summary>
+        /// <param name="led">O index do led [0, 7].</param>
+        /// <param name="state">O estado que o led deve assumir, true ou false.</param>
         private void SetLEDState(int led, bool state)
         {
             LED[led].Image = state ? Properties.Resources.ledOn : Properties.Resources.ledOff;
         }
 
+        /// <summary>
+        /// Seta o estado de um determinado segmento do display de 7 segmentos.
+        /// </summary>
+        /// <param name="seg">O index do segmento [0, 7].</param>
+        /// <param name="state">O estado que o segmento deve assumir, true ou false.</param>
         private void SetSEGState(int seg, bool state)
         {
             if ((string)(SEG[seg].Tag) == "h")
@@ -214,6 +238,9 @@ namespace LabarcFPGASimulatorDesktop
             }
         }
 
+        /// <summary>
+        /// Método executado ao clicar em qualquer um dos switchs.
+        /// </summary>
         private void SwitchClick_Click(object sender, EventArgs e)
         {
             PictureBox actual = (PictureBox)sender;
@@ -233,7 +260,10 @@ namespace LabarcFPGASimulatorDesktop
             SendStatesToVerilog();
         }
 
-        private void TextEditorControl1_Load(object sender, EventArgs e)
+        /// <summary>
+        /// Método que configura a caixa de texto para editar código.
+        /// </summary>
+        private void TextEditorControl_Load(object sender, EventArgs e)
         {
             FileSyntaxModeProvider fileSyntaxModeProvider = new FileSyntaxModeProvider(Application.StartupPath);
             HighlightingManager.Manager.AddSyntaxModeFileProvider(fileSyntaxModeProvider);
@@ -262,7 +292,10 @@ namespace LabarcFPGASimulatorDesktop
             Log("Não foi possível salvar, o usuário cancelou a ação.", LogType.Warning);
             return false;
         }
-
+        
+        /// <summary>
+        /// Reseta o texto da caixa de texto do código para o padrão.
+        /// </summary>
         private void ButtonReset_Click(object sender, EventArgs e)
         {
             DialogResult result = MessageBox.Show("Deseja salvar antes?", "", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1);
@@ -287,6 +320,9 @@ namespace LabarcFPGASimulatorDesktop
             }
         }
 
+        /// <summary>
+        /// Carrega um novo código para a caixa de texto do código. Não pergunta se quer salvar.
+        /// </summary>
         private void LoadCode()
         {
             openFileDialog.Filter = "SystemVerilog|*sv|Verilog|*v||*.*";
@@ -328,6 +364,9 @@ namespace LabarcFPGASimulatorDesktop
             }
         }
 
+        /// <summary>
+        /// Método que constroi os arquivos necessários para rodar o código Verilog e executa o mesmo.
+        /// </summary>
         private void ButtonBuildAndRun_Click(object sender, EventArgs e)
         {
             try
@@ -375,15 +414,6 @@ namespace LabarcFPGASimulatorDesktop
                     return;
                 }
                 Log("A compilação do Main.sv foi um sucesso!", LogType.GoodNews);
-
-                /*Process[] mainProcesses = Process.GetProcessesByName("Main");
-                for (int i = 0; i < mainProcesses.Length; i++)
-                {
-                    if (System.IO.Path.GetDirectoryName(mainProcesses[i].MainModule.FileName) == Application.StartupPath)
-                    {
-                        mainProcesses[i].Kill();
-                    }
-                }*/
 
                 if (System.IO.File.Exists("Main.exe"))
                 {
@@ -443,6 +473,9 @@ namespace LabarcFPGASimulatorDesktop
             }
         }
 
+        /// <summary>
+        /// Método chamado sempre que o processo do Verilog tem saída disponível.
+        /// </summary>
         private void MainVerilogProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             for (int i = 0; i < 8; i++)
@@ -455,12 +488,18 @@ namespace LabarcFPGASimulatorDesktop
             }
         }
 
+        /// <summary>
+        /// Método chamado para alterar o valor do clock, ele pode ser chamado dependendo da velocidade do clock.
+        /// </summary>
         private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
             clock = clock == 1 ? 0 : 1;
             SendStatesToVerilog();
         }
 
+        /// <summary>
+        /// Caso tenha um processo do Verilog, envia os estados atuais dos switchs e do clock.
+        /// </summary>
         private void SendStatesToVerilog()
         {
             if (MainVerilogProcess == null)
@@ -476,6 +515,11 @@ namespace LabarcFPGASimulatorDesktop
             MainVerilogProcess.StandardInput.WriteLine(con + clock);
         }
 
+        /// <summary>
+        /// Método chamado quando o programa fecha, este é responsável por lembrar de fechar um suposto processo Main que ainda esteja rodando.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             if (MainVerilogProcess != null)

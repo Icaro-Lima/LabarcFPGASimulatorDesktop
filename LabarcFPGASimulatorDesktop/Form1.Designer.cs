@@ -102,7 +102,7 @@
             this.textEditorControl1.TabIndex = 29;
             this.textEditorControl1.Text = "module Main(\r\n  input logic [7:0] SWI,\r\n  input logic CLOCK,\r\n  output logic [7:0" +
     "] LED,\r\n  output logic [7:0] SEG\r\n);\r\n\r\n// Seu código aqui:\r\n\r\nendmodule";
-            this.textEditorControl1.Load += new System.EventHandler(this.TextEditorControl1_Load);
+            this.textEditorControl1.Load += new System.EventHandler(this.TextEditorControl_Load);
             // 
             // pictureBox3
             // 
