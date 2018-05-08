@@ -79,7 +79,7 @@ namespace LabarcFPGASimulatorDesktop
             CheckGPP();
             CheckVerilator();
 
-            System.Timers.Timer timer = new System.Timers.Timer(1000);
+            System.Timers.Timer timer = new System.Timers.Timer(500);
             timer.Elapsed += Timer_Elapsed;
             timer.Start();
         }
