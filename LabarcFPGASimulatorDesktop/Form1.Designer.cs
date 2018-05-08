@@ -59,8 +59,8 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.buttonReset = new System.Windows.Forms.Button();
             this.buttonLoadCode = new System.Windows.Forms.Button();
-            this.textBoxLogs = new System.Windows.Forms.TextBox();
             this.buttonBuildAndRun = new System.Windows.Forms.Button();
+            this.richTextBoxConsoleLog = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi1)).BeginInit();
@@ -100,8 +100,8 @@
             this.textEditorControl1.Name = "textEditorControl1";
             this.textEditorControl1.Size = new System.Drawing.Size(497, 748);
             this.textEditorControl1.TabIndex = 29;
-            this.textEditorControl1.Text = "module Main(\r\n  input logic [7:0] SWI,\r\n  output logic [7:0] LED,\r\n  output logic" +
-    " [7:0] SEG\r\n);\r\n\r\n// Seu código aqui:\r\n\r\nendmodule";
+            this.textEditorControl1.Text = "module Main(\r\n  input logic [7:0] SWI,\r\n  input logic CLOCK,\r\n  output logic [7:0" +
+    "] LED,\r\n  output logic [7:0] SEG\r\n);\r\n\r\n// Seu código aqui:\r\n\r\nendmodule";
             this.textEditorControl1.Load += new System.EventHandler(this.TextEditorControl1_Load);
             // 
             // pictureBox3
@@ -446,20 +446,6 @@
             this.buttonLoadCode.UseVisualStyleBackColor = true;
             this.buttonLoadCode.Click += new System.EventHandler(this.ButtonLoadCode_Click);
             // 
-            // textBoxLogs
-            // 
-            this.textBoxLogs.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.textBoxLogs.BackColor = System.Drawing.SystemColors.WindowText;
-            this.textBoxLogs.Font = new System.Drawing.Font("Consolas", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxLogs.ForeColor = System.Drawing.SystemColors.Window;
-            this.textBoxLogs.Location = new System.Drawing.Point(0, 664);
-            this.textBoxLogs.Multiline = true;
-            this.textBoxLogs.Name = "textBoxLogs";
-            this.textBoxLogs.ReadOnly = true;
-            this.textBoxLogs.Size = new System.Drawing.Size(658, 132);
-            this.textBoxLogs.TabIndex = 32;
-            // 
             // buttonBuildAndRun
             // 
             this.buttonBuildAndRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -472,13 +458,27 @@
             this.buttonBuildAndRun.UseVisualStyleBackColor = true;
             this.buttonBuildAndRun.Click += new System.EventHandler(this.ButtonBuildAndRun_Click);
             // 
+            // richTextBoxConsoleLog
+            // 
+            this.richTextBoxConsoleLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.richTextBoxConsoleLog.BackColor = System.Drawing.Color.Black;
+            this.richTextBoxConsoleLog.Font = new System.Drawing.Font("Consolas", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.richTextBoxConsoleLog.ForeColor = System.Drawing.Color.White;
+            this.richTextBoxConsoleLog.Location = new System.Drawing.Point(0, 664);
+            this.richTextBoxConsoleLog.Name = "richTextBoxConsoleLog";
+            this.richTextBoxConsoleLog.ReadOnly = true;
+            this.richTextBoxConsoleLog.Size = new System.Drawing.Size(654, 132);
+            this.richTextBoxConsoleLog.TabIndex = 34;
+            this.richTextBoxConsoleLog.Text = "";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1169, 808);
+            this.Controls.Add(this.richTextBoxConsoleLog);
             this.Controls.Add(this.buttonBuildAndRun);
-            this.Controls.Add(this.textBoxLogs);
             this.Controls.Add(this.buttonLoadCode);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.textEditorControl1);
@@ -512,6 +512,7 @@
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Form1";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi1)).EndInit();
@@ -576,8 +577,8 @@
         private ICSharpCode.TextEditor.TextEditorControl textEditorControl1;
         private System.Windows.Forms.Button buttonReset;
         private System.Windows.Forms.Button buttonLoadCode;
-        private System.Windows.Forms.TextBox textBoxLogs;
         private System.Windows.Forms.Button buttonBuildAndRun;
+        private System.Windows.Forms.RichTextBox richTextBoxConsoleLog;
     }
 }
 

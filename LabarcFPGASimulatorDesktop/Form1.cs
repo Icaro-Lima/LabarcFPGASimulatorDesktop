@@ -5,6 +5,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,6 +22,12 @@ namespace LabarcFPGASimulatorDesktop
         private string defaultVerilogTemplate;
         private SaveFileDialog saveFileDialog;
         private OpenFileDialog openFileDialog;
+
+        private Process MainVerilogProcess;
+
+        private enum LogType { Normal = 0, GoodNews = 1, Warning = 2, Error = 3 };
+
+        private int clock;
 
         public Form1()
         {
@@ -69,7 +76,12 @@ namespace LabarcFPGASimulatorDesktop
             saveFileDialog = new SaveFileDialog();
             openFileDialog = new OpenFileDialog();
 
+            CheckGPP();
             CheckVerilator();
+
+            System.Timers.Timer timer = new System.Timers.Timer(1000);
+            timer.Elapsed += Timer_Elapsed;
+            timer.Start();
         }
 
         private void SwiInit(PictureBox pictureBoxSwi)
@@ -88,6 +100,97 @@ namespace LabarcFPGASimulatorDesktop
             pos = pictureBox3.PointToClient(pos);
             pictureBoxSegment.Parent = pictureBox3;
             pictureBoxSegment.Location = pos;
+        }
+
+        private void Log(string text, LogType type, bool endl = true)
+        {
+            Color color = Color.Purple;
+
+            switch ((int)type)
+            {
+                case 0:
+                    color = Color.White;
+                    break;
+                case 1:
+                    color = Color.Green;
+                    break;
+                case 2:
+                    color = Color.Yellow;
+                    break;
+                case 3:
+                    color = Color.Red;
+                    break;
+            }
+
+            if (endl)
+            {
+                text += Environment.NewLine;
+            }
+
+            richTextBoxConsoleLog.SelectionStart = richTextBoxConsoleLog.TextLength;
+            richTextBoxConsoleLog.SelectionLength = 0;
+
+            richTextBoxConsoleLog.SelectionColor = color;
+            richTextBoxConsoleLog.AppendText(text);
+            richTextBoxConsoleLog.SelectionColor = richTextBoxConsoleLog.ForeColor;
+
+            richTextBoxConsoleLog.ScrollToCaret();
+        }
+
+        private void CheckGPP()
+        {
+            try
+            {
+                ProcessStartInfo processStartInfo = new ProcessStartInfo("g++", "--version")
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false
+                };
+                Process p = Process.Start(processStartInfo);
+                if (p.WaitForExit(1000))
+                {
+                    Log("Comando g++ bem configurado. [Conjectura]", LogType.GoodNews);
+                }
+                else
+                {
+                    Log("O comando g++ demorou mais de 1s para executar, pode ter algo bem errado.", LogType.Error);
+                }
+                p.Close();
+            }
+            catch
+            {
+                Log("Você precisa configurar o g++ nas suas variáveis de ambiente.", LogType.Error);
+            }
+        }
+
+        private void CheckVerilator()
+        {
+            try
+            {
+                ProcessStartInfo processStartInfo = new ProcessStartInfo("verilator", "--version")
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false
+                };
+                Process p = Process.Start(processStartInfo);
+                if (p.WaitForExit(1000))
+                {
+                    Log("Verilator bem configurado. [Conjectura]", LogType.GoodNews);
+                }
+                else
+                {
+                    Log("O verilator demorou mais de 1s para executar, pode ter algo bem errado.", LogType.Error);
+                }
+                p.Close();
+            }
+            catch
+            {
+                Log("Você precisa configurar o verilator nas suas variáveis de ambiente.", LogType.Error);
+            }
         }
 
         private void SetLEDState(int led, bool state)
@@ -126,6 +229,8 @@ namespace LabarcFPGASimulatorDesktop
                 actual.Image = Properties.Resources.slideswitchOn;
             }
             actual.Tag = !(bool)actual.Tag;
+
+            SendStatesToVerilog();
         }
 
         private void TextEditorControl1_Load(object sender, EventArgs e)
@@ -150,11 +255,11 @@ namespace LabarcFPGASimulatorDesktop
                     writer.Close();
                 }
 
-                textBoxLogs.AppendText("Código salvo em: " + saveFileDialog.FileName + Environment.NewLine);
+                Log("Código salvo em: " + saveFileDialog.FileName, LogType.Normal);
                 return true;
             }
 
-            textBoxLogs.AppendText("Não foi possível salvar, o usuário cancelou a ação." + Environment.NewLine);
+            Log("Não foi possível salvar, o usuário cancelou a ação.", LogType.Warning);
             return false;
         }
 
@@ -166,17 +271,19 @@ namespace LabarcFPGASimulatorDesktop
                 if (SaveCode())
                 {
                     textEditorControl1.Text = defaultVerilogTemplate;
-                    textBoxLogs.AppendText("Código salvo e resetado para o padrão." + Environment.NewLine);
+
+                    Log("Código salvo e resetado para o padrão.", LogType.Normal);
                 }
             }
             else if (result == DialogResult.No)
             {
                 textEditorControl1.Text = defaultVerilogTemplate;
-                textBoxLogs.AppendText("Código resetado para o padrão sem salvar." + Environment.NewLine);
+
+                Log("Código resetado para o padrão sem salvar.", LogType.Warning);
             }
             else
             {
-                textBoxLogs.AppendText("Não foi possível resetar, o usuário cancelou a ação." + Environment.NewLine);
+                Log("Não foi possível resetar, o usuário cancelou a ação.", LogType.Warning);
             }
         }
 
@@ -193,11 +300,11 @@ namespace LabarcFPGASimulatorDesktop
                     reader.Close();
                 }
 
-                textBoxLogs.AppendText("Código carregado a partir de : " + openFileDialog.FileName + Environment.NewLine);
+                Log("Código carregado a partir de : " + openFileDialog.FileName, LogType.Normal);
             }
             else
             {
-                textBoxLogs.AppendText("Não foi possível carregar, o usuário cancelou a ação." + Environment.NewLine);
+                Log("Não foi possível carregar, o usuário cancelou a ação.", LogType.Warning);
             }
         }
 
@@ -217,42 +324,163 @@ namespace LabarcFPGASimulatorDesktop
             }
             else
             {
-                textBoxLogs.AppendText("Não foi possível carregar, o usuário cancelou a ação." + Environment.NewLine);
-            }
-        }
-
-        private void CheckVerilator()
-        {
-            try
-            {
-                ProcessStartInfo processStartInfo = new ProcessStartInfo("verilator", "--version")
-                {
-                    WindowStyle = ProcessWindowStyle.Hidden,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false
-                };
-                Process p = Process.Start(processStartInfo);
-                if (p.WaitForExit(1000))
-                {
-                    textBoxLogs.AppendText("Olá, detectei que você configurou corretamente o verilator, posso estar errado, mas não fui configurado para refletir sobre." + Environment.NewLine);
-                    textBoxLogs.AppendText(Environment.NewLine + p.StandardOutput.ReadToEnd() + Environment.NewLine + Environment.NewLine);
-                }
-                else
-                {
-                    textBoxLogs.AppendText("O verilator demorou mais de 1s para executar, pode ter algo bem errado." + Environment.NewLine);
-                }
-                p.Close();
-            }
-            catch
-            {
-                textBoxLogs.AppendText("Você precisa configurar o verilator nas suas variáveis de ambiente." + Environment.NewLine);
+                Log("Não foi possível carregar, o usuário cancelou a ação.", LogType.Warning);
             }
         }
 
         private void ButtonBuildAndRun_Click(object sender, EventArgs e)
         {
+            try
+            {
+                Log("Copiando o código para um arquivo temporário Main.sv...", LogType.Normal);
+                System.IO.File.WriteAllText("Main.sv", textEditorControl1.Text);
 
+                if (System.IO.Directory.Exists("obj_dir"))
+                {
+                    System.IO.Directory.Delete("obj_dir", true);
+                }
+
+                Log("Compilando Main.sv em cabeçalhos do C++...", LogType.Normal);
+                ProcessStartInfo verilatorProcessStartInfo = new ProcessStartInfo("verilator", "--cc Main.sv")
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false
+                };
+                Process verilatorProcess = Process.Start(verilatorProcessStartInfo);
+
+                if (!verilatorProcess.WaitForExit(10000))
+                {
+                    Log("Por algum motivo o verilator demorou muito(10000) para responder.", LogType.Error);
+                    return;
+                }
+
+                Log("Processo do verilator finalizado...", LogType.Normal);
+
+                if (!System.IO.Directory.Exists("obj_dir"))
+                {
+                    Log(verilatorProcess.StandardError.ReadToEnd(), LogType.Error);
+                    return;
+                }
+                Log("A compilação do Main.sv foi um sucesso!", LogType.GoodNews);
+
+                if (MainVerilogProcess != null)
+                {
+                    pictureBox2.Enabled = false;
+                    MainVerilogProcess.CancelOutputRead();
+                    MainVerilogProcess.Kill();
+                    MainVerilogProcess.Close();
+                    MainVerilogProcess = null;
+                }
+
+                /*Process[] mainProcesses = Process.GetProcessesByName("Main");
+                for (int i = 0; i < mainProcesses.Length; i++)
+                {
+                    if (System.IO.Path.GetDirectoryName(mainProcesses[i].MainModule.FileName) == Application.StartupPath)
+                    {
+                        mainProcesses[i].Kill();
+                    }
+                }*/
+
+                if (System.IO.File.Exists("Main.exe"))
+                {
+                    System.IO.File.Delete("Main.exe");
+                }
+
+                Log("Compilando Main.cpp", LogType.Normal);
+                ProcessStartInfo gppProcessStartInfo = new ProcessStartInfo("g++", "-I\"obj_dir\" -I\"include\" obj_dir\\VMain__Syms.cpp include\\verilated.cpp obj_dir\\VMain.cpp Main.cpp -o Main.exe")
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false
+                };
+                Process gppProcess = Process.Start(gppProcessStartInfo);
+
+                if (!gppProcess.WaitForExit(10000))
+                {
+                    Log("Por algum motivo o g++ demorou muito(10000) para responder.", LogType.Error);
+                    return;
+                }
+
+                if (!System.IO.File.Exists("Main.exe"))
+                {
+                    Log(gppProcess.StandardError.ReadToEnd(), LogType.Error);
+                    return;
+                }
+
+                Log("Compilação do Main.cpp concluida!", LogType.GoodNews);
+
+                ProcessStartInfo mainProcessStartInfo = new ProcessStartInfo("Main.exe")
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardInput = true,
+                    UseShellExecute = false
+                };
+                MainVerilogProcess = new Process
+                {
+                    StartInfo = mainProcessStartInfo
+                };
+                MainVerilogProcess.OutputDataReceived += MainVerilogProcess_OutputDataReceived;
+
+                MainVerilogProcess.Start();
+
+                MainVerilogProcess.BeginOutputReadLine();
+
+                SendStatesToVerilog();
+
+                pictureBox2.Enabled = true;
+            }
+            catch (Exception ex)
+            {
+                Log(ex.Message, LogType.Error);
+            }
+        }
+
+        private void MainVerilogProcess_OutputDataReceived(object sender, DataReceivedEventArgs e)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                SetLEDState(i, (e.Data[i] - 48) == 1 ? true : false);
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                SetSEGState(i, (e.Data[i + 8] - 48) == 1 ? true : false);
+            }
+        }
+
+        private void Timer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            clock = clock == 1 ? 0 : 1;
+            SendStatesToVerilog();
+        }
+
+        private void SendStatesToVerilog()
+        {
+            if (MainVerilogProcess == null)
+            {
+                return;
+            }
+
+            string con = "";
+            for (int i = 0; i < 8; i++)
+            {
+                con += (bool)(SWI[i].Tag) ? 1 : 0;
+            }
+            MainVerilogProcess.StandardInput.WriteLine(con + clock);
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            if (MainVerilogProcess != null)
+            {
+                MainVerilogProcess.Kill();
+            }
         }
     }
 }
