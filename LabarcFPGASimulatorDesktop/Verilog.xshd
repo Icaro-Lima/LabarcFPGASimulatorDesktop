@@ -58,7 +58,8 @@ https://github.com/ei
                                 
             <KeyWords name="Keywords1" color="Blue" bold="false">
                 <Key word="always"/>
-		<Key word="always_comb"/>
+		            <Key word="always_comb"/>
+                <Key word="always_ff" />
                 <Key word="and"/>
                 <Key word="assert"/>
                 <Key word="assign"/>

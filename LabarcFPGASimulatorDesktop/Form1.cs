@@ -332,6 +332,16 @@ namespace LabarcFPGASimulatorDesktop
         {
             try
             {
+                if (MainVerilogProcess != null)
+                {
+                    Log("Matando processo atual...", LogType.Normal);
+                    pictureBox2.Enabled = false;
+                    MainVerilogProcess.CancelOutputRead();
+                    MainVerilogProcess.Kill();
+                    MainVerilogProcess.Close();
+                    MainVerilogProcess = null;
+                }
+
                 Log("Copiando o código para um arquivo temporário Main.sv...", LogType.Normal);
                 System.IO.File.WriteAllText("Main.sv", textEditorControl1.Text);
 
@@ -365,15 +375,6 @@ namespace LabarcFPGASimulatorDesktop
                     return;
                 }
                 Log("A compilação do Main.sv foi um sucesso!", LogType.GoodNews);
-
-                if (MainVerilogProcess != null)
-                {
-                    pictureBox2.Enabled = false;
-                    MainVerilogProcess.CancelOutputRead();
-                    MainVerilogProcess.Kill();
-                    MainVerilogProcess.Close();
-                    MainVerilogProcess = null;
-                }
 
                 /*Process[] mainProcesses = Process.GetProcessesByName("Main");
                 for (int i = 0; i < mainProcesses.Length; i++)
