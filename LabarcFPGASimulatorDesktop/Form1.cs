@@ -260,6 +260,25 @@ namespace LabarcFPGASimulatorDesktop
             SendStatesToVerilog();
         }
 
+        private void PictureBoxSwi_MouseDown(object sender, MouseEventArgs e)
+        {
+            PictureBox actual = (PictureBox)sender;
+
+            int index = actual.Name[actual.Name.Length - 1] - 48;
+
+            if ((bool)actual.Tag)
+            {
+                actual.Image = Properties.Resources.slideswitchOff;
+            }
+            else
+            {
+                actual.Image = Properties.Resources.slideswitchOn;
+            }
+            actual.Tag = !(bool)actual.Tag;
+
+            SendStatesToVerilog();
+        }
+
         /// <summary>
         /// Método que configura a caixa de texto para editar código.
         /// </summary>

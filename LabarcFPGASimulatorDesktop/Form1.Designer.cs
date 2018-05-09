@@ -95,10 +95,12 @@
             this.textEditorControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textEditorControl1.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.textEditorControl1.Font = new System.Drawing.Font("Courier New", 10F);
             this.textEditorControl1.IsReadOnly = false;
-            this.textEditorControl1.Location = new System.Drawing.Point(660, 12);
+            this.textEditorControl1.Location = new System.Drawing.Point(664, 12);
             this.textEditorControl1.Name = "textEditorControl1";
-            this.textEditorControl1.Size = new System.Drawing.Size(497, 748);
+            this.textEditorControl1.Size = new System.Drawing.Size(493, 748);
             this.textEditorControl1.TabIndex = 29;
             this.textEditorControl1.Text = "module Main(\r\n  input logic [7:0] SWI,\r\n  input logic CLOCK,\r\n  output logic [7:0" +
     "] LED,\r\n  output logic [7:0] SEG\r\n);\r\n\r\n// Seu código aqui:\r\n\r\nendmodule";
@@ -108,7 +110,7 @@
             // 
             this.pictureBox3.BackColor = System.Drawing.SystemColors.Control;
             this.pictureBox3.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.segments;
-            this.pictureBox3.Location = new System.Drawing.Point(263, 12);
+            this.pictureBox3.Location = new System.Drawing.Point(265, 12);
             this.pictureBox3.Name = "pictureBox3";
             this.pictureBox3.Size = new System.Drawing.Size(128, 192);
             this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -120,112 +122,112 @@
             this.pictureBoxSwi0.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi0.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi0.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
-            this.pictureBoxSwi0.Location = new System.Drawing.Point(600, 64);
+            this.pictureBoxSwi0.Location = new System.Drawing.Point(593, 64);
             this.pictureBoxSwi0.Name = "pictureBoxSwi0";
-            this.pictureBoxSwi0.Size = new System.Drawing.Size(33, 96);
-            this.pictureBoxSwi0.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxSwi0.Size = new System.Drawing.Size(47, 96);
+            this.pictureBoxSwi0.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxSwi0.TabIndex = 28;
             this.pictureBoxSwi0.TabStop = false;
             this.pictureBoxSwi0.Tag = "";
-            this.pictureBoxSwi0.Click += new System.EventHandler(this.SwitchClick_Click);
+            this.pictureBoxSwi0.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxSwi_MouseDown);
             // 
             // pictureBoxSwi1
             // 
             this.pictureBoxSwi1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi1.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi1.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
-            this.pictureBoxSwi1.Location = new System.Drawing.Point(536, 64);
+            this.pictureBoxSwi1.Location = new System.Drawing.Point(529, 64);
             this.pictureBoxSwi1.Name = "pictureBoxSwi1";
-            this.pictureBoxSwi1.Size = new System.Drawing.Size(33, 96);
-            this.pictureBoxSwi1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxSwi1.Size = new System.Drawing.Size(47, 96);
+            this.pictureBoxSwi1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxSwi1.TabIndex = 27;
             this.pictureBoxSwi1.TabStop = false;
             this.pictureBoxSwi1.Tag = "";
-            this.pictureBoxSwi1.Click += new System.EventHandler(this.SwitchClick_Click);
+            this.pictureBoxSwi1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxSwi_MouseDown);
             // 
             // pictureBoxSwi2
             // 
             this.pictureBoxSwi2.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi2.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi2.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
-            this.pictureBoxSwi2.Location = new System.Drawing.Point(472, 64);
+            this.pictureBoxSwi2.Location = new System.Drawing.Point(465, 64);
             this.pictureBoxSwi2.Name = "pictureBoxSwi2";
-            this.pictureBoxSwi2.Size = new System.Drawing.Size(33, 96);
-            this.pictureBoxSwi2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxSwi2.Size = new System.Drawing.Size(47, 96);
+            this.pictureBoxSwi2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxSwi2.TabIndex = 26;
             this.pictureBoxSwi2.TabStop = false;
             this.pictureBoxSwi2.Tag = "";
-            this.pictureBoxSwi2.Click += new System.EventHandler(this.SwitchClick_Click);
+            this.pictureBoxSwi2.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxSwi_MouseDown);
             // 
             // pictureBoxSwi3
             // 
             this.pictureBoxSwi3.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi3.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi3.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
-            this.pictureBoxSwi3.Location = new System.Drawing.Point(408, 64);
+            this.pictureBoxSwi3.Location = new System.Drawing.Point(401, 64);
             this.pictureBoxSwi3.Name = "pictureBoxSwi3";
-            this.pictureBoxSwi3.Size = new System.Drawing.Size(33, 96);
-            this.pictureBoxSwi3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxSwi3.Size = new System.Drawing.Size(47, 96);
+            this.pictureBoxSwi3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxSwi3.TabIndex = 25;
             this.pictureBoxSwi3.TabStop = false;
             this.pictureBoxSwi3.Tag = "";
-            this.pictureBoxSwi3.Click += new System.EventHandler(this.SwitchClick_Click);
+            this.pictureBoxSwi3.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxSwi_MouseDown);
             // 
             // pictureBoxSwi4
             // 
             this.pictureBoxSwi4.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi4.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi4.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
-            this.pictureBoxSwi4.Location = new System.Drawing.Point(216, 64);
+            this.pictureBoxSwi4.Location = new System.Drawing.Point(209, 64);
             this.pictureBoxSwi4.Name = "pictureBoxSwi4";
-            this.pictureBoxSwi4.Size = new System.Drawing.Size(33, 96);
-            this.pictureBoxSwi4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxSwi4.Size = new System.Drawing.Size(47, 96);
+            this.pictureBoxSwi4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxSwi4.TabIndex = 24;
             this.pictureBoxSwi4.TabStop = false;
             this.pictureBoxSwi4.Tag = "";
-            this.pictureBoxSwi4.Click += new System.EventHandler(this.SwitchClick_Click);
+            this.pictureBoxSwi4.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxSwi_MouseDown);
             // 
             // pictureBoxSwi5
             // 
             this.pictureBoxSwi5.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi5.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi5.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
-            this.pictureBoxSwi5.Location = new System.Drawing.Point(152, 64);
+            this.pictureBoxSwi5.Location = new System.Drawing.Point(145, 64);
             this.pictureBoxSwi5.Name = "pictureBoxSwi5";
-            this.pictureBoxSwi5.Size = new System.Drawing.Size(33, 96);
-            this.pictureBoxSwi5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxSwi5.Size = new System.Drawing.Size(47, 96);
+            this.pictureBoxSwi5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxSwi5.TabIndex = 23;
             this.pictureBoxSwi5.TabStop = false;
             this.pictureBoxSwi5.Tag = "";
-            this.pictureBoxSwi5.Click += new System.EventHandler(this.SwitchClick_Click);
+            this.pictureBoxSwi5.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxSwi_MouseDown);
             // 
             // pictureBoxSwi6
             // 
             this.pictureBoxSwi6.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi6.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi6.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
-            this.pictureBoxSwi6.Location = new System.Drawing.Point(88, 64);
+            this.pictureBoxSwi6.Location = new System.Drawing.Point(81, 64);
             this.pictureBoxSwi6.Name = "pictureBoxSwi6";
-            this.pictureBoxSwi6.Size = new System.Drawing.Size(33, 96);
-            this.pictureBoxSwi6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxSwi6.Size = new System.Drawing.Size(47, 96);
+            this.pictureBoxSwi6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxSwi6.TabIndex = 22;
             this.pictureBoxSwi6.TabStop = false;
             this.pictureBoxSwi6.Tag = "";
-            this.pictureBoxSwi6.Click += new System.EventHandler(this.SwitchClick_Click);
+            this.pictureBoxSwi6.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxSwi_MouseDown);
             // 
             // pictureBoxSwi7
             // 
             this.pictureBoxSwi7.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSwi7.Cursor = System.Windows.Forms.Cursors.Hand;
             this.pictureBoxSwi7.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.slideswitchOn;
-            this.pictureBoxSwi7.Location = new System.Drawing.Point(24, 64);
+            this.pictureBoxSwi7.Location = new System.Drawing.Point(17, 64);
             this.pictureBoxSwi7.Name = "pictureBoxSwi7";
-            this.pictureBoxSwi7.Size = new System.Drawing.Size(33, 96);
-            this.pictureBoxSwi7.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBoxSwi7.Size = new System.Drawing.Size(47, 96);
+            this.pictureBoxSwi7.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxSwi7.TabIndex = 21;
             this.pictureBoxSwi7.TabStop = false;
             this.pictureBoxSwi7.Tag = "";
-            this.pictureBoxSwi7.Click += new System.EventHandler(this.SwitchClick_Click);
+            this.pictureBoxSwi7.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBoxSwi_MouseDown);
             // 
             // pictureBoxLed0
             // 
@@ -417,7 +419,7 @@
             // pictureBox1
             // 
             this.pictureBox1.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.fpga_background;
-            this.pictureBox1.Location = new System.Drawing.Point(-4, 0);
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(658, 658);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -468,7 +470,7 @@
             this.richTextBoxConsoleLog.Location = new System.Drawing.Point(0, 664);
             this.richTextBoxConsoleLog.Name = "richTextBoxConsoleLog";
             this.richTextBoxConsoleLog.ReadOnly = true;
-            this.richTextBoxConsoleLog.Size = new System.Drawing.Size(654, 132);
+            this.richTextBoxConsoleLog.Size = new System.Drawing.Size(658, 132);
             this.richTextBoxConsoleLog.TabIndex = 34;
             this.richTextBoxConsoleLog.Text = "";
             // 
