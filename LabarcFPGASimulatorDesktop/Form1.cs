@@ -314,7 +314,7 @@ namespace LabarcFPGASimulatorDesktop
             Log("Não foi possível salvar, o usuário cancelou a ação.", LogType.Warning);
             return false;
         }
-        
+
         /// <summary>
         /// Reseta o texto da caixa de texto do código para o padrão.
         /// </summary>
@@ -443,7 +443,7 @@ namespace LabarcFPGASimulatorDesktop
                 }
 
                 Log("Compilando Main.cpp", LogType.Normal);
-                ProcessStartInfo gppProcessStartInfo = new ProcessStartInfo("g++", "-I\"obj_dir\" -I\"include\" obj_dir\\VMain__Syms.cpp include\\verilated.cpp obj_dir\\VMain.cpp Main.cpp -o Main.exe")
+                ProcessStartInfo gppProcessStartInfo = new ProcessStartInfo("g++", "-I\"obj_dir\" -I\"include\" " + System.IO.Path.Combine("obj_dir", "VMain__Syms.cpp") + " " + System.IO.Path.Combine("include", "verilated.cpp") + " " + System.IO.Path.Combine("obj_dir", "VMain.cpp") + " Main.cpp -o Main.exe")
                 {
                     WindowStyle = ProcessWindowStyle.Hidden,
                     CreateNoWindow = true,
