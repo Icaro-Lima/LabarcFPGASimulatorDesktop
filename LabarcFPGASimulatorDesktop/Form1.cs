@@ -35,9 +35,6 @@ namespace LabarcFPGASimulatorDesktop
         {
             InitializeComponent();
 
-            AutoScaleDimensions = new SizeF(96F, 96F);
-            AutoScaleMode = AutoScaleMode.Dpi;
-
             SWI = new PictureBox[]
             {
                 pictureBoxSwi0,

@@ -144,6 +144,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Readme.txt" />
+    <None Include="Resources\Resistor.png" />
     <Content Include="Verilog.xshd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

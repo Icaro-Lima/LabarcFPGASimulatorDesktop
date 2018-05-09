@@ -30,7 +30,10 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.textEditorControl1 = new ICSharpCode.TextEditor.TextEditorControl();
-            this.pictureBox3 = new System.Windows.Forms.PictureBox();
+            this.buttonReset = new System.Windows.Forms.Button();
+            this.buttonLoadCode = new System.Windows.Forms.Button();
+            this.buttonBuildAndRun = new System.Windows.Forms.Button();
+            this.richTextBoxConsoleLog = new System.Windows.Forms.RichTextBox();
             this.pictureBoxSwi0 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSwi1 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSwi2 = new System.Windows.Forms.PictureBox();
@@ -55,13 +58,9 @@
             this.pictureBoxSegment4 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSegment2 = new System.Windows.Forms.PictureBox();
             this.pictureBoxSegment1 = new System.Windows.Forms.PictureBox();
+            this.pictureBox3 = new System.Windows.Forms.PictureBox();
             this.pictureBox2 = new System.Windows.Forms.PictureBox();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.buttonReset = new System.Windows.Forms.Button();
-            this.buttonLoadCode = new System.Windows.Forms.Button();
-            this.buttonBuildAndRun = new System.Windows.Forms.Button();
-            this.richTextBoxConsoleLog = new System.Windows.Forms.RichTextBox();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi2)).BeginInit();
@@ -86,6 +85,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment4)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -106,16 +106,53 @@
     "] LED,\r\n  output logic [7:0] SEG\r\n);\r\n\r\n// Seu código aqui:\r\n\r\nendmodule";
             this.textEditorControl1.Load += new System.EventHandler(this.TextEditorControl_Load);
             // 
-            // pictureBox3
+            // buttonReset
             // 
-            this.pictureBox3.BackColor = System.Drawing.SystemColors.Control;
-            this.pictureBox3.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.segments;
-            this.pictureBox3.Location = new System.Drawing.Point(265, 12);
-            this.pictureBox3.Name = "pictureBox3";
-            this.pictureBox3.Size = new System.Drawing.Size(128, 192);
-            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
-            this.pictureBox3.TabIndex = 3;
-            this.pictureBox3.TabStop = false;
+            this.buttonReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonReset.Location = new System.Drawing.Point(664, 766);
+            this.buttonReset.Name = "buttonReset";
+            this.buttonReset.Size = new System.Drawing.Size(75, 30);
+            this.buttonReset.TabIndex = 30;
+            this.buttonReset.Text = "Resetar";
+            this.buttonReset.UseVisualStyleBackColor = true;
+            this.buttonReset.Click += new System.EventHandler(this.ButtonReset_Click);
+            // 
+            // buttonLoadCode
+            // 
+            this.buttonLoadCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.buttonLoadCode.Location = new System.Drawing.Point(745, 766);
+            this.buttonLoadCode.Name = "buttonLoadCode";
+            this.buttonLoadCode.Size = new System.Drawing.Size(75, 30);
+            this.buttonLoadCode.TabIndex = 31;
+            this.buttonLoadCode.Text = "Carregar";
+            this.buttonLoadCode.UseVisualStyleBackColor = true;
+            this.buttonLoadCode.Click += new System.EventHandler(this.ButtonLoadCode_Click);
+            // 
+            // buttonBuildAndRun
+            // 
+            this.buttonBuildAndRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.buttonBuildAndRun.AutoSize = true;
+            this.buttonBuildAndRun.Location = new System.Drawing.Point(1050, 766);
+            this.buttonBuildAndRun.Name = "buttonBuildAndRun";
+            this.buttonBuildAndRun.Size = new System.Drawing.Size(107, 30);
+            this.buttonBuildAndRun.TabIndex = 33;
+            this.buttonBuildAndRun.Text = "Build and Run";
+            this.buttonBuildAndRun.UseVisualStyleBackColor = true;
+            this.buttonBuildAndRun.Click += new System.EventHandler(this.ButtonBuildAndRun_Click);
+            // 
+            // richTextBoxConsoleLog
+            // 
+            this.richTextBoxConsoleLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.richTextBoxConsoleLog.BackColor = System.Drawing.Color.Black;
+            this.richTextBoxConsoleLog.Font = new System.Drawing.Font("Consolas", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.richTextBoxConsoleLog.ForeColor = System.Drawing.Color.White;
+            this.richTextBoxConsoleLog.Location = new System.Drawing.Point(0, 664);
+            this.richTextBoxConsoleLog.Name = "richTextBoxConsoleLog";
+            this.richTextBoxConsoleLog.ReadOnly = true;
+            this.richTextBoxConsoleLog.Size = new System.Drawing.Size(658, 132);
+            this.richTextBoxConsoleLog.TabIndex = 34;
+            this.richTextBoxConsoleLog.Text = "";
             // 
             // pictureBoxSwi0
             // 
@@ -405,6 +442,17 @@
             this.pictureBoxSegment1.TabStop = false;
             this.pictureBoxSegment1.Tag = "v";
             // 
+            // pictureBox3
+            // 
+            this.pictureBox3.BackColor = System.Drawing.SystemColors.Control;
+            this.pictureBox3.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.segments;
+            this.pictureBox3.Location = new System.Drawing.Point(265, 12);
+            this.pictureBox3.Name = "pictureBox3";
+            this.pictureBox3.Size = new System.Drawing.Size(128, 192);
+            this.pictureBox3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
+            this.pictureBox3.TabIndex = 3;
+            this.pictureBox3.TabStop = false;
+            // 
             // pictureBox2
             // 
             this.pictureBox2.BackColor = System.Drawing.SystemColors.Control;
@@ -426,58 +474,11 @@
             this.pictureBox1.TabIndex = 12;
             this.pictureBox1.TabStop = false;
             // 
-            // buttonReset
-            // 
-            this.buttonReset.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonReset.Location = new System.Drawing.Point(664, 766);
-            this.buttonReset.Name = "buttonReset";
-            this.buttonReset.Size = new System.Drawing.Size(75, 30);
-            this.buttonReset.TabIndex = 30;
-            this.buttonReset.Text = "Resetar";
-            this.buttonReset.UseVisualStyleBackColor = true;
-            this.buttonReset.Click += new System.EventHandler(this.ButtonReset_Click);
-            // 
-            // buttonLoadCode
-            // 
-            this.buttonLoadCode.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.buttonLoadCode.Location = new System.Drawing.Point(745, 766);
-            this.buttonLoadCode.Name = "buttonLoadCode";
-            this.buttonLoadCode.Size = new System.Drawing.Size(75, 30);
-            this.buttonLoadCode.TabIndex = 31;
-            this.buttonLoadCode.Text = "Carregar";
-            this.buttonLoadCode.UseVisualStyleBackColor = true;
-            this.buttonLoadCode.Click += new System.EventHandler(this.ButtonLoadCode_Click);
-            // 
-            // buttonBuildAndRun
-            // 
-            this.buttonBuildAndRun.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonBuildAndRun.AutoSize = true;
-            this.buttonBuildAndRun.Location = new System.Drawing.Point(1050, 766);
-            this.buttonBuildAndRun.Name = "buttonBuildAndRun";
-            this.buttonBuildAndRun.Size = new System.Drawing.Size(107, 30);
-            this.buttonBuildAndRun.TabIndex = 33;
-            this.buttonBuildAndRun.Text = "Build and Run";
-            this.buttonBuildAndRun.UseVisualStyleBackColor = true;
-            this.buttonBuildAndRun.Click += new System.EventHandler(this.ButtonBuildAndRun_Click);
-            // 
-            // richTextBoxConsoleLog
-            // 
-            this.richTextBoxConsoleLog.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.richTextBoxConsoleLog.BackColor = System.Drawing.Color.Black;
-            this.richTextBoxConsoleLog.Font = new System.Drawing.Font("Consolas", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.richTextBoxConsoleLog.ForeColor = System.Drawing.Color.White;
-            this.richTextBoxConsoleLog.Location = new System.Drawing.Point(0, 664);
-            this.richTextBoxConsoleLog.Name = "richTextBoxConsoleLog";
-            this.richTextBoxConsoleLog.ReadOnly = true;
-            this.richTextBoxConsoleLog.Size = new System.Drawing.Size(658, 132);
-            this.richTextBoxConsoleLog.TabIndex = 34;
-            this.richTextBoxConsoleLog.Text = "";
-            // 
             // Form1
             // 
+            //AutoScaleDimensions = new SizeF(96F, 96F);
             this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1169, 808);
             this.Controls.Add(this.richTextBoxConsoleLog);
             this.Controls.Add(this.buttonBuildAndRun);
@@ -515,7 +516,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Labarc FPGA Simulator";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi2)).EndInit();
@@ -540,6 +540,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment4)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSegment1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);

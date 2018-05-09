@@ -103,6 +103,16 @@ namespace LabarcFPGASimulatorDesktop.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Resistor {
+            get {
+                object obj = ResourceManager.GetObject("Resistor", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap segmentHorizontalOff {
             get {
                 object obj = ResourceManager.GetObject("segmentHorizontalOff", resourceCulture);
