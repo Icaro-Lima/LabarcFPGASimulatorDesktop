@@ -313,7 +313,7 @@
             // 
             this.pictureBoxSegment7.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment7.Image = global::LabarcFPGASimulatorDesktop.Properties.Resources.segmentPointOn;
-            this.pictureBoxSegment7.Location = new System.Drawing.Point(361, 155);
+            this.pictureBoxSegment7.Location = new System.Drawing.Point(363, 155);
             this.pictureBoxSegment7.Name = "pictureBoxSegment7";
             this.pictureBoxSegment7.Size = new System.Drawing.Size(15, 15);
             this.pictureBoxSegment7.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -325,7 +325,7 @@
             // 
             this.pictureBoxSegment5.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment5.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment5.Image")));
-            this.pictureBoxSegment5.Location = new System.Drawing.Point(287, 54);
+            this.pictureBoxSegment5.Location = new System.Drawing.Point(289, 54);
             this.pictureBoxSegment5.Name = "pictureBoxSegment5";
             this.pictureBoxSegment5.Size = new System.Drawing.Size(13, 52);
             this.pictureBoxSegment5.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -337,7 +337,7 @@
             // 
             this.pictureBoxSegment3.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment3.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment3.Image")));
-            this.pictureBoxSegment3.Location = new System.Drawing.Point(296, 156);
+            this.pictureBoxSegment3.Location = new System.Drawing.Point(298, 156);
             this.pictureBoxSegment3.Name = "pictureBoxSegment3";
             this.pictureBoxSegment3.Size = new System.Drawing.Size(52, 13);
             this.pictureBoxSegment3.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -349,7 +349,7 @@
             // 
             this.pictureBoxSegment6.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment6.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment6.Image")));
-            this.pictureBoxSegment6.Location = new System.Drawing.Point(296, 101);
+            this.pictureBoxSegment6.Location = new System.Drawing.Point(298, 101);
             this.pictureBoxSegment6.Name = "pictureBoxSegment6";
             this.pictureBoxSegment6.Size = new System.Drawing.Size(52, 13);
             this.pictureBoxSegment6.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -361,7 +361,7 @@
             // 
             this.pictureBoxSegment0.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment0.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment0.Image")));
-            this.pictureBoxSegment0.Location = new System.Drawing.Point(296, 46);
+            this.pictureBoxSegment0.Location = new System.Drawing.Point(298, 46);
             this.pictureBoxSegment0.Name = "pictureBoxSegment0";
             this.pictureBoxSegment0.Size = new System.Drawing.Size(52, 13);
             this.pictureBoxSegment0.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -373,7 +373,7 @@
             // 
             this.pictureBoxSegment4.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment4.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment4.Image")));
-            this.pictureBoxSegment4.Location = new System.Drawing.Point(287, 109);
+            this.pictureBoxSegment4.Location = new System.Drawing.Point(289, 109);
             this.pictureBoxSegment4.Name = "pictureBoxSegment4";
             this.pictureBoxSegment4.Size = new System.Drawing.Size(13, 52);
             this.pictureBoxSegment4.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -385,7 +385,7 @@
             // 
             this.pictureBoxSegment2.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment2.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment2.Image")));
-            this.pictureBoxSegment2.Location = new System.Drawing.Point(344, 109);
+            this.pictureBoxSegment2.Location = new System.Drawing.Point(346, 109);
             this.pictureBoxSegment2.Name = "pictureBoxSegment2";
             this.pictureBoxSegment2.Size = new System.Drawing.Size(13, 52);
             this.pictureBoxSegment2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -397,7 +397,7 @@
             // 
             this.pictureBoxSegment1.BackColor = System.Drawing.Color.Transparent;
             this.pictureBoxSegment1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBoxSegment1.Image")));
-            this.pictureBoxSegment1.Location = new System.Drawing.Point(344, 54);
+            this.pictureBoxSegment1.Location = new System.Drawing.Point(346, 54);
             this.pictureBoxSegment1.Name = "pictureBoxSegment1";
             this.pictureBoxSegment1.Size = new System.Drawing.Size(13, 52);
             this.pictureBoxSegment1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
@@ -476,15 +476,14 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(1169, 808);
             this.Controls.Add(this.richTextBoxConsoleLog);
             this.Controls.Add(this.buttonBuildAndRun);
             this.Controls.Add(this.buttonLoadCode);
             this.Controls.Add(this.buttonReset);
             this.Controls.Add(this.textEditorControl1);
-            this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.pictureBoxSwi0);
             this.Controls.Add(this.pictureBoxSwi1);
             this.Controls.Add(this.pictureBoxSwi2);
@@ -509,11 +508,12 @@
             this.Controls.Add(this.pictureBoxSegment4);
             this.Controls.Add(this.pictureBoxSegment2);
             this.Controls.Add(this.pictureBoxSegment1);
+            this.Controls.Add(this.pictureBox3);
             this.Controls.Add(this.pictureBox2);
             this.Controls.Add(this.pictureBox1);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Form1";
+            this.Text = "Labarc FPGA Simulator";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSwi0)).EndInit();
