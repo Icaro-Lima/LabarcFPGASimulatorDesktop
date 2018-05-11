@@ -1,7 +1,7 @@
 // -*- mode: C++; c-file-style: "cc-mode" -*-
 //*************************************************************************
 //
-// Copyright 2003-2012 by Wilson Snyder. This program is free software; you can
+// Copyright 2003-2017 by Wilson Snyder. This program is free software; you can
 // redistribute it and/or modify it under the terms of either the GNU
 // Lesser General Public License Version 3 or the Perl Artistic License.
 // Version 2.0.
@@ -33,17 +33,14 @@
 // Global variables
 
 // Slow path variables
-int  Verilated::s_randReset = 0;
+VerilatedMutex Verilated::m_mutex;
 VerilatedVoidCb Verilated::s_flushCb = NULL;
 
 // Keep below together in one cache line
-int  Verilated::s_debug = 0;
-bool Verilated::s_calcUnusedSigs = false;
-bool Verilated::s_gotFinish = false;
-bool Verilated::s_assertOn = true;
-VL_THREAD const VerilatedScope* Verilated::t_dpiScopep = NULL;
-VL_THREAD const char* Verilated::t_dpiFilename = "";
-VL_THREAD int Verilated::t_dpiLineno = 0;
+Verilated::Serialized Verilated::s_s;
+VL_THREAD_LOCAL Verilated::ThreadLocal Verilated::t_s;
+
+struct Verilated::CommandArgValues Verilated::s_args = {0, NULL};
 
 VerilatedImp  VerilatedImp::s_s;
 
@@ -51,11 +48,11 @@ VerilatedImp  VerilatedImp::s_s;
 // User definable functions
 
 #ifndef VL_USER_FINISH		// Define this to override this function
-void vl_finish (const char* filename, int linenum, const char* hier) {
+void vl_finish (const char* filename, int linenum, const char* hier) VL_MT_UNSAFE {
     if (0 && hier) {}
-    VL_PRINTF("- %s:%d: Verilog $finish\n", filename, linenum);
+    VL_PRINTF("- %s:%d: Verilog $finish\n", filename, linenum);  // Not VL_PRINTF_MT, already on main thread
     if (Verilated::gotFinish()) {
-	VL_PRINTF("- %s:%d: Second verilog $finish, exiting\n", filename, linenum);
+	VL_PRINTF("- %s:%d: Second verilog $finish, exiting\n", filename, linenum);  // Not VL_PRINTF_MT, already on main thread
 	Verilated::flushCall();
 	exit(0);
     }
@@ -64,7 +61,7 @@ void vl_finish (const char* filename, int linenum, const char* hier) {
 #endif
 
 #ifndef VL_USER_STOP		// Define this to override this function
-void vl_stop (const char* filename, int linenum, const char* hier) {
+void vl_stop (const char* filename, int linenum, const char* hier) VL_MT_UNSAFE {
     Verilated::gotFinish(true);
     Verilated::flushCall();
     vl_fatal (filename,linenum,hier,"Verilog $stop");
@@ -72,20 +69,145 @@ void vl_stop (const char* filename, int linenum, const char* hier) {
 #endif
 
 #ifndef VL_USER_FATAL	// Define this to override this function
-void vl_fatal (const char* filename, int linenum, const char* hier, const char* msg) {
+void vl_fatal (const char* filename, int linenum, const char* hier, const char* msg) VL_MT_UNSAFE {
     if (0 && hier) {}
     Verilated::gotFinish(true);
-    VL_PRINTF("%%Error: %s:%d: %s\n", filename, linenum, msg);
+    VL_PRINTF("%%Error: %s:%d: %s\n", filename, linenum, msg);  // Not VL_PRINTF_MT, already on main thread
     Verilated::flushCall();
+
+    VL_PRINTF("Aborting...\n");  // Not VL_PRINTF_MT, already on main thread
+    Verilated::flushCall();  // Second flush in case VL_PRINTF does something needing a flush
     abort();
 }
 #endif
 
 //===========================================================================
+// Wrapper to call certain functions via messages when multithreaded
+
+void VL_FINISH_MT (const char* filename, int linenum, const char* hier) VL_MT_SAFE {
+#ifdef VL_THREADED
+    VerilatedThreadMsgQueue::post(VerilatedMsg([=](){
+		vl_finish(filename, linenum, hier);
+	    }));
+#else
+    vl_finish(filename, linenum, hier);
+#endif
+}
+
+void VL_STOP_MT (const char* filename, int linenum, const char* hier) VL_MT_SAFE {
+#ifdef VL_THREADED
+    VerilatedThreadMsgQueue::post(VerilatedMsg([=](){
+		vl_stop(filename, linenum, hier);
+	    }));
+#else
+    vl_stop(filename, linenum, hier);
+#endif
+}
+
+void VL_FATAL_MT (const char* filename, int linenum, const char* hier, const char* msg) VL_MT_SAFE {
+#ifdef VL_THREADED
+    VerilatedThreadMsgQueue::post(VerilatedMsg([=](){
+		vl_fatal(filename, linenum, hier, msg);
+	    }));
+#else
+    vl_fatal(filename, linenum, hier, msg);
+#endif
+}
+
+//===========================================================================
+// Debug prints
+
+/// sprintf but return as string (this isn't fast, for print messages only)
+std::string _vl_string_vprintf(const char* formatp, va_list ap) VL_MT_SAFE {
+    va_list aq;
+    va_copy(aq, ap);
+    int len = VL_VSNPRINTF(NULL, 0, formatp, aq);
+    if (VL_UNLIKELY(len < 1)) return "";
+
+    char* bufp = new char[len+1];
+    VL_VSNPRINTF(bufp, len+1, formatp, ap);
+    std::string out = std::string(bufp, len);
+    delete[] bufp;
+    return out;
+}
+
+vluint64_t _vl_dbg_sequence_number() VL_MT_SAFE {
+#ifdef VL_THREADED
+    static std::atomic<vluint64_t> sequence;
+#else
+    static vluint64_t sequence = 0;
+#endif
+    return ++sequence;
+}
+
+vluint32_t VL_THREAD_ID() VL_MT_SAFE {
+#ifdef VL_THREADED
+    // Alternative is to use std::this_thread::get_id, but that returns a hard-to-read number and is very slow
+    static std::atomic<vluint32_t> s_nextId (0);
+    static VL_THREAD_LOCAL vluint32_t t_myId = ++s_nextId;
+    return t_myId;
+#else
+    return 0;
+#endif
+}
+
+void VL_DBG_MSGF(const char* formatp, ...) VL_MT_SAFE {
+    // We're still using c printf formats instead of operator<< so we can avoid the heavy
+    // includes that otherwise would be required in every Verilated module
+    va_list ap;
+    va_start(ap, formatp);
+    std::string out = _vl_string_vprintf(formatp, ap);
+    va_end(ap);
+    // printf("-imm-V{t%d,%" VL_PRI64 "d}%s", VL_THREAD_ID(), _vl_dbg_sequence_number(), out.c_str());
+    VL_PRINTF_MT("-V{t%d,%" VL_PRI64 "d}%s", VL_THREAD_ID(), _vl_dbg_sequence_number(), out.c_str());
+}
+
+#ifdef VL_THREADED
+void VL_PRINTF_MT(const char* formatp, ...) VL_MT_SAFE {
+    va_list ap;
+    va_start(ap, formatp);
+    std::string out = _vl_string_vprintf(formatp, ap);
+    va_end(ap);
+    VerilatedThreadMsgQueue::post(VerilatedMsg([=](){
+		VL_PRINTF("%s", out.c_str());
+	    }));
+}
+#endif
+
+//===========================================================================
+// Overall class init
+
+Verilated::Serialized::Serialized() {
+    s_randReset = 0;
+    s_debug = 0;
+    s_calcUnusedSigs = false;
+    s_gotFinish = false;
+    s_assertOn = true;
+    s_fatalOnVpiError = true; // retains old default behaviour
+}
+
+//===========================================================================
 // Random reset -- Only called at init time, so don't inline.
 
-IData VL_RAND32() {
-#if defined(_WIN32) && !defined(__CYGWIN__)
+IData VL_RAND32() VL_MT_SAFE {
+#ifdef VL_THREADED
+    static VL_THREAD_LOCAL bool t_seeded = false;
+    static VL_THREAD_LOCAL drand48_data t_buffer;
+    static VerilatedMutex s_mutex;
+    if (VL_UNLIKELY(!t_seeded)) {
+	t_seeded = true;
+	long seedval;
+	{
+	    VerilatedLockGuard guard(s_mutex);
+	    seedval = lrand48()<<16 ^ lrand48();
+	    if (!seedval) seedval++;
+	}
+	srand48_r(seedval, &t_buffer);
+    }
+    long v0; lrand48_r(&t_buffer, &v0);
+    long v1; lrand48_r(&t_buffer, &v1);
+    return (v0<<16) ^ v1;
+#elif defined(_WIN32) && !defined(__CYGWIN__)
     // Windows doesn't have lrand48(), although Cygwin does.
     return (rand()<<16) ^ rand();
 #else
@@ -93,17 +215,17 @@ IData VL_RAND32() {
 #endif
 }
 
-IData VL_RANDOM_I(int obits) {
+IData VL_RANDOM_I(int obits) VL_MT_SAFE {
     return VL_RAND32() & VL_MASK_I(obits);
 }
 
-QData VL_RANDOM_Q(int obits) {
+QData VL_RANDOM_Q(int obits) VL_MT_SAFE {
     QData data = ((QData)VL_RAND32()<<VL_ULL(32)) | (QData)VL_RAND32();
     return data & VL_MASK_Q(obits);
 }
 
-WDataOutP VL_RANDOM_W(int obits, WDataOutP outwp) {
-    for (int i=0; i<VL_WORDS_I(obits); i++) {
+WDataOutP VL_RANDOM_W(int obits, WDataOutP outwp) VL_MT_SAFE {
+    for (int i=0; i<VL_WORDS_I(obits); ++i) {
 	if (i<(VL_WORDS_I(obits)-1)) {
 	    outwp[i] = VL_RAND32();
 	} else {
@@ -113,7 +235,7 @@ WDataOutP VL_RANDOM_W(int obits, WDataOutP outwp) {
     return outwp;
 }
 
-IData VL_RAND_RESET_I(int obits) {
+IData VL_RAND_RESET_I(int obits) VL_MT_SAFE {
     if (Verilated::randReset()==0) return 0;
     IData data = ~0;
     if (Verilated::randReset()!=1) {	// if 2, randomize
@@ -123,7 +245,7 @@ IData VL_RAND_RESET_I(int obits) {
     return data;
 }
 
-QData VL_RAND_RESET_Q(int obits) {
+QData VL_RAND_RESET_Q(int obits) VL_MT_SAFE {
     if (Verilated::randReset()==0) return 0;
     QData data = VL_ULL(~0);
     if (Verilated::randReset()!=1) {	// if 2, randomize
@@ -133,8 +255,8 @@ QData VL_RAND_RESET_Q(int obits) {
     return data;
 }
 
-WDataOutP VL_RAND_RESET_W(int obits, WDataOutP outwp) {
-    for (int i=0; i<VL_WORDS_I(obits); i++) {
+WDataOutP VL_RAND_RESET_W(int obits, WDataOutP outwp) VL_MT_SAFE {
+    for (int i=0; i<VL_WORDS_I(obits); ++i) {
 	if (i<(VL_WORDS_I(obits)-1)) {
 	    outwp[i] = VL_RAND_RESET_I(32);
 	} else {
@@ -144,30 +266,30 @@ WDataOutP VL_RAND_RESET_W(int obits, WDataOutP outwp) {
     return outwp;
 }
 
-WDataOutP VL_ZERO_RESET_W(int obits, WDataOutP outwp) {
-    for (int i=0; i<VL_WORDS_I(obits); i++) outwp[i] = 0;
+WDataOutP VL_ZERO_RESET_W(int obits, WDataOutP outwp) VL_MT_SAFE {
+    for (int i=0; i<VL_WORDS_I(obits); ++i) outwp[i] = 0;
     return outwp;
 }
 
 //===========================================================================
 // Debug
 
-void _VL_DEBUG_PRINT_W(int lbits, WDataInP iwp) {
-    VL_PRINTF("  Data: w%d: ", lbits);
-    for (int i=VL_WORDS_I(lbits)-1; i>=0; i--) { VL_PRINTF("%08x ",iwp[i]); }
-    VL_PRINTF("\n");
+void _VL_DEBUG_PRINT_W(int lbits, WDataInP iwp) VL_MT_SAFE {
+    VL_PRINTF_MT("  Data: w%d: ", lbits);
+    for (int i=VL_WORDS_I(lbits)-1; i>=0; --i) { VL_PRINTF_MT("%08x ",iwp[i]); }
+    VL_PRINTF_MT("\n");
 }
 
 //===========================================================================
 // Slow math
 
-WDataOutP _vl_moddiv_w(int lbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, bool is_modulus) {
+WDataOutP _vl_moddiv_w(int lbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, bool is_modulus) VL_MT_SAFE {
     // See Knuth Algorithm D.  Computes u/v = q.r
     // This isn't massively tuned, as wide division is rare
     // for debug see V3Number version
     // Requires clean input
     int words = VL_WORDS_I(lbits);
-    for (int i=0; i<words; i++) owp[i]=0;
+    for (int i=0; i<words; ++i) owp[i]=0;
     // Find MSB and check for zero.
     int umsbp1 = VL_MOSTSETBITP1_W(words,lwp); // dividend
     int vmsbp1 = VL_MOSTSETBITP1_W(words,rwp); // divisor
@@ -181,14 +303,14 @@ WDataOutP _vl_moddiv_w(int lbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, boo
 
     if (vw == 1) {  // Single divisor word breaks rest of algorithm
 	vluint64_t k = 0;
-	for (int j = uw-1; j >= 0; j--) {
-	    vluint64_t unw64 = ((k<<VL_ULL(32)) + (vluint64_t)(lwp[j]));
-	    owp[j] = unw64 / (vluint64_t)(rwp[0]);
-	    k      = unw64 - (vluint64_t)(owp[j])*(vluint64_t)(rwp[0]);
+	for (int j = uw-1; j >= 0; --j) {
+	    vluint64_t unw64 = ((k<<VL_ULL(32)) + static_cast<vluint64_t>(lwp[j]));
+	    owp[j] = unw64 / static_cast<vluint64_t>(rwp[0]);
+	    k      = unw64 - static_cast<vluint64_t>(owp[j])*static_cast<vluint64_t>(rwp[0]);
 	}
 	if (is_modulus) {
 	    owp[0] = k;
-	    for (int i=1; i<words; i++) owp[i]=0;
+	    for (int i=1; i<words; ++i) owp[i]=0;
 	}
 	return owp;
     }
@@ -198,13 +320,14 @@ WDataOutP _vl_moddiv_w(int lbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, boo
     vluint32_t vn[VL_MULS_MAX_WORDS+1]; // v normalized
 
     // Zero for ease of debugging and to save having to zero for shifts
-    for (int i=0; i<words; i++) { un[i]=vn[i]=0; }
+    // Note +1 as loop will use extra word
+    for (int i=0; i<words+1; ++i) { un[i]=vn[i]=0; }
 
     // Algorithm requires divisor MSB to be set
     // Copy and shift to normalize divisor so MSB of vn[vw-1] is set
     int s = 31-VL_BITBIT_I(vmsbp1-1);  // shift amount (0...31)
     vluint32_t shift_mask = s ? 0xffffffff : 0;  // otherwise >> 32 won't mask the value
-    for (int i = vw-1; i>0; i--) {
+    for (int i = vw-1; i>0; --i) {
 	vn[i] = (rwp[i] << s) | (shift_mask & (rwp[i-1] >> (32-s)));
     }
     vn[0] = rwp[0] << s;
@@ -212,17 +335,17 @@ WDataOutP _vl_moddiv_w(int lbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, boo
     // Copy and shift dividend by same amount; may set new upper word
     if (s) un[uw] = lwp[uw-1] >> (32-s);
     else un[uw] = 0;
-    for (int i=uw-1; i>0; i--) {
+    for (int i=uw-1; i>0; --i) {
 	un[i] = (lwp[i] << s) | (shift_mask & (lwp[i-1] >> (32-s)));
     }
     un[0] = lwp[0] << s;
 
     // Main loop
-    for (int j = uw - vw; j >= 0; j--) {
+    for (int j = uw - vw; j >= 0; --j) {
 	// Estimate
-	vluint64_t unw64 = ((vluint64_t)(un[j+vw])<<VL_ULL(32) | (vluint64_t)(un[j+vw-1]));
-	vluint64_t qhat = unw64 / (vluint64_t)(vn[vw-1]);
-	vluint64_t rhat = unw64 - qhat*(vluint64_t)(vn[vw-1]);
+	vluint64_t unw64 = (static_cast<vluint64_t>(un[j+vw])<<VL_ULL(32) | static_cast<vluint64_t>(un[j+vw-1]));
+	vluint64_t qhat = unw64 / static_cast<vluint64_t>(vn[vw-1]);
+	vluint64_t rhat = unw64 - qhat*static_cast<vluint64_t>(vn[vw-1]);
 
       again:
 	if (qhat >= VL_ULL(0x100000000)
@@ -234,7 +357,7 @@ WDataOutP _vl_moddiv_w(int lbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, boo
 
 	vlsint64_t t = 0;  // Must be signed
 	vluint64_t k = 0;
-	for (int i=0; i<vw; i++) {
+	for (int i=0; i<vw; ++i) {
 	    vluint64_t p = qhat*vn[i];  // Multiply by estimate
 	    t = un[i+j] - k - (p & VL_ULL(0xFFFFFFFF));  // Subtract
 	    un[i+j] = t;
@@ -248,8 +371,8 @@ WDataOutP _vl_moddiv_w(int lbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, boo
 	    // Over subtracted; correct by adding back
 	    owp[j]--;
 	    k = 0;
-	    for (int i=0; i<vw; i++) {
-		t = (vluint64_t)(un[i+j]) + (vluint64_t)(vn[i]) + k;
+	    for (int i=0; i<vw; ++i) {
+		t = static_cast<vluint64_t>(un[i+j]) + static_cast<vluint64_t>(vn[i]) + k;
 		un[i+j] = t;
 		k = t >> VL_ULL(32);
 	    }
@@ -259,14 +382,90 @@ WDataOutP _vl_moddiv_w(int lbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, boo
 
     if (is_modulus) { // modulus
 	// Need to reverse normalization on copy to output
-	for (int i=0; i<vw; i++) {
+	for (int i=0; i<vw; ++i) {
 	    owp[i] = (un[i] >> s) | (shift_mask & (un[i+1] << (32-s)));
 	}
-	for (int i=vw; i<words; i++) owp[i] = 0;
+	for (int i=vw; i<words; ++i) owp[i] = 0;
 	return owp;
     } else { // division
 	return owp;
     }
+}
+
+WDataOutP VL_POW_WWW(int obits, int, int rbits, WDataOutP owp, WDataInP lwp, WDataInP rwp) VL_MT_SAFE {
+    // obits==lbits, rbits can be different
+    owp[0] = 1;
+    for (int i=1; i < VL_WORDS_I(obits); i++) owp[i] = 0;
+    // cppcheck-suppress variableScope
+    WData powstore[VL_MULS_MAX_WORDS]; // Fixed size, as MSVC++ doesn't allow [words] here
+    WData lastpowstore[VL_MULS_MAX_WORDS]; // Fixed size, as MSVC++ doesn't allow [words] here
+    WData lastoutstore[VL_MULS_MAX_WORDS]; // Fixed size, as MSVC++ doesn't allow [words] here
+    // cppcheck-suppress variableScope
+    VL_ASSIGN_W(obits, powstore, lwp);
+    for (int bit=0; bit<rbits; bit++) {
+	if (bit>0) {  // power = power*power
+	    VL_ASSIGN_W(obits, lastpowstore, powstore);
+	    VL_MUL_W(VL_WORDS_I(obits), powstore, lastpowstore, lastpowstore);
+	}
+	if (VL_BITISSET_W(rwp,bit)) {  // out *= power
+	    VL_ASSIGN_W(obits, lastoutstore, owp);
+	    VL_MUL_W(VL_WORDS_I(obits), owp, lastoutstore, powstore);
+	}
+    }
+    return owp;
+}
+WDataOutP VL_POW_WWQ(int obits, int lbits, int rbits, WDataOutP owp, WDataInP lwp, QData rhs) VL_MT_SAFE {
+    WData rhsw[2];  VL_SET_WQ(rhsw, rhs);
+    return VL_POW_WWW(obits,lbits,rbits,owp,lwp,rhsw);
+}
+QData VL_POW_QQW(int, int, int rbits, QData lhs, WDataInP rwp) VL_MT_SAFE {
+    // Skip check for rhs == 0, as short-circuit doesn't save time
+    if (VL_UNLIKELY(lhs==0)) return 0;
+    QData power = lhs;
+    QData out = VL_ULL(1);
+    for (int bit=0; bit<rbits; ++bit) {
+	if (bit>0) power = power*power;
+	if (VL_BITISSET_W(rwp,bit)) out *= power;
+    }
+    return out;
+}
+
+WDataOutP VL_POWSS_WWW(int obits, int, int rbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, bool lsign, bool rsign) VL_MT_SAFE {
+    // obits==lbits, rbits can be different
+    if (rsign && VL_SIGN_W(rbits, rwp)) {
+	int words = VL_WORDS_I(obits);
+	VL_ZERO_W(obits, owp);
+	IData lor = 0; // 0=all zeros, ~0=all ones, else mix
+	for (int i=1; i < (words-1); ++i) {
+	    lor |= lwp[i];
+	}
+	lor |= ( (lwp[words-1] == VL_MASK_I(rbits)) ? ~VL_UL(0) : 0);
+	if (lor==0 && lwp[0]==0) { return owp; } // "X" so return 0
+	else if (lor==0 && lwp[0]==1) { owp[0] = 1; return owp; } // 1
+	else if (lsign && lor == ~VL_UL(0) && lwp[0]==~VL_UL(0)) {  // -1
+	    if (rwp[0] & 1) { return VL_ALLONES_W(obits, owp); } // -1^odd=-1
+	    else { owp[0] = 1; return owp; } // -1^even=1
+	}
+	return 0;
+    }
+    return VL_POW_WWW(obits, rbits, rbits, owp, lwp, rwp);
+}
+WDataOutP VL_POWSS_WWQ(int obits, int lbits, int rbits, WDataOutP owp, WDataInP lwp, QData rhs, bool lsign, bool rsign) VL_MT_SAFE {
+    WData rhsw[2];  VL_SET_WQ(rhsw, rhs);
+    return VL_POWSS_WWW(obits,lbits,rbits,owp,lwp,rhsw,lsign,rsign);
+}
+QData VL_POWSS_QQW(int obits, int, int rbits, QData lhs, WDataInP rwp, bool lsign, bool rsign) VL_MT_SAFE {
+    // Skip check for rhs == 0, as short-circuit doesn't save time
+    if (rsign && VL_SIGN_W(rbits, rwp)) {
+	if (lhs==0) return 0;	// "X"
+	else if (lhs==1) return 1;
+	else if (lsign && lhs==VL_MASK_I(obits)) {  // -1
+	    if (rwp[0] & 1) return VL_MASK_I(obits);  // -1^odd=-1
+	    else return 1; // -1^even=1
+	}
+	return 0;
+    }
+    return VL_POW_QQW(obits, rbits, rbits, lhs, rwp);
 }
 
 //===========================================================================
@@ -275,7 +474,7 @@ WDataOutP _vl_moddiv_w(int lbits, WDataOutP owp, WDataInP lwp, WDataInP rwp, boo
 // Do a va_arg returning a quad, assuming input argument is anything less than wide
 #define _VL_VA_ARG_Q(ap, bits) (((bits) <= VL_WORDSIZE) ? va_arg(ap,IData) : va_arg(ap,QData))
 
-void _vl_vsformat(string& output, const char* formatp, va_list ap) {
+void _vl_vsformat(std::string& output, const char* formatp, va_list ap) VL_MT_SAFE {
     // Format a Verilog $write style format into the output list
     // The format must be pre-processed (and lower cased) by Verilator
     // Arguments are in "width, arg-value (or WDataIn* if wide)" form
@@ -283,14 +482,13 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
     // Note uses a single buffer internally; presumes only one usage per printf
     // Note also assumes variables < 64 are not wide, this assumption is
     // sometimes not true in low-level routines written here in verilated.cpp
-    static VL_THREAD char tmp[VL_VALUE_STRING_MAX_WIDTH];
-    static VL_THREAD char tmpf[VL_VALUE_STRING_MAX_WIDTH];
+    static VL_THREAD_LOCAL char tmp[VL_VALUE_STRING_MAX_WIDTH];
+    static VL_THREAD_LOCAL char tmpf[VL_VALUE_STRING_MAX_WIDTH];
     const char* pctp = NULL;  // Most recent %##.##g format
     bool inPct = false;
     bool widthSet = false;
     int width = 0;
-    const char* pos = formatp;
-    for (; *pos; ++pos) {
+    for (const char* pos = formatp; *pos; ++pos) {
 	if (!inPct && pos[0]=='%') {
 	    pctp = pos;
 	    inPct = true;
@@ -301,7 +499,7 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
 	    const char *ep = pos;
 	    while (ep[0] && ep[0]!='%') ep++;
 	    if (ep != pos) {
-		output += string(pos, ep-pos);
+		output.append(pos, ep-pos);
 		pos += ep-pos-1;
 	    }
 	} else { // Format character
@@ -330,6 +528,12 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
 		output += cstrp;
 		break;
 	    }
+	    case '@': { // Verilog/C++ string
+		va_arg(ap, int);  // # bits is ignored
+		const std::string* cstrp = va_arg(ap, const std::string*);
+		output += *cstrp;
+		break;
+	    }
 	    case 'e':
 	    case 'f':
 	    case 'g': {
@@ -346,19 +550,19 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
 		// Deal with all read-and-print somethings
 		const int lbits = va_arg(ap, int);
 		QData ld = 0;
+		WData qlwp[2];
 		WDataInP lwp;
 		if (lbits <= VL_QUADSIZE) {
-		    WData qlwp[2];
 		    ld = _VL_VA_ARG_Q(ap, lbits);
 		    VL_SET_WQ(qlwp,ld);
 		    lwp = qlwp;
 		} else {
 		    lwp = va_arg(ap,WDataInP);
 		    ld = lwp[0];
-		    if (fmt == 'u' || fmt == 'd') fmt = 'x';  // Not supported, but show something
+		    if (fmt == 'd' || fmt == '#') fmt = 'x';  // Not supported, but show something
 		}
 		int lsb=lbits-1;
-		if (widthSet && width==0) while (lsb && !VL_BITISSET_W(lwp,lsb)) lsb--;
+		if (widthSet && width==0) while (lsb && !VL_BITISSET_W(lwp,lsb)) --lsb;
 		switch (fmt) {
 		case 'c': {
 		    IData charval = ld & 0xff;
@@ -366,14 +570,15 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
 		    break;
 		}
 		case 's':
-		    for (; lsb>=0; lsb--) {
+		    for (; lsb>=0; --lsb) {
 			lsb = (lsb / 8) * 8; // Next digit
 			IData charval = (lwp[VL_BITWORD_I(lsb)]>>VL_BITBIT_I(lsb)) & 0xff;
 			output += (charval==0)?' ':charval;
 		    }
 		    break;
 		case 'd': { // Signed decimal
-		    int digits=sprintf(tmp,"%" VL_PRI64 "d",(vlsint64_t)(VL_EXTENDS_QQ(lbits,lbits,ld)));
+                    int digits = sprintf(tmp,"%" VL_PRI64 "d",
+                                         static_cast<vlsint64_t>(VL_EXTENDS_QQ(lbits,lbits,ld)));
 		    int needmore = width-digits;
 		    if (needmore>0) {
 			if (pctp && pctp[0] && pctp[1]=='0') { //%0
@@ -385,7 +590,7 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
 		    output += tmp;
 		    break;
 		}
-		case 'u': { // Unsigned decimal
+		case '#': { // Unsigned decimal
 		    int digits=sprintf(tmp,"%" VL_PRI64 "u",ld);
 		    int needmore = width-digits;
 		    if (needmore>0) {
@@ -404,10 +609,10 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
 			digits=sprintf(tmp,"%" VL_PRI64 "u",ld);
 		    } else if (VL_TIME_MULTIPLIER==1000) {
 			digits=sprintf(tmp,"%" VL_PRI64 "u.%03" VL_PRI64 "u",
-				       (QData)(ld/VL_TIME_MULTIPLIER),
-				       (QData)(ld%VL_TIME_MULTIPLIER));
+                                       static_cast<QData>(ld/VL_TIME_MULTIPLIER),
+                                       static_cast<QData>(ld%VL_TIME_MULTIPLIER));
 		    } else {
-			vl_fatal(__FILE__,__LINE__,"","Unsupported VL_TIME_MULTIPLIER");
+			VL_FATAL_MT(__FILE__,__LINE__,"","Unsupported VL_TIME_MULTIPLIER");
 		    }
 		    int needmore = width-digits;
 		    if (needmore>0) output.append(needmore,' '); // Pre-pad spaces
@@ -415,12 +620,13 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
 		    break;
 		}
 		case 'b':
-		    for (; lsb>=0; lsb--) {
+		    for (; lsb>=0; --lsb) {
 			output += ((lwp[VL_BITWORD_I(lsb)]>>VL_BITBIT_I(lsb)) & 1) + '0';
 		    }
 		    break;
+		    break;
 		case 'o':
-		    for (; lsb>=0; lsb--) {
+		    for (; lsb>=0; --lsb) {
 			lsb = (lsb / 3) * 3; // Next digit
 			// Octal numbers may span more than one wide word,
 			// so we need to grab each bit separately and check for overrun
@@ -431,16 +637,41 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
 				   + ((VL_BITISSETLIMIT_W(lwp, lbits, lsb+2)) ? 4 : 0));
 		    }
 		    break;
+		case 'u':  // Packed 2-state
+		    output.reserve(output.size() + 4*VL_WORDS_I(lbits));
+		    for (int i=0; i<VL_WORDS_I(lbits); ++i) {
+                        output += static_cast<char>((lwp[i]     ) & 0xff);
+                        output += static_cast<char>((lwp[i] >> 8) & 0xff);
+                        output += static_cast<char>((lwp[i] >> 16) & 0xff);
+                        output += static_cast<char>((lwp[i] >> 24) & 0xff);
+		    }
+		    break;
+		case 'z':  // Packed 4-state
+		    output.reserve(output.size() + 8*VL_WORDS_I(lbits));
+		    for (int i=0; i<VL_WORDS_I(lbits); ++i) {
+                        output += static_cast<char>((lwp[i]     ) & 0xff);
+                        output += static_cast<char>((lwp[i] >> 8) & 0xff);
+                        output += static_cast<char>((lwp[i] >> 16) & 0xff);
+                        output += static_cast<char>((lwp[i] >> 24) & 0xff);
+                        output += "\0\0\0\0"; // No tristate
+		    }
+		    break;
+		case 'v': // Strength; assume always strong
+		    for (lsb=lbits-1; lsb>=0; --lsb) {
+			if ((lwp[VL_BITWORD_I(lsb)]>>VL_BITBIT_I(lsb)) & 1) output += "St1 ";
+			else output += "St0 ";
+		    }
+		    break;
 		case 'x':
-		    for (; lsb>=0; lsb--) {
+		    for (; lsb>=0; --lsb) {
 			lsb = (lsb / 4) * 4; // Next digit
 			IData charval = (lwp[VL_BITWORD_I(lsb)]>>VL_BITBIT_I(lsb)) & 0xf;
 			output += "0123456789abcdef"[charval];
 		    }
 		    break;
 		default:
-		    string msg = string("Unknown _vl_vsformat code: ")+pos[0];
-		    vl_fatal(__FILE__,__LINE__,"",msg.c_str());
+		    std::string msg = std::string("Unknown _vl_vsformat code: ")+pos[0];
+		    VL_FATAL_MT(__FILE__,__LINE__,"",msg.c_str());
 		    break;
 		} // switch
 	    }
@@ -449,15 +680,15 @@ void _vl_vsformat(string& output, const char* formatp, va_list ap) {
     }
 }
 
-static inline bool _vl_vsss_eof(FILE* fp, int& floc) {
+static inline bool _vl_vsss_eof(FILE* fp, int& floc) VL_MT_SAFE {
     if (fp) return feof(fp) ? 1 : 0;  // 1:0 to prevent MSVC++ warning
     else return (floc<0);
 }
-static inline void _vl_vsss_advance(FILE* fp, int& floc) {
+static inline void _vl_vsss_advance(FILE* fp, int& floc) VL_MT_SAFE {
     if (fp) fgetc(fp);
     else floc -= 8;
 }
-static inline int  _vl_vsss_peek(FILE* fp, int& floc, WDataInP fromp) {
+static inline int  _vl_vsss_peek(FILE* fp, int& floc, WDataInP fromp, const std::string& fstr) VL_MT_SAFE {
     // Get a character without advancing
     if (fp) {
 	int data = fgetc(fp);
@@ -467,23 +698,26 @@ static inline int  _vl_vsss_peek(FILE* fp, int& floc, WDataInP fromp) {
     } else {
 	if (floc < 0) return EOF;
 	floc = floc & ~7;	// Align to closest character
-	int data = (fromp[VL_BITWORD_I(floc)] >> VL_BITBIT_I(floc)) & 0xff;
-	return data;
+	if (fromp == NULL) {
+	    return fstr[fstr.length()-1 - (floc>>3)];
+	} else {
+	    return (fromp[VL_BITWORD_I(floc)] >> VL_BITBIT_I(floc)) & 0xff;
+	}
     }
 }
-static inline void _vl_vsss_skipspace(FILE* fp, int& floc, WDataInP fromp) {
+static inline void _vl_vsss_skipspace(FILE* fp, int& floc, WDataInP fromp, const std::string& fstr) VL_MT_SAFE {
     while (1) {
-	int c = _vl_vsss_peek(fp, floc, fromp);
+	int c = _vl_vsss_peek(fp, floc, fromp, fstr);
 	if (c==EOF || !isspace(c)) return;
 	_vl_vsss_advance(fp, floc);
     }
 }
-static inline void _vl_vsss_read(FILE* fp, int& floc, WDataInP fromp,
-				 char* tmpp, const char* acceptp) {
+static inline void _vl_vsss_read(FILE* fp, int& floc, WDataInP fromp, const std::string& fstr,
+				 char* tmpp, const char* acceptp) VL_MT_SAFE {
     // Read into tmp, consisting of characters from acceptp list
     char* cp = tmpp;
     while (1) {
-	int c = _vl_vsss_peek(fp, floc, fromp);
+	int c = _vl_vsss_peek(fp, floc, fromp, fstr);
 	if (c==EOF || isspace(c)) break;
 	if (acceptp!=NULL // String - allow anything
 	    && NULL==strchr(acceptp, c)) break;
@@ -492,17 +726,18 @@ static inline void _vl_vsss_read(FILE* fp, int& floc, WDataInP fromp,
 	_vl_vsss_advance(fp, floc);
     }
     *cp++ = '\0';
-    //VL_PRINTF("\t_read got='%s'\n", tmpp);
+    //VL_DBG_MSGF(" _read got='"<<tmpp<<"'\n");
 }
-static inline void _vl_vsss_setbit(WDataOutP owp, int obits, int lsb, int nbits, IData ld) {
+static inline void _vl_vsss_setbit(WDataOutP owp, int obits, int lsb, int nbits, IData ld) VL_MT_SAFE {
     for (; nbits && lsb<obits; nbits--, lsb++, ld>>=1) {
 	VL_ASSIGNBIT_WI(0, lsb, owp, ld & 1);
     }
 }
-static inline void _vl_vsss_based(WDataOutP owp, int obits, int baseLog2, const char* strp, int posstart, int posend) {
+static inline void _vl_vsss_based(WDataOutP owp, int obits, int baseLog2,
+				  const char* strp, size_t posstart, size_t posend) VL_MT_SAFE {
     // Read in base "2^^baseLog2" digits from strp[posstart..posend-1] into owp of size obits.
     int lsb = 0;
-    for (int i=0, pos=posend-1; i<obits && pos>=posstart; pos--) {
+    for (int i=0, pos=static_cast<int>(posend)-1; i<obits && pos>=static_cast<int>(posstart); --pos) {
 	switch (tolower (strp[pos])) {
 	case 'x': case 'z': case '?': //FALLTHRU
 	case '0': lsb += baseLog2; break;
@@ -528,25 +763,26 @@ static inline void _vl_vsss_based(WDataOutP owp, int obits, int baseLog2, const 
 
 IData _vl_vsscanf(FILE* fp,  // If a fscanf
 		  int fbits, WDataInP fromp,  // Else if a sscanf
-		  const char* formatp, va_list ap) {
+		  const std::string& fstr,  // if a sscanf to string
+		  const char* formatp, va_list ap) VL_MT_SAFE {
     // Read a Verilog $sscanf/$fscanf style format into the output list
     // The format must be pre-processed (and lower cased) by Verilator
     // Arguments are in "width, arg-value (or WDataIn* if wide)" form
-    static VL_THREAD char tmp[VL_VALUE_STRING_MAX_WIDTH];
+    static VL_THREAD_LOCAL char tmp[VL_VALUE_STRING_MAX_WIDTH];
     int floc = fbits - 1;
     IData got = 0;
     bool inPct = false;
     const char* pos = formatp;
     for (; *pos && !_vl_vsss_eof(fp,floc); ++pos) {
-	//VL_PRINTF("_vlscan fmt='%c' floc=%d file='%c'\n", pos[0], floc, _vl_vsss_peek(fp,floc,fromp));
+	//VL_DBG_MSGF("_vlscan fmt='"<<pos[0]<<"' floc="<<floc<<" file='"<<_vl_vsss_peek(fp,floc,fromp,fstr)<<"'"<<endl);
 	if (!inPct && pos[0]=='%') {
 	    inPct = true;
 	} else if (!inPct && isspace(pos[0])) {   // Format spaces
 	    while (isspace(pos[1])) pos++;
-	    _vl_vsss_skipspace(fp,floc,fromp);
+	    _vl_vsss_skipspace(fp,floc,fromp,fstr);
 	} else if (!inPct) {   // Expected Format
-	    _vl_vsss_skipspace(fp,floc,fromp);
-	    int c = _vl_vsss_peek(fp,floc,fromp);
+	    _vl_vsss_skipspace(fp,floc,fromp,fstr);
+	    int c = _vl_vsss_peek(fp,floc,fromp,fstr);
 	    if (c != pos[0]) goto done;
 	    else _vl_vsss_advance(fp,floc);
 	} else { // Format character
@@ -555,7 +791,7 @@ IData _vl_vsscanf(FILE* fp,  // If a fscanf
 	    char fmt = pos[0];
 	    switch (fmt) {
 	    case '%': {
-		int c = _vl_vsss_peek(fp,floc,fromp);
+		int c = _vl_vsss_peek(fp,floc,fromp,fstr);
 		if (c != '%') goto done;
 		else _vl_vsss_advance(fp,floc);
 		break;
@@ -564,85 +800,86 @@ IData _vl_vsscanf(FILE* fp,  // If a fscanf
 		// Deal with all read-and-scan somethings
 		// Note LSBs are preserved if there's an overflow
 		const int obits = va_arg(ap, int);
-		WData qowp[2];
+		WData qowp[2] = {0, 0};
 		WDataOutP owp = qowp;
 		if (obits > VL_QUADSIZE) {
 		    owp = va_arg(ap,WDataOutP);
 		}
-		for (int i=0; i<VL_WORDS_I(obits); i++) owp[i] = 0;
+		for (int i=0; i<VL_WORDS_I(obits); ++i) owp[i] = 0;
 		switch (fmt) {
 		case 'c': {
-		    int c = _vl_vsss_peek(fp,floc,fromp);
+		    int c = _vl_vsss_peek(fp,floc,fromp,fstr);
 		    if (c==EOF) goto done;
 		    else _vl_vsss_advance(fp,floc);
 		    owp[0] = c;
 		    break;
 		}
 		case 's': {
-		    _vl_vsss_skipspace(fp,floc,fromp);
-		    _vl_vsss_read(fp,floc,fromp, tmp, NULL);
+		    _vl_vsss_skipspace(fp,floc,fromp,fstr);
+		    _vl_vsss_read(fp,floc,fromp,fstr, tmp, NULL);
 		    if (!tmp[0]) goto done;
-		    int pos = ((int)strlen(tmp))-1;
+		    int lpos = (static_cast<int>(strlen(tmp)))-1;
 		    int lsb = 0;
-		    for (int i=0; i<obits && pos>=0; pos--) {
-			_vl_vsss_setbit(owp,obits,lsb, 8, tmp[pos]); lsb+=8;
+		    for (int i=0; i<obits && lpos>=0; --lpos) {
+			_vl_vsss_setbit(owp,obits,lsb, 8, tmp[lpos]); lsb+=8;
 		    }
 		    break;
 		}
 		case 'd': { // Signed decimal
-		    _vl_vsss_skipspace(fp,floc,fromp);
-		    _vl_vsss_read(fp,floc,fromp, tmp, "0123456789+-xXzZ?_");
+		    _vl_vsss_skipspace(fp,floc,fromp,fstr);
+		    _vl_vsss_read(fp,floc,fromp,fstr, tmp, "0123456789+-xXzZ?_");
 		    if (!tmp[0]) goto done;
 		    vlsint64_t ld;
-		    sscanf(tmp,"%" VL_PRI64 "d",&ld);
+		    sscanf(tmp,"%30" VL_PRI64 "d",&ld);
 		    VL_SET_WQ(owp,ld);
 		    break;
 		}
 		case 'f':
 		case 'e':
 		case 'g': { // Real number
-		    _vl_vsss_skipspace(fp,floc,fromp);
-		    _vl_vsss_read(fp,floc,fromp, tmp, "+-.0123456789eE");
+		    _vl_vsss_skipspace(fp,floc,fromp,fstr);
+		    _vl_vsss_read(fp,floc,fromp,fstr, tmp, "+-.0123456789eE");
 		    if (!tmp[0]) goto done;
+		    // cppcheck-suppress unusedStructMember  // It's used
 		    union { double r; vlsint64_t ld; } u;
 		    u.r = strtod(tmp, NULL);
 		    VL_SET_WQ(owp,u.ld);
 		    break;
 		}
 		case 't': // FALLTHRU  // Time
-		case 'u': { // Unsigned decimal
-		    _vl_vsss_skipspace(fp,floc,fromp);
-		    _vl_vsss_read(fp,floc,fromp, tmp, "0123456789+-xXzZ?_");
+		case '#': { // Unsigned decimal
+		    _vl_vsss_skipspace(fp,floc,fromp,fstr);
+		    _vl_vsss_read(fp,floc,fromp,fstr, tmp, "0123456789+-xXzZ?_");
 		    if (!tmp[0]) goto done;
 		    QData ld;
-		    sscanf(tmp,"%" VL_PRI64 "u",&ld);
+		    sscanf(tmp,"%30" VL_PRI64 "u",&ld);
 		    VL_SET_WQ(owp,ld);
 		    break;
 		}
 		case 'b': {
-		    _vl_vsss_skipspace(fp,floc,fromp);
-		    _vl_vsss_read(fp,floc,fromp, tmp, "01xXzZ?_");
+		    _vl_vsss_skipspace(fp,floc,fromp,fstr);
+		    _vl_vsss_read(fp,floc,fromp,fstr, tmp, "01xXzZ?_");
 		    if (!tmp[0]) goto done;
-		    _vl_vsss_based(owp,obits, 1, tmp, 0, (int)strlen(tmp));
+		    _vl_vsss_based(owp,obits, 1, tmp, 0, strlen(tmp));
 		    break;
 		}
 		case 'o': {
-		    _vl_vsss_skipspace(fp,floc,fromp);
-		    _vl_vsss_read(fp,floc,fromp, tmp, "01234567xXzZ?_");
+		    _vl_vsss_skipspace(fp,floc,fromp,fstr);
+		    _vl_vsss_read(fp,floc,fromp,fstr, tmp, "01234567xXzZ?_");
 		    if (!tmp[0]) goto done;
-		    _vl_vsss_based(owp,obits, 3, tmp, 0, (int)strlen(tmp));
+		    _vl_vsss_based(owp,obits, 3, tmp, 0, strlen(tmp));
 		    break;
 		}
 		case 'x': {
-		    _vl_vsss_skipspace(fp,floc,fromp);
-		    _vl_vsss_read(fp,floc,fromp, tmp, "0123456789abcdefABCDEFxXzZ?_");
+		    _vl_vsss_skipspace(fp,floc,fromp,fstr);
+		    _vl_vsss_read(fp,floc,fromp,fstr, tmp, "0123456789abcdefABCDEFxXzZ?_");
 		    if (!tmp[0]) goto done;
-		    _vl_vsss_based(owp,obits, 4, tmp, 0, (int)strlen(tmp));
+		    _vl_vsss_based(owp,obits, 4, tmp, 0, strlen(tmp));
 		    break;
 		}
 		default:
-		    string msg = string("Unknown _vl_vsscanf code: ")+pos[0];
-		    vl_fatal(__FILE__,__LINE__,"",msg.c_str());
+		    std::string msg = std::string("Unknown _vl_vsscanf code: ")+pos[0];
+		    VL_FATAL_MT(__FILE__,__LINE__,"",msg.c_str());
 		    break;
 		} // switch
 
@@ -668,16 +905,16 @@ IData _vl_vsscanf(FILE* fp,  // If a fscanf
 //===========================================================================
 // File I/O
 
-FILE* VL_CVT_I_FP(IData lhs) {
+FILE* VL_CVT_I_FP(IData lhs) VL_MT_SAFE {
     return VerilatedImp::fdToFp(lhs);
 }
 
-void _VL_VINT_TO_STRING(int obits, char* destoutp, WDataInP sourcep) {
+void _VL_VINT_TO_STRING(int obits, char* destoutp, WDataInP sourcep) VL_MT_SAFE {
     // See also VL_DATA_TO_STRING_NW
     int lsb=obits-1;
     bool start=true;
     char* destp = destoutp;
-    for (; lsb>=0; lsb--) {
+    for (; lsb>=0; --lsb) {
 	lsb = (lsb / 8) * 8; // Next digit
 	IData charval = (sourcep[VL_BITWORD_I(lsb)]>>VL_BITBIT_I(lsb)) & 0xff;
 	if (!start || charval) {
@@ -685,21 +922,22 @@ void _VL_VINT_TO_STRING(int obits, char* destoutp, WDataInP sourcep) {
 	    start = false;	// Drop leading 0s
 	}
     }
-    *destp++ = '\0'; // Terminate
-    while (isspace(*(destp-1)) && destp>destoutp) *--destp = '\0';  // Drop trailing spaces
+    *destp = '\0'; // Terminate
+    if (!start) while (isspace(*(destp-1)) && destp>destoutp) *--destp = '\0';  // Drop trailing spaces
 }
 
-void _VL_STRING_TO_VINT(int obits, void* destp, int srclen, const char* srcp) {
+void _VL_STRING_TO_VINT(int obits, void* destp, size_t srclen, const char* srcp) VL_MT_SAFE {
     // Convert C string to Verilog format
-    int bytes = VL_BYTES_I(obits);
-    char* op = ((char*)(destp));
+    size_t bytes = VL_BYTES_I(obits);
+    char* op = reinterpret_cast<char*>(destp);
     if (srclen > bytes) srclen = bytes;  // Don't overflow destination
-    int i;
-    for (i=0; i<srclen; i++) { *op++ = srcp[srclen-1-i]; }
-    for (; i<bytes; i++) { *op++ = 0; }
+    size_t i;
+    for (i=0; i<srclen; ++i) { *op++ = srcp[srclen-1-i]; }
+    for (; i<bytes; ++i) { *op++ = 0; }
 }
 
-IData VL_FGETS_IXI(int obits, void* destp, IData fpi) {
+IData VL_FGETS_IXI(int obits, void* destp, IData fpi) VL_MT_SAFE {
+    // While threadsafe, each thread can only access different file handles
     FILE* fp = VL_CVT_I_FP(fpi);
     if (VL_UNLIKELY(!fp)) return 0;
 
@@ -710,14 +948,14 @@ IData VL_FGETS_IXI(int obits, void* destp, IData fpi) {
     char buffer[VL_TO_STRING_MAX_WORDS*VL_WORDSIZE+1];
     // V3Emit has static check that bytes < VL_TO_STRING_MAX_WORDS, but be safe
     if (VL_UNLIKELY(bytes > VL_TO_STRING_MAX_WORDS*VL_WORDSIZE)) {
-	vl_fatal(__FILE__,__LINE__,"","Internal: fgets buffer overrun");
+	VL_FATAL_MT(__FILE__,__LINE__,"","Internal: fgets buffer overrun");
     }
 
     // We don't use fgets, as we must read \0s.
     IData got = 0;
     char* cp = buffer;
     while (got < bytes) {
-	int c = getc(fp);
+	int c = getc(fp);  // getc() is threadsafe
 	if (c==EOF) break;
 	*cp++ = c;  got++;
 	if (c=='\n') break;
@@ -727,124 +965,205 @@ IData VL_FGETS_IXI(int obits, void* destp, IData fpi) {
     return got;
 }
 
-IData VL_FOPEN_QI(QData filename, IData mode) {
-    IData fnw[2];  VL_SET_WQ(fnw, filename);
+IData VL_FOPEN_NI(const std::string& filename, IData mode) VL_MT_SAFE {
+    // While threadsafe, each thread can only access different file handles
+    char modez[5];
+    _VL_VINT_TO_STRING(VL_WORDSIZE, modez, &mode);
+    return VL_FOPEN_S(filename.c_str(), modez);
+}
+IData VL_FOPEN_QI(QData filename, IData mode) VL_MT_SAFE {
+    // While threadsafe, each thread can only access different file handles
+    WData fnw[2];  VL_SET_WQ(fnw, filename);
     return VL_FOPEN_WI(2, fnw, mode);
 }
-IData VL_FOPEN_WI(int fnwords, WDataInP filenamep, IData mode) {
+IData VL_FOPEN_WI(int fnwords, WDataInP filenamep, IData mode) VL_MT_SAFE {
+    // While threadsafe, each thread can only access different file handles
     char filenamez[VL_TO_STRING_MAX_WORDS*VL_WORDSIZE+1];
     _VL_VINT_TO_STRING(fnwords*VL_WORDSIZE, filenamez, filenamep);
     char modez[5];
     _VL_VINT_TO_STRING(VL_WORDSIZE, modez, &mode);
     return VL_FOPEN_S(filenamez,modez);
 }
-IData VL_FOPEN_S(const char* filenamep, const char* modep) {
+IData VL_FOPEN_S(const char* filenamep, const char* modep) VL_MT_SAFE {
     return VerilatedImp::fdNew(fopen(filenamep,modep));
 }
 
-void VL_FCLOSE_I(IData fdi) {
+void VL_FCLOSE_I(IData fdi) VL_MT_SAFE {
+    // While threadsafe, each thread can only access different file handles
     FILE* fp = VL_CVT_I_FP(fdi);
     if (VL_UNLIKELY(!fp)) return;
     fclose(fp);
     VerilatedImp::fdDelete(fdi);
 }
 
-void VL_SFORMAT_X(int obits, void* destp, const char* formatp, ...) {
+void VL_SFORMAT_X(int obits, CData& destr, const char* formatp, ...) VL_MT_SAFE {
+    static VL_THREAD_LOCAL std::string output;  // static only for speed
+    output = "";
     va_list ap;
     va_start(ap,formatp);
-    string output;
     _vl_vsformat(output, formatp, ap);
     va_end(ap);
 
-    _VL_STRING_TO_VINT(obits, destp, (int)output.length(), output.c_str());
+    _VL_STRING_TO_VINT(obits, &destr, output.length(), output.c_str());
 }
 
-string VL_SFORMATF_NX(const char* formatp, ...) {
+void VL_SFORMAT_X(int obits, SData& destr, const char* formatp, ...) VL_MT_SAFE {
+    static VL_THREAD_LOCAL std::string output;  // static only for speed
+    output = "";
     va_list ap;
     va_start(ap,formatp);
-    string output;
+    _vl_vsformat(output, formatp, ap);
+    va_end(ap);
+
+    _VL_STRING_TO_VINT(obits, &destr, output.length(), output.c_str());
+}
+
+void VL_SFORMAT_X(int obits, IData& destr, const char* formatp, ...) VL_MT_SAFE {
+    static VL_THREAD_LOCAL std::string output;  // static only for speed
+    output = "";
+    va_list ap;
+    va_start(ap,formatp);
+    _vl_vsformat(output, formatp, ap);
+    va_end(ap);
+
+    _VL_STRING_TO_VINT(obits, &destr, output.length(), output.c_str());
+}
+
+void VL_SFORMAT_X(int obits, QData& destr, const char* formatp, ...) VL_MT_SAFE {
+    static VL_THREAD_LOCAL std::string output;  // static only for speed
+    output = "";
+    va_list ap;
+    va_start(ap,formatp);
+    _vl_vsformat(output, formatp, ap);
+    va_end(ap);
+
+    _VL_STRING_TO_VINT(obits, &destr, output.length(), output.c_str());
+}
+
+void VL_SFORMAT_X(int obits, void* destp, const char* formatp, ...) VL_MT_SAFE {
+    static VL_THREAD_LOCAL std::string output;  // static only for speed
+    output = "";
+    va_list ap;
+    va_start(ap,formatp);
+    _vl_vsformat(output, formatp, ap);
+    va_end(ap);
+
+    _VL_STRING_TO_VINT(obits, destp, output.length(), output.c_str());
+}
+
+void VL_SFORMAT_X(int obits_ignored, std::string &output, const char* formatp, ...) VL_MT_SAFE {
+    if (obits_ignored) {}
+    output = "";
+    va_list ap;
+    va_start(ap,formatp);
+    _vl_vsformat(output, formatp, ap);
+    va_end(ap);
+}
+
+std::string VL_SFORMATF_NX(const char* formatp, ...) VL_MT_SAFE {
+    static VL_THREAD_LOCAL std::string output;  // static only for speed
+    output = "";
+    va_list ap;
+    va_start(ap,formatp);
     _vl_vsformat(output, formatp, ap);
     va_end(ap);
 
     return output;
 }
 
-void VL_WRITEF(const char* formatp, ...) {
+void VL_WRITEF(const char* formatp, ...) VL_MT_SAFE {
+    static VL_THREAD_LOCAL std::string output;  // static only for speed
+    output = "";
     va_list ap;
     va_start(ap,formatp);
-    string output;
     _vl_vsformat(output, formatp, ap);
     va_end(ap);
 
-    // Users can redefine VL_PRINTF if they wish.
-    VL_PRINTF("%s", output.c_str());
+    VL_PRINTF_MT("%s", output.c_str());
 }
 
-void VL_FWRITEF(IData fpi, const char* formatp, ...) {
+void VL_FWRITEF(IData fpi, const char* formatp, ...) VL_MT_SAFE {
+    // While threadsafe, each thread can only access different file handles
+    static VL_THREAD_LOCAL std::string output;  // static only for speed
+    output = "";
     FILE* fp = VL_CVT_I_FP(fpi);
     if (VL_UNLIKELY(!fp)) return;
 
     va_list ap;
     va_start(ap,formatp);
-    string output;
     _vl_vsformat(output, formatp, ap);
     va_end(ap);
 
     fputs(output.c_str(), fp);
 }
 
-IData VL_FSCANF_IX(IData fpi, const char* formatp, ...) {
+IData VL_FSCANF_IX(IData fpi, const char* formatp, ...) VL_MT_SAFE {
+    // While threadsafe, each thread can only access different file handles
     FILE* fp = VL_CVT_I_FP(fpi);
     if (VL_UNLIKELY(!fp)) return 0;
 
     va_list ap;
     va_start(ap,formatp);
-    IData got = _vl_vsscanf(fp, 0, NULL, formatp, ap);
+    IData got = _vl_vsscanf(fp, 0, NULL, "", formatp, ap);
     va_end(ap);
     return got;
 }
 
-IData VL_SSCANF_IIX(int lbits, IData ld, const char* formatp, ...) {
-    IData fnw[2];  VL_SET_WI(fnw, ld);
+IData VL_SSCANF_IIX(int lbits, IData ld, const char* formatp, ...) VL_MT_SAFE {
+    WData fnw[2];  VL_SET_WI(fnw, ld);
 
     va_list ap;
     va_start(ap,formatp);
-    IData got = _vl_vsscanf(NULL, lbits, fnw, formatp, ap);
+    IData got = _vl_vsscanf(NULL, lbits, fnw, "", formatp, ap);
     va_end(ap);
     return got;
 }
-IData VL_SSCANF_IQX(int lbits, QData ld, const char* formatp, ...) {
-    IData fnw[2];  VL_SET_WQ(fnw, ld);
+IData VL_SSCANF_IQX(int lbits, QData ld, const char* formatp, ...) VL_MT_SAFE {
+    WData fnw[2];  VL_SET_WQ(fnw, ld);
 
     va_list ap;
     va_start(ap,formatp);
-    IData got = _vl_vsscanf(NULL, lbits, fnw, formatp, ap);
+    IData got = _vl_vsscanf(NULL, lbits, fnw, "", formatp, ap);
     va_end(ap);
     return got;
 }
-IData VL_SSCANF_IWX(int lbits, WDataInP lwp, const char* formatp, ...) {
+IData VL_SSCANF_IWX(int lbits, WDataInP lwp, const char* formatp, ...) VL_MT_SAFE {
     va_list ap;
     va_start(ap,formatp);
-    IData got = _vl_vsscanf(NULL, lbits, lwp, formatp, ap);
+    IData got = _vl_vsscanf(NULL, lbits, lwp, "", formatp, ap);
+    va_end(ap);
+    return got;
+}
+IData VL_SSCANF_INX(int, const std::string& ld, const char* formatp, ...) VL_MT_SAFE {
+    va_list ap;
+    va_start(ap,formatp);
+    IData got = _vl_vsscanf(NULL, ld.length()*8, NULL, ld, formatp, ap);
     va_end(ap);
     return got;
 }
 
 void VL_READMEM_Q(bool hex, int width, int depth, int array_lsb, int,
-		  QData ofilename, void* memp, IData start, IData end) {
-    IData fnw[2];  VL_SET_WQ(fnw, ofilename);
+		  QData ofilename, void* memp, IData start, IData end) VL_MT_SAFE {
+    WData fnw[2];  VL_SET_WQ(fnw, ofilename);
     return VL_READMEM_W(hex,width,depth,array_lsb,2, fnw,memp,start,end);
 }
 
 void VL_READMEM_W(bool hex, int width, int depth, int array_lsb, int fnwords,
-		  WDataInP ofilenamep, void* memp, IData start, IData end) {
+		  WDataInP ofilenamep, void* memp, IData start, IData end) VL_MT_SAFE {
     char ofilenamez[VL_TO_STRING_MAX_WORDS*VL_WORDSIZE+1];
     _VL_VINT_TO_STRING(fnwords*VL_WORDSIZE, ofilenamez, ofilenamep);
-    FILE* fp = fopen(ofilenamez, "r");
+    std::string ofilenames(ofilenamez);
+    return VL_READMEM_N(hex,width,depth,array_lsb,fnwords,ofilenames,memp,start,end);
+}
+
+void VL_READMEM_N(bool hex, int width, int depth, int array_lsb, int fnwords,
+		  const std::string& ofilenamep, void* memp, IData start, IData end) VL_MT_SAFE {
+    if (fnwords) {}
+    FILE* fp = fopen(ofilenamep.c_str(), "r");
     if (VL_UNLIKELY(!fp)) {
-	// We don't report the Verilog source filename as it slow to have to pass it down
-	vl_fatal (ofilenamez, 0, "", "$readmem file not found");
-	return;
+        // We don't report the Verilog source filename as it slow to have to pass it down
+        VL_FATAL_MT (ofilenamep.c_str(), 0, "", "$readmem file not found");
+        return;
     }
     // Prep for reading
     IData addr = start;
@@ -859,140 +1178,193 @@ void VL_READMEM_W(bool hex, int width, int depth, int array_lsb, int fnwords,
     // We process a character at a time, as then we don't need to deal
     // with changing buffer sizes dynamically, etc.
     while (1) {
-	int c = fgetc(fp);
-	if (VL_UNLIKELY(c==EOF)) break;
-	//printf("%d: Got '%c' Addr%x IN%d IgE%d IgC%d ninc%d\n", linenum, c, addr, innum, ignore_to_eol, ignore_to_cmt, needinc);
-	if (c=='\n') { linenum++; ignore_to_eol=false; if (innum) reading_addr=false; innum=false; }
-	else if (c=='\t' || c==' ' || c=='\r' || c=='\f') { if (innum) reading_addr=false; innum=false; }
-	// Skip // comments and detect /* comments
-	else if (ignore_to_cmt && lastc=='*' && c=='/') {
-	    ignore_to_cmt = false; if (innum) reading_addr=false; innum=false;
-	} else if (!ignore_to_eol && !ignore_to_cmt) {
-	    if (lastc=='/' && c=='*') { ignore_to_cmt = true; }
-	    else if (lastc=='/' && c=='/') { ignore_to_eol = true; }
-	    else if (c=='/') {}  // Part of /* or //
-	    else if (c=='_') {}
-	    else if (c=='@') { reading_addr = true; innum=false; needinc=false; }
-	    // Check for hex or binary digits as file format requests
-	    else if (isxdigit(c)) {
-		c = tolower(c);
-		int value = (c >= 'a' ? (c-'a'+10) : (c-'0'));
-		if (!innum) {  // Prep for next number
-		    if (needinc) { addr++; needinc=false; }
-		}
-		if (reading_addr) {
-		    // Decode @ addresses
-		    if (!innum) addr=0;
-		    addr = (addr<<4) + value;
-		} else {
-		    needinc = true;
-		    //printf(" Value width=%d  @%x = %c\n", width, addr, c);
-		    if (VL_UNLIKELY(addr >= (IData)(depth+array_lsb) || addr < (IData)(array_lsb))) {
-			vl_fatal (ofilenamez, linenum, "", "$readmem file address beyond bounds of array");
-		    } else {
-			int entry = addr - array_lsb;
-			QData shift = hex ? VL_ULL(4) : VL_ULL(1);
-			// Shift value in
-			if (width<=8) {
-			    CData* datap = &((CData*)(memp))[entry];
-			    if (!innum) { *datap = 0; }
-			    *datap = ((*datap << shift) + value) & VL_MASK_I(width);
-			} else if (width<=16) {
-			    SData* datap = &((SData*)(memp))[entry];
-			    if (!innum) { *datap = 0; }
-			    *datap = ((*datap << shift) + value) & VL_MASK_I(width);
-			} else if (width<=VL_WORDSIZE) {
-			    IData* datap = &((IData*)(memp))[entry];
-			    if (!innum) { *datap = 0; }
-			    *datap = ((*datap << shift) + value) & VL_MASK_I(width);
-			} else if (width<=VL_QUADSIZE) {
-			    QData* datap = &((QData*)(memp))[entry];
-			    if (!innum) { *datap = 0; }
-			    *datap = ((*datap << (QData)(shift)) + (QData)(value)) & VL_MASK_Q(width);
-			} else {
-			    WDataOutP datap = &((WDataOutP)(memp))[ entry*VL_WORDS_I(width) ];
-			    if (!innum) { VL_ZERO_RESET_W(width, datap); }
-			    _VL_SHIFTL_INPLACE_W(width, datap, (IData)shift);
-			    datap[0] |= value;
-			}
-			if (VL_UNLIKELY(value>=(1<<shift))) {
-			    vl_fatal (ofilenamez, linenum, "", "$readmemb (binary) file contains hex characters");
-			}
-		    }
-		}
-		innum = true;
-	    }
-	    else {
-		vl_fatal (ofilenamez, linenum, "", "$readmem file syntax error");
-	    }
-	}
-	lastc = c;
+        int c = fgetc(fp);
+        if (VL_UNLIKELY(c==EOF)) break;
+        //printf("%d: Got '%c' Addr%x IN%d IgE%d IgC%d ninc%d\n", linenum, c, addr, innum, ignore_to_eol, ignore_to_cmt, needinc);
+        if (c=='\n') { linenum++; ignore_to_eol=false; if (innum) reading_addr=false; innum=false; }
+        else if (c=='\t' || c==' ' || c=='\r' || c=='\f') { if (innum) reading_addr=false; innum=false; }
+        // Skip // comments and detect /* comments
+        else if (ignore_to_cmt && lastc=='*' && c=='/') {
+            ignore_to_cmt = false; if (innum) reading_addr=false; innum=false;
+        } else if (!ignore_to_eol && !ignore_to_cmt) {
+            if (lastc=='/' && c=='*') { ignore_to_cmt = true; }
+            else if (lastc=='/' && c=='/') { ignore_to_eol = true; }
+            else if (c=='/') {}  // Part of /* or //
+            else if (c=='_') {}
+            else if (c=='@') { reading_addr = true; innum=false; needinc=false; }
+            // Check for hex or binary digits as file format requests
+            else if (isxdigit(c) || (!reading_addr && (c=='x' || c=='X'))) {
+                c = tolower(c);
+                int value = (c >= 'a' ? (c=='x' ? VL_RAND_RESET_I(4) : (c-'a'+10)) : (c-'0'));
+                if (!innum) {  // Prep for next number
+                    if (needinc) { addr++; needinc=false; }
+                }
+                if (reading_addr) {
+                    // Decode @ addresses
+                    if (!innum) addr=0;
+                    addr = (addr<<4) + value;
+                } else {
+                    needinc = true;
+                    //printf(" Value width=%d  @%x = %c\n", width, addr, c);
+                    if (VL_UNLIKELY(addr >= static_cast<IData>(depth+array_lsb)
+                                    || addr < static_cast<IData>(array_lsb))) {
+                        VL_FATAL_MT (ofilenamep.c_str(), linenum, "", "$readmem file address beyond bounds of array");
+                    } else {
+                        int entry = addr - array_lsb;
+                        QData shift = hex ? VL_ULL(4) : VL_ULL(1);
+                        // Shift value in
+                        if (width<=8) {
+                            CData* datap = &(reinterpret_cast<CData*>(memp))[entry];
+                            if (!innum) { *datap = 0; }
+                            *datap = ((*datap << shift) + value) & VL_MASK_I(width);
+                        } else if (width<=16) {
+                            SData* datap = &(reinterpret_cast<SData*>(memp))[entry];
+                            if (!innum) { *datap = 0; }
+                            *datap = ((*datap << shift) + value) & VL_MASK_I(width);
+                        } else if (width<=VL_WORDSIZE) {
+                            IData* datap = &(reinterpret_cast<IData*>(memp))[entry];
+                            if (!innum) { *datap = 0; }
+                            *datap = ((*datap << shift) + value) & VL_MASK_I(width);
+                        } else if (width<=VL_QUADSIZE) {
+                            QData* datap = &(reinterpret_cast<QData*>(memp))[entry];
+                            if (!innum) { *datap = 0; }
+                            *datap = ((*datap << static_cast<QData>(shift))
+                                      + static_cast<QData>(value)) & VL_MASK_Q(width);
+                        } else {
+                            WDataOutP datap = &(reinterpret_cast<WDataOutP>(memp))[ entry*VL_WORDS_I(width) ];
+                            if (!innum) { VL_ZERO_RESET_W(width, datap); }
+                            _VL_SHIFTL_INPLACE_W(width, datap, static_cast<IData>(shift));
+                            datap[0] |= value;
+                        }
+                        if (VL_UNLIKELY(value>=(1<<shift))) {
+                            VL_FATAL_MT (ofilenamep.c_str(), linenum, "", "$readmemb (binary) file contains hex characters");
+                        }
+                    }
+                }
+                innum = true;
+            }
+            else {
+                VL_FATAL_MT (ofilenamep.c_str(), linenum, "", "$readmem file syntax error");
+            }
+        }
+        lastc = c;
     }
-    if (needinc) { addr++; needinc=false; }
+    if (needinc) { addr++; }
 
     // Final checks
     fclose(fp);
     if (VL_UNLIKELY(end != VL_UL(0xffffffff) && addr != (end+1))) {
-	vl_fatal (ofilenamez, linenum, "", "$readmem file ended before specified ending-address");
+        VL_FATAL_MT (ofilenamep.c_str(), linenum, "", "$readmem file ended before specified ending-address");
     }
 }
 
-IData VL_SYSTEM_IQ(QData lhs) {
-    IData lhsw[2];  VL_SET_WQ(lhsw, lhs);
+IData VL_SYSTEM_IQ(QData lhs) VL_MT_SAFE {
+    WData lhsw[2];  VL_SET_WQ(lhsw, lhs);
     return VL_SYSTEM_IW(2, lhsw);
 }
-IData VL_SYSTEM_IW(int lhswords, WDataInP filenamep) {
+IData VL_SYSTEM_IW(int lhswords, WDataInP filenamep) VL_MT_SAFE {
     char filenamez[VL_TO_STRING_MAX_WORDS*VL_WORDSIZE+1];
     _VL_VINT_TO_STRING(lhswords*VL_WORDSIZE, filenamez, filenamep);
-    int code = system(filenamez);
+    int code = system(filenamez);  // Yes, system() is threadsafe
     return code >> 8;  // Want exit status
 }
 
-IData VL_TESTPLUSARGS_I(const char* formatp) {
-    string match = VerilatedImp::argPlusMatch(formatp);
+IData VL_TESTPLUSARGS_I(const char* formatp) VL_MT_SAFE {
+    const std::string& match = VerilatedImp::argPlusMatch(formatp);
     if (match == "") return 0;
     else return 1;
 }
 
-IData VL_VALUEPLUSARGS_IW(int rbits, const char* prefixp, char fmt, WDataOutP rwp) {
-    string match = VerilatedImp::argPlusMatch(prefixp);
-    const char* dp = match.c_str() + 1 /*leading + */ + strlen(prefixp);
+IData VL_VALUEPLUSARGS_INW(int rbits, const std::string& ld, WDataOutP rwp) VL_MT_SAFE {
+    std::string prefix;
+    bool inPct = false;
+    bool done = false;
+    char fmt = ' ';
+    for (const char* posp = ld.c_str(); !done && *posp; ++posp) {
+	if (!inPct && posp[0]=='%') {
+	    inPct = true;
+	} else if (!inPct) {   // Normal text
+	    prefix += *posp;
+	} else { // Format character
+	    switch (tolower(*posp)) {
+	    case '%':
+		prefix += *posp;
+		inPct = false;
+		break;
+	    default:
+		fmt = *posp;
+		done = true;
+		break;
+	    }
+	}
+    }
+
+    const std::string& match = VerilatedImp::argPlusMatch(prefix.c_str());
+    const char* dp = match.c_str() + 1 /*leading + */ + prefix.length();
     if (match == "") return 0;
+
     VL_ZERO_RESET_W(rbits, rwp);
     switch (tolower(fmt)) {
-    case '%':
-	break;
     case 'd':
-	vlsint64_t ld;
-	sscanf(dp,"%" VL_PRI64 "d",&ld);
-	VL_SET_WQ(rwp,ld);
+	vlsint64_t lld;
+	sscanf(dp,"%30" VL_PRI64 "d",&lld);
+	VL_SET_WQ(rwp,lld);
 	break;
     case 'b':
-	_vl_vsss_based(rwp,rbits, 1, dp, 0, (int)strlen(dp));
+	_vl_vsss_based(rwp,rbits, 1, dp, 0, strlen(dp));
 	break;
     case 'o':
-	_vl_vsss_based(rwp,rbits, 3, dp, 0, (int)strlen(dp));
+	_vl_vsss_based(rwp,rbits, 3, dp, 0, strlen(dp));
 	break;
     case 'h': //FALLTHRU
     case 'x':
-	_vl_vsss_based(rwp,rbits, 4, dp, 0, (int)strlen(dp));
+	_vl_vsss_based(rwp,rbits, 4, dp, 0, strlen(dp));
 	break;
-    case 's':
-	for (int i=0, lsb=0, pos=((int)strlen(dp))-1; i<rbits && pos>=0; pos--) {
-	    _vl_vsss_setbit(rwp,rbits,lsb, 8, dp[pos]); lsb+=8;
+    case 's': // string/no conversion
+	for (int i=0, lsb=0, posp=static_cast<int>(strlen(dp))-1; i<rbits && posp>=0; --posp) {
+	    _vl_vsss_setbit(rwp,rbits,lsb, 8, dp[posp]); lsb+=8;
 	}
 	break;
-    default:  // Compile time should have found all errors before this
-	vl_fatal (__FILE__, __LINE__, "", "$value$plusargs format error");
-	break;
+    case 'e': //FALLTHRU - Unsupported
+    case 'f': //FALLTHRU - Unsupported
+    case 'g': //FALLTHRU - Unsupported
+    default:  // Other simulators simply return 0 in these cases and don't error out
+	return 0;
     }
     _VL_CLEAN_INPLACE_W(rbits,rwp);
     return 1;
 }
+IData VL_VALUEPLUSARGS_INN(int, const std::string& ld, std::string& rdr) VL_MT_SAFE {
+    std::string prefix;
+    bool inPct = false;
+    bool done = false;
+    for (const char* posp = ld.c_str(); !done && *posp; ++posp) {
+	if (!inPct && posp[0]=='%') {
+	    inPct = true;
+	} else if (!inPct) {   // Normal text
+	    prefix += *posp;
+	} else { // Format character
+	    switch (tolower(*posp)) {
+	    case '%':
+		prefix += *posp;
+		inPct = false;
+		break;
+	    default:
+		done = true;
+		break;
+	    }
+	}
+    }
+    const std::string& match = VerilatedImp::argPlusMatch(prefix.c_str());
+    const char* dp = match.c_str() + 1 /*leading + */ + prefix.length();
+    if (match == "") return 0;
+    rdr = std::string(dp);
+    return 1;
+}
 
-const char* vl_mc_scan_plusargs(const char* prefixp) {
-    string match = VerilatedImp::argPlusMatch(prefixp);
-    static VL_THREAD char outstr[VL_VALUE_STRING_MAX_WIDTH];
+const char* vl_mc_scan_plusargs(const char* prefixp) VL_MT_SAFE {
+    const std::string& match = VerilatedImp::argPlusMatch(prefixp);
+    static VL_THREAD_LOCAL char outstr[VL_VALUE_STRING_MAX_WIDTH];
     if (match == "") return NULL;
     strncpy(outstr, match.c_str()+strlen(prefixp)+1, // +1 to skip the "+"
 	    VL_VALUE_STRING_MAX_WIDTH);
@@ -1003,7 +1375,7 @@ const char* vl_mc_scan_plusargs(const char* prefixp) {
 //===========================================================================
 // Heavy functions
 
-string VL_CVT_PACK_STR_NW(int lwords, WDataInP lwp) {
+std::string VL_CVT_PACK_STR_NW(int lwords, WDataInP lwp) VL_MT_SAFE {
     // See also _VL_VINT_TO_STRING
     char destout[VL_TO_STRING_MAX_WORDS*VL_WORDSIZE+1];
     int obits = lwords * VL_WORDSIZE;
@@ -1011,7 +1383,7 @@ string VL_CVT_PACK_STR_NW(int lwords, WDataInP lwp) {
     bool start=true;
     char* destp = destout;
     int len = 0;
-    for (; lsb>=0; lsb--) {
+    for (; lsb>=0; --lsb) {
 	lsb = (lsb / 8) * 8; // Next digit
 	IData charval = (lwp[VL_BITWORD_I(lsb)]>>VL_BITBIT_I(lsb)) & 0xff;
 	if (!start || charval) {
@@ -1020,19 +1392,61 @@ string VL_CVT_PACK_STR_NW(int lwords, WDataInP lwp) {
 	    start = false;	// Drop leading 0s
 	}
     }
-    return string(destout, len);
+    return std::string(destout, len);
 }
 
 //===========================================================================
 // Verilated:: Methods
 
-const char* Verilated::catName(const char* n1, const char* n2) {
+Verilated::ThreadLocal::ThreadLocal()
+    :
+#ifdef VL_THREADED
+    t_trainId(0),
+#endif
+    t_dpiScopep(NULL), t_dpiFilename(0), t_dpiLineno(0) {
+}
+Verilated::ThreadLocal::~ThreadLocal() {
+}
+
+void Verilated::debug(int val) VL_MT_SAFE {
+    VerilatedLockGuard guard(m_mutex);
+    s_s.s_debug = val;
+    if (val) {
+#ifdef VL_DEBUG
+	VL_DEBUG_IF(VL_DBG_MSGF("- Verilated::debug is on. Message prefix indicates {<thread>,<sequence_number>}.\n"););
+#else
+	VL_PRINTF_MT("- Verilated::debug attempted, but compiled without VL_DEBUG, so messages suppressed.\n");
+#endif
+    }
+}
+void Verilated::randReset(int val) VL_MT_SAFE {
+    VerilatedLockGuard guard(m_mutex);
+    s_s.s_randReset = val;
+}
+void Verilated::calcUnusedSigs(bool flag) VL_MT_SAFE {
+    VerilatedLockGuard guard(m_mutex);
+    s_s.s_calcUnusedSigs = flag;
+}
+void Verilated::gotFinish(bool flag) VL_MT_SAFE {
+    VerilatedLockGuard guard(m_mutex);
+    s_s.s_gotFinish = flag;
+}
+void Verilated::assertOn(bool flag) VL_MT_SAFE {
+    VerilatedLockGuard guard(m_mutex);
+    s_s.s_assertOn = flag;
+}
+void Verilated::fatalOnVpiError(bool flag) VL_MT_SAFE {
+    VerilatedLockGuard guard(m_mutex);
+    s_s.s_fatalOnVpiError = flag;
+}
+
+const char* Verilated::catName(const char* n1, const char* n2) VL_MT_SAFE {
     // Returns new'ed data
     // Used by symbol table creation to make module names
-    static char* strp = NULL;
-    static size_t len  = 0;
+    static VL_THREAD_LOCAL char* strp = NULL;
+    static VL_THREAD_LOCAL size_t len  = 0;
     size_t newlen = strlen(n1)+strlen(n2)+2;
-    if (newlen > len) {
+    if (!strp || newlen > len) {
 	if (strp) delete [] strp;
 	strp = new char[newlen];
 	len = newlen;
@@ -1043,29 +1457,106 @@ const char* Verilated::catName(const char* n1, const char* n2) {
     return strp;
 }
 
-void Verilated::flushCb(VerilatedVoidCb cb) {
+void Verilated::flushCb(VerilatedVoidCb cb) VL_MT_SAFE {
+    VerilatedLockGuard guard(m_mutex);
     if (s_flushCb == cb) {}  // Ok - don't duplicate
     else if (!s_flushCb) { s_flushCb=cb; }
     else {
 	// Someday we may allow multiple callbacks ala atexit(), but until then
-	vl_fatal("unknown",0,"", "Verilated::flushCb called twice with different callbacks");
+	VL_FATAL_MT("unknown",0,"", "Verilated::flushCb called twice with different callbacks");
     }
 }
 
-void Verilated::commandArgs(int argc, const char** argv) {
+void Verilated::flushCall() VL_MT_SAFE {
+    VerilatedLockGuard guard(m_mutex);
+    if (s_flushCb) (*s_flushCb)();
+}
+
+void Verilated::commandArgs(int argc, const char** argv) VL_MT_SAFE {
+    VerilatedLockGuard guard(m_mutex);
+    s_args.argc = argc;
+    s_args.argv = argv;
     VerilatedImp::commandArgs(argc,argv);
 }
 
-void Verilated::scopesDump() {
+const char* Verilated::commandArgsPlusMatch(const char* prefixp) VL_MT_SAFE {
+    const std::string& match = VerilatedImp::argPlusMatch(prefixp);
+    static VL_THREAD_LOCAL char outstr[VL_VALUE_STRING_MAX_WIDTH];
+    if (match == "") return "";
+    strncpy(outstr, match.c_str(), VL_VALUE_STRING_MAX_WIDTH);
+    outstr[VL_VALUE_STRING_MAX_WIDTH-1] = '\0';
+    return outstr;
+}
+
+void Verilated::overWidthError(const char* signame) VL_MT_SAFE {
+    // Slowpath - Called only when signal sets too high of a bit
+    std::string msg = (std::string("Testbench C set input '")
+                       + signame
+                       + "' to value that overflows what the signal's width can fit");
+    VL_FATAL_MT("unknown",0,"", msg.c_str());
+}
+
+void Verilated::quiesce() VL_MT_SAFE {
+#ifdef VL_THREADED
+    // Wait until all threads under this evaluation are quiet
+    // THREADED-TODO
+#endif
+}
+
+void Verilated::internalsDump() VL_MT_SAFE {
+    VerilatedImp::internalsDump();
+}
+
+void Verilated::scopesDump() VL_MT_SAFE {
     VerilatedImp::scopesDump();
 }
 
-const VerilatedScope* Verilated::scopeFind(const char* namep) {
+void Verilated::numThreads(unsigned threads) VL_MT_SAFE {
+    VerilatedImp::numThreads(threads);
+}
+unsigned Verilated::numThreads() VL_MT_SAFE {
+    return VerilatedImp::numThreads();
+}
+void Verilated::spawnThreads() VL_MT_SAFE {
+    VerilatedImp::spawnThreads();
+}
+
+const VerilatedScope* Verilated::scopeFind(const char* namep) VL_MT_SAFE {
     return VerilatedImp::scopeFind(namep);
 }
 
-int Verilated::exportFuncNum(const char* namep) {
+int Verilated::exportFuncNum(const char* namep) VL_MT_SAFE {
     return VerilatedImp::exportFind(namep);
+}
+
+const VerilatedScopeNameMap* Verilated::scopeNameMap() VL_MT_SAFE {
+    return VerilatedImp::scopeNameMap();
+}
+
+#ifdef VL_THREADED
+void Verilated::endOfThreadTrainGuts(VerilatedEvalMsgQueue* evalMsgQp) VL_MT_SAFE {
+    VL_DEBUG_IF(VL_DBG_MSGF("End of thread train\n"););
+    VerilatedThreadMsgQueue::flush(evalMsgQp);
+}
+
+void Verilated::endOfEvalGuts(VerilatedEvalMsgQueue* evalMsgQp) VL_MT_SAFE {
+    VL_DEBUG_IF(VL_DBG_MSGF("End-of-eval cleanup\n"););
+    evalMsgQp->process();
+}
+#endif
+
+//======================================================================
+// VerilatedSyms:: Methods
+
+VerilatedSyms::VerilatedSyms() {
+#ifdef VL_THREADED
+    __Vm_evalMsgQp = new VerilatedEvalMsgQueue;
+#endif
+}
+VerilatedSyms::~VerilatedSyms() {
+#ifdef VL_THREADED
+    delete __Vm_evalMsgQp;
+#endif
 }
 
 //===========================================================================
@@ -1076,12 +1567,14 @@ VerilatedModule::VerilatedModule(const char* namep)
 }
 
 VerilatedModule::~VerilatedModule() {
-    if (m_namep) free((void*)m_namep); m_namep=NULL;
+    // Memory cleanup - not called during normal operation
+    if (m_namep) { free((void*)m_namep); m_namep=NULL; }
 }
 
 //======================================================================
 // VerilatedVar:: Methods
 
+// cppcheck-suppress unusedFunction  // Used by applications
 vluint32_t VerilatedVar::entSize() const {
     vluint32_t size = 1;
     switch (vltype()) {
@@ -1090,7 +1583,7 @@ vluint32_t VerilatedVar::entSize() const {
     case VLVT_UINT16:	size=sizeof(SData); break;
     case VLVT_UINT32:	size=sizeof(IData); break;
     case VLVT_UINT64:	size=sizeof(QData); break;
-    case VLVT_WDATA:	size=VL_WORDS_I(range().bits())*sizeof(IData); break;
+    case VLVT_WDATA:	size=VL_WORDS_I(range().elements())*sizeof(IData); break;
     default:		size=0; break;
     }
     return size;
@@ -1108,6 +1601,7 @@ VerilatedScope::VerilatedScope() {
 }
 
 VerilatedScope::~VerilatedScope() {
+    // Memory cleanup - not called during normal operation
     VerilatedImp::scopeErase(this);
     if (m_namep) { delete [] m_namep; m_namep = NULL; }
     if (m_callbacksp) { delete [] m_callbacksp; m_callbacksp = NULL; }
@@ -1115,7 +1609,7 @@ VerilatedScope::~VerilatedScope() {
     m_funcnumMax = 0;  // Force callback table to empty
 }
 
-void VerilatedScope::configure(VerilatedSyms* symsp, const char* prefixp, const char* suffixp) {
+void VerilatedScope::configure(VerilatedSyms* symsp, const char* prefixp, const char* suffixp) VL_MT_UNSAFE {
     // Slowpath - called once/scope at construction
     // We don't want the space and reference-count access overhead of strings.
     m_symsp = symsp;
@@ -1127,7 +1621,7 @@ void VerilatedScope::configure(VerilatedSyms* symsp, const char* prefixp, const 
     VerilatedImp::scopeInsert(this);
 }
 
-void VerilatedScope::exportInsert(int finalize, const char* namep, void* cb) {
+void VerilatedScope::exportInsert(int finalize, const char* namep, void* cb) VL_MT_UNSAFE {
     // Slowpath - called once/scope*export at construction
     // Insert a exported function into scope table
     int funcnum = VerilatedImp::exportInsert(namep);
@@ -1137,7 +1631,7 @@ void VerilatedScope::exportInsert(int finalize, const char* namep, void* cb) {
 	if (funcnum >= m_funcnumMax) { m_funcnumMax = funcnum+1; }
     } else {
 	if (VL_UNLIKELY(funcnum >= m_funcnumMax)) {
-	    vl_fatal(__FILE__,__LINE__,"","Internal: Bad funcnum vs. pre-finalize maximum");
+	    VL_FATAL_MT(__FILE__,__LINE__,"","Internal: Bad funcnum vs. pre-finalize maximum");
 	}
 	if (VL_UNLIKELY(!m_callbacksp)) { // First allocation
 	    m_callbacksp = new void* [m_funcnumMax];
@@ -1148,7 +1642,7 @@ void VerilatedScope::exportInsert(int finalize, const char* namep, void* cb) {
 }
 
 void VerilatedScope::varInsert(int finalize, const char* namep, void* datap,
-			       VerilatedVarType vltype, int vlflags, int dims, ...) {
+			       VerilatedVarType vltype, int vlflags, int dims, ...) VL_MT_UNSAFE {
     // Grab dimensions
     // In the future we may just create a large table at emit time and statically construct from that.
     if (!finalize) return;
@@ -1162,65 +1656,76 @@ void VerilatedScope::varInsert(int finalize, const char* namep, void* datap,
 	int msb = va_arg(ap,int);
 	int lsb = va_arg(ap,int);
 	if (i==0) {
-	    var.m_range.m_lhs = msb;
-	    var.m_range.m_rhs = lsb;
+	    var.m_range.m_left = msb;
+	    var.m_range.m_right = lsb;
 	} else if (i==1) {
-	    var.m_array.m_lhs = msb;
-	    var.m_array.m_rhs = lsb;
+	    var.m_array.m_left = msb;
+	    var.m_array.m_right = lsb;
 	} else {
 	    // We could have a linked list of ranges, but really this whole thing needs
 	    // to be generalized to support structs and unions, etc.
-	    vl_fatal(__FILE__,__LINE__,"",(string("Unsupported multi-dimensional public varInsert: ")+namep).c_str());
+	    VL_FATAL_MT(__FILE__,__LINE__,"",(std::string("Unsupported multi-dimensional public varInsert: ")+namep).c_str());
 	}
     }
     va_end(ap);
 
-    m_varsp->insert(make_pair(namep,var));
+    m_varsp->insert(std::make_pair(namep,var));
 }
 
-VerilatedVar* VerilatedScope::varFind(const char* namep) const {
+// cppcheck-suppress unusedFunction  // Used by applications
+VerilatedVar* VerilatedScope::varFind(const char* namep) const VL_MT_SAFE_POSTINIT {
     if (VL_LIKELY(m_varsp)) {
 	VerilatedVarNameMap::iterator it = m_varsp->find(namep);
-	if (VL_LIKELY(it != m_varsp->end())) {	
+	if (VL_LIKELY(it != m_varsp->end())) {
 	    return &(it->second);
 	}
     }
     return NULL;
 }
 
-void* VerilatedScope::exportFindNullError(int funcnum) const {
+void* VerilatedScope::exportFindNullError(int funcnum) VL_MT_SAFE {
     // Slowpath - Called only when find has failed
-    string msg = (string("Testbench C called '")
-		  +VerilatedImp::exportName(funcnum)
-		  +"' but scope wasn't set, perhaps due to dpi import call without 'context'");
-    vl_fatal("unknown",0,"", msg.c_str());
+    std::string msg = (std::string("Testbench C called '")
+		       +VerilatedImp::exportName(funcnum)
+		       +"' but scope wasn't set, perhaps due to dpi import call without 'context'");
+    VL_FATAL_MT("unknown",0,"", msg.c_str());
     return NULL;
 }
 
 void* VerilatedScope::exportFindError(int funcnum) const {
     // Slowpath - Called only when find has failed
-    string msg = (string("Testbench C called '")
-		  +VerilatedImp::exportName(funcnum)
-		  +"' but this DPI export function exists only in other scopes, not scope '"
-		  +name()+"'");
-    vl_fatal("unknown",0,"", msg.c_str());
+    std::string msg = (std::string("Testbench C called '")
+		       +VerilatedImp::exportName(funcnum)
+		       +"' but this DPI export function exists only in other scopes, not scope '"
+		       +name()+"'");
+    VL_FATAL_MT("unknown",0,"", msg.c_str());
     return NULL;
 }
 
 void VerilatedScope::scopeDump() const {
-    VL_PRINTF("    SCOPE %p: %s\n", this, name());
-    for (int i=0; i<m_funcnumMax; i++) {
+    VL_PRINTF_MT("    SCOPE %p: %s\n", this, name());
+    for (int i=0; i<m_funcnumMax; ++i) {
 	if (m_callbacksp && m_callbacksp[i]) {
-	    VL_PRINTF("       DPI-EXPORT %p: %s\n",
-		      m_callbacksp[i], VerilatedImp::exportName(i));
+	    VL_PRINTF_MT("       DPI-EXPORT %p: %s\n",
+			 m_callbacksp[i], VerilatedImp::exportName(i));
 	}
     }
-    if (varsp()) {
-	for (VerilatedVarNameMap::const_iterator it = varsp()->begin();
-	     it != varsp()->end(); ++it) {
-	    VL_PRINTF("       VAR %p: %s\n", &(it->second), it->first);
+    if (VerilatedVarNameMap* varsp = this->varsp()) {
+	for (VerilatedVarNameMap::const_iterator it = varsp->begin();
+	     it != varsp->end(); ++it) {
+	    VL_PRINTF_MT("       VAR %p: %s\n", &(it->second), it->first);
 	}
     }
 }
+
+//===========================================================================
+// VerilatedOneThreaded:: Methods
+
+#ifdef VL_THREADED
+void VerilatedAssertOneThread::fatal_different() VL_MT_SAFE {
+    VL_FATAL_MT(__FILE__, __LINE__, "", "Routine called that is single threaded, but called from"
+		" a different thread then the expected constructing thread");
+}
+#endif
 
 //===========================================================================

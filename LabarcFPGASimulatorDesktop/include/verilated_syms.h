@@ -1,7 +1,7 @@
 // -*- mode: C++; c-file-style: "cc-mode" -*-
 //*************************************************************************
 //
-// Copyright 2003-2012 by Wilson Snyder. This program is free software; you can
+// Copyright 2003-2017 by Wilson Snyder. This program is free software; you can
 // redistribute it and/or modify it under the terms of either the GNU
 // Lesser General Public License Version 3 or the Perl Artistic License.
 // Version 2.0.
@@ -20,6 +20,9 @@
 ///	the symbol table.  It is not included in verilated.h
 ///	as it requires some heavyweight C++ classes.
 ///
+///     These classes are thread safe on read only. It is constructed
+///     only when a model is built (from the main thread).
+///
 /// Code available from: http://www.veripool.org/verilator
 ///
 //*************************************************************************
@@ -32,36 +35,29 @@
 
 #include <map>
 
-//======================================================================
-// Types
-
-struct VerilatedCStrCmp {
-    /// Ordering maps keyed by const char*'s
-    bool operator() (const char *a, const char *b) const {
-	return std::strcmp(a, b) < 0;
-    }
-};
-
 //===========================================================================
 /// Verilator range
+/// Thread safety: Assume is constructed only with model, then any number of readers
 
-class VerilatedRange { 
-    int		m_lhs;
-    int		m_rhs;
+// See also V3Ast::VNumRange
+class VerilatedRange {
+    int		m_left;
+    int		m_right;
 protected:
     friend class VerilatedVar;
     friend class VerilatedScope;
-    VerilatedRange() : m_lhs(0), m_rhs(0) {}
-    void sets(int lhs, int rhs) { m_lhs=lhs; m_rhs=rhs; }
+    VerilatedRange() : m_left(0), m_right(0) {}
+    void sets(int left, int right) { m_left=left; m_right=right; }
 public:
     ~VerilatedRange() {}
-    int lhs() const { return m_lhs; }
-    int rhs() const { return m_rhs; }
-    int bits() const { return (VL_LIKELY(m_lhs>=m_rhs)?(m_lhs-m_rhs+1):(m_rhs-m_lhs+1)); }
+    int left() const { return m_left; }
+    int right() const { return m_right; }
+    int elements() const { return (VL_LIKELY(m_left>=m_right)?(m_left-m_right+1):(m_right-m_left+1)); }
 };
 
 //===========================================================================
 /// Verilator variable
+/// Thread safety: Assume is constructed only with model, then any number of readers
 
 class VerilatedVar {
     void*		m_datap;	// Location of data
@@ -80,7 +76,7 @@ public:
     ~VerilatedVar() {}
     void* datap() const { return m_datap; }
     VerilatedVarType vltype() const { return m_vltype; }
-    VerilatedVarFlags vldir() const { return (VerilatedVarFlags)((int)m_vlflags & VLVF_MASK_DIR); }
+    VerilatedVarFlags vldir() const { return static_cast<VerilatedVarFlags>(static_cast<int>(m_vlflags) & VLVF_MASK_DIR); }
     vluint32_t entSize() const;
     bool isPublicRW() const { return ((m_vlflags & VLVF_PUB_RW) != 0); }
     const VerilatedRange& range() const { return m_range; }
@@ -92,7 +88,23 @@ public:
 //======================================================================
 /// Types
 
-struct VerilatedVarNameMap : public map<const char*, VerilatedVar, VerilatedCStrCmp> {
+struct VerilatedCStrCmp {
+    /// Ordering maps keyed by const char*'s
+    bool operator() (const char *a, const char *b) const {
+	return std::strcmp(a, b) < 0;
+    }
+};
+
+class VerilatedScopeNameMap
+    : public std::map<const char*, const VerilatedScope*, VerilatedCStrCmp> {
+public:
+    VerilatedScopeNameMap() {}
+    ~VerilatedScopeNameMap() {}
+};
+
+class VerilatedVarNameMap
+    : public std::map<const char*, VerilatedVar, VerilatedCStrCmp> {
+public:
     VerilatedVarNameMap() {}
     ~VerilatedVarNameMap() {}
 };

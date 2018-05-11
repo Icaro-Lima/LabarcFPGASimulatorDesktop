@@ -5,6 +5,8 @@
 
 VMain * vmain;
 
+using namespace std;
+
 int main() {
 	vmain = new VMain;
 

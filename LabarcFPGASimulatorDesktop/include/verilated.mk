@@ -2,28 +2,35 @@
 ######################################################################
 # DESCRIPTION: Makefile commands for all verilated target files
 #
-# Copyright 2003-2012 by Wilson Snyder. Verilator is free software; you can
+# Copyright 2003-2017 by Wilson Snyder. Verilator is free software; you can
 # redistribute it and/or modify it under the terms of either the GNU Lesser
 # General Public License Version 3 or the Perl Artistic License Version 2.0.
 ######################################################################
 
-PERL = @PERL@
-CXX = @CXX@
-LINK = @CXX@
+PERL = /usr/bin/perl
+CXX = g++
+LINK = g++
 AR     = ar
 RANLIB = ranlib
 
-CFG_WITH_CCWARN = @CFG_WITH_CCWARN@
-CFG_WITH_LONGTESTS = @CFG_WITH_LONGTESTS@
+CFG_WITH_CCWARN = no
+CFG_WITH_LONGTESTS = no
 
+# Select newest language
+CFG_CXXFLAGS_STD_NEWEST = -std=gnu++14
+# Select oldest language (for Verilator internal testing only)
+CFG_CXXFLAGS_STD_OLDEST = -std=gnu++03
 # Compiler flags to use to turn off unused and generated code warnings, such as -Wno-div-by-zero
-CFG_CXXFLAGS_NO_UNUSED = @CFG_CXXFLAGS_NO_UNUSED@
+CFG_CXXFLAGS_NO_UNUSED =  -faligned-new -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable -Wno-shadow
+# Compiler flags that turn on extra warnings
+CFG_CXXFLAGS_WEXTRA =  -Wextra -Wfloat-conversion -Wlogical-op
 
 ######################################################################
 # Programs
 
-SP_PREPROC	= sp_preproc
-SP_INCLUDER     = $(PERL) $(VERILATOR_ROOT)/bin/verilator_includer
+SP_INCLUDER	= $(VERILATOR_INCLUDER)
+VERILATOR_COVERAGE = $(PERL) $(VERILATOR_ROOT)/bin/verilator_coverage
+VERILATOR_INCLUDER = $(PERL) $(VERILATOR_ROOT)/bin/verilator_includer
 
 ######################################################################
 # Make checks
@@ -41,16 +48,16 @@ VK_CPPFLAGS_ALWAYS += \
 		-I$(VERILATOR_ROOT)/include \
 		-I$(VERILATOR_ROOT)/include/vltstd \
 		-DVL_PRINTF=printf \
-		-DVM_TRACE=$(VM_TRACE) \
 		-DVM_COVERAGE=$(VM_COVERAGE) \
+		-DVM_SC=$(VM_SC) \
+		-DVM_TRACE=$(VM_TRACE) \
+		$(CFG_CXXFLAGS_NO_UNUSED) \
 
 ifeq ($(CFG_WITH_CCWARN),yes)	# Local... Else don't burden users
-VK_CPPFLAGS_WALL += -Wall \
-		$(CFG_CXXFLAGS_NO_UNUSED) \
-		-Werror
+VK_CPPFLAGS_WALL += -Wall $(CFG_CXXFLAGS_WEXTRA) -Werror
 endif
 
-CPPFLAGS += -I. $(VK_CPPFLAGS_ALWAYS) $(VK_CPPFLAGS_WALL)
+CPPFLAGS += -I. $(VK_CPPFLAGS_WALL) $(VK_CPPFLAGS_ALWAYS)
 
 VPATH += ..
 VPATH += $(VERILATOR_ROOT)/include
@@ -90,9 +97,9 @@ VM_CLASSES += $(VM_CLASSES_FAST) $(VM_CLASSES_SLOW)
 VM_SUPPORT += $(VM_SUPPORT_FAST) $(VM_SUPPORT_SLOW)
 
 #######################################################################
-##### SystemC or SystemPerl builds
+##### SystemC builds
 
-ifeq ($(VM_SP_OR_SC),1)
+ifeq ($(VM_SC),1)
   CPPFLAGS += $(SYSTEMC_CXX_FLAGS) -I$(SYSTEMC_INCLUDE)
   LDFLAGS  += $(SYSTEMC_CXX_FLAGS) -L$(SYSTEMC_LIBDIR)
   SC_LIBS   = -lsystemc
@@ -103,41 +110,24 @@ ifeq ($(VM_SP_OR_SC),1)
 endif
 
 #######################################################################
-##### SystemPerl builds
+##### Threaded builds
 
-ifeq ($(VM_SP),1)
-  CPPFLAGS += -I$(SYSTEMPERL_INCLUDE) -DSYSTEMPERL
-  VPATH    +=   $(SYSTEMPERL_INCLUDE)
-  LIBS   += -lm -lstdc++
-
-  VK_CLASSES_SP = $(addsuffix .sp, $(VM_CLASSES))
-
-  # This rule is called manually by the upper level makefile
-  preproc:
-	 @echo "      SP Preprocess" $(basename $(VM_CLASSES)) ...
-	 $(SP_PREPROC) -M sp_preproc.d --tree $(VM_PREFIX).sp_tree \
-		--preproc $(VK_CLASSES_SP)
-else
- ifeq ($(VM_COVERAGE),1)
-  CPPFLAGS += -I$(SYSTEMPERL_INCLUDE)
-  VPATH    +=   $(SYSTEMPERL_INCLUDE)
+ifneq ($(VM_THREADS),0)
+ ifneq ($(VM_THREADS),)
+  # Need C++11 at least, so always default to newest
+  CPPFLAGS += -DVL_THREADED $(CFG_CXXFLAGS_STD_NEWEST)
  endif
-  preproc:
 endif
 
 #######################################################################
-##### SystemC w/o SystemPerl builds
+##### Stub
 
-ifeq ($(VM_SC),1)
-  LIBS   += -lm -lstdc++
-endif
+preproc:
 
 #######################################################################
 ##### C/H builds
 
-ifeq ($(VM_PCLI),1)
-  LIBS   += -lm -lstdc++
-endif
+LIBS   += -lm -lstdc++
 
 #######################################################################
 # Overall Objects Linking
@@ -157,9 +147,9 @@ ifneq ($(VM_PARALLEL_BUILDS),1)
   VK_OBJS += $(VM_PREFIX)__ALLcls.o   $(VM_PREFIX)__ALLsup.o
   all_cpp:   $(VM_PREFIX)__ALLcls.cpp $(VM_PREFIX)__ALLsup.cpp
   $(VM_PREFIX)__ALLcls.cpp: $(VK_CLASSES_CPP)
-	$(SP_INCLUDER) $^ > $@
+	$(VERILATOR_INCLUDER) -DVL_INCLUDE_OPT=include $^ > $@
   $(VM_PREFIX)__ALLsup.cpp: $(VK_SUPPORT_CPP)
-	$(SP_INCLUDER) $^ > $@
+	$(VERILATOR_INCLUDER) -DVL_INCLUDE_OPT=include $^ > $@
 else
   #Slow way of building... Each .cpp file by itself
   VK_OBJS += $(addsuffix .o, $(VM_CLASSES) $(VM_SUPPORT))
@@ -173,15 +163,23 @@ $(VM_PREFIX)__ALL.a: $(VK_OBJS)
 ######################################################################
 ### Compile rules
 
-#Default rule embedded in make:  (Not defined so user makefiles can override it)
-#.cpp.o:
-#	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
-
+ifneq ($(VM_DEFAULT_RULES),0)
 $(VM_PREFIX)__ALLsup.o: $(VM_PREFIX)__ALLsup.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_SLOW) -c -o $@ $<
 
 $(VM_PREFIX)__ALLcls.o: $(VM_PREFIX)__ALLcls.cpp
 	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+
+$(VM_PREFIX)%__Slow.o: $(VM_PREFIX)%__Slow.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_SLOW) -c -o $@ $<
+
+$(VM_PREFIX)%.o: $(VM_PREFIX)%.cpp
+	$(OBJCACHE) $(CXX) $(CXXFLAGS) $(CPPFLAGS) $(OPT_FAST) -c -o $@ $<
+endif
+
+#Default rule embedded in make:
+#.cpp.o:
+#	$(CXX) $(CXXFLAGS) $(CPPFLAGS) -c -o $@ $<
 
 ######################################################################
 ### Debugging
@@ -195,6 +193,7 @@ debug-make::
 	@echo VM_SUPPORT_SLOW: $(VM_SUPPORT_SLOW)
 	@echo VM_GLOBAL_FAST: $(VM_GLOBAL_FAST)
 	@echo VM_GLOBAL_SLOW: $(VM_GLOBAL_SLOW)
+	@echo CPPFLAGS: $(CPPFLAGS)
 	@echo
 
 ######################################################################

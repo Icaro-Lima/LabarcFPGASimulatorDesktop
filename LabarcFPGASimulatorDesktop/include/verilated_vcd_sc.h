@@ -3,7 +3,7 @@
 //
 // THIS MODULE IS PUBLICLY LICENSED
 //
-// Copyright 2001-2012 by Wilson Snyder.  This program is free software;
+// Copyright 2001-2017 by Wilson Snyder.  This program is free software;
 // you can redistribute it and/or modify it under the terms of either the GNU
 // Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
 //
@@ -15,9 +15,9 @@
 //=============================================================================
 ///
 /// \file
-/// \brief SystemPerl tracing in VCD format
+/// \brief Verilator tracing in VCD format
 ///
-/// AUTHOR:  Wilson Snyder
+/// This class is not threadsafe, as the SystemC kernel is not threadsafe.
 ///
 //=============================================================================
 // SPDIFF_OFF
@@ -39,6 +39,8 @@ class VerilatedVcdSc
     : sc_trace_file
     , public VerilatedVcdC
 {
+    // CONSTRUCTORS
+    VL_UNCOPYABLE(VerilatedVcdSc);
 public:
     VerilatedVcdSc() {
 	sc_get_curr_simcontext()->add_trace_file(this);
@@ -58,8 +60,9 @@ public:
 	spTrace()->set_time_resolution(sc_get_time_resolution().to_string());
 # endif
     }
-
     virtual ~VerilatedVcdSc() {}
+
+    // METHODS
     /// Called by SystemC simulate()
     virtual void cycle (bool delta_cycle) {
 # if (SYSTEMC_VERSION>20011000)

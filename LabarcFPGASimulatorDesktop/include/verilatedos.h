@@ -1,7 +1,7 @@
 // -*- mode: C++; c-file-style: "cc-mode" -*-
 //*************************************************************************
 //
-// Copyright 2003-2012 by Wilson Snyder. This program is free software; you can
+// Copyright 2003-2017 by Wilson Snyder. This program is free software; you can
 // redistribute it and/or modify it under the terms of either the GNU
 // Lesser General Public License Version 3 or the Perl Artistic License.
 // Version 2.0.
@@ -42,45 +42,100 @@
 # else
 #  define VL_ATTR_PRINTF(fmtArgNum) __attribute__ ((format (printf, fmtArgNum, fmtArgNum+1)))
 # endif
+# define VL_ATTR_PURE __attribute__ ((pure))
 # define VL_ATTR_UNUSED __attribute__ ((unused))
 # define VL_FUNC  __func__
+# if defined(__clang__) && defined(VL_THREADED)
+#  define VL_ACQUIRE(...) __attribute__ ((acquire_capability(__VA_ARGS__)))
+#  define VL_ACQUIRE_SHARED(...) __attribute__ ((acquire_shared_capability(__VA_ARGS__)))
+#  define VL_RELEASE(...) __attribute__ ((release_capability(__VA_ARGS__)))
+#  define VL_RELEASE_SHARED(...) __attribute__ ((release_shared_capability(__VA_ARGS__)))
+#  define VL_TRY_ACQUIRE(...) __attribute__ ((try_acquire_capability(__VA_ARGS__)))
+#  define VL_TRY_ACQUIRE_SHARED(...) __attribute__ ((try_acquire_shared_capability(__VA_ARGS__)))
+#  define VL_CAPABILITY(x) __attribute__ ((capability(x)))
+#  define VL_REQUIRES(x) __attribute__ ((requires_capability(x)))
+#  define VL_GUARDED_BY(x) __attribute__ ((guarded_by(x)))
+#  define VL_EXCLUDES(x) __attribute__ ((locks_excluded(x)))
+#  define VL_SCOPED_CAPABILITY __attribute__ ((scoped_lockable))
+# endif
 # define VL_LIKELY(x)	__builtin_expect(!!(x), 1)
 # define VL_UNLIKELY(x)	__builtin_expect(!!(x), 0)
+# define VL_UNREACHABLE __builtin_unreachable();
 # define VL_PREFETCH_RD(p) __builtin_prefetch((p),0)
 # define VL_PREFETCH_RW(p) __builtin_prefetch((p),1)
 #elif defined(_MSC_VER)
-# define VL_ATTR_ALIGNED(alignment)
-# define VL_ATTR_ALWINLINE
-# define VL_ATTR_NORETURN
-# define VL_ATTR_PRINTF(fmtArgNum)
-# define VL_ATTR_UNUSED
 # define VL_FUNC  __FUNCTION__
-# define VL_LIKELY(x)	(!!(x))
-# define VL_UNLIKELY(x)	(!!(x))
-# define VL_PREFETCH_RD(p)
-# define VL_PREFETCH_RW(p)
-#else
+#endif
+
+// Defaults for unsupported compiler features
+#ifndef VL_ATTR_ALIGNED
 # define VL_ATTR_ALIGNED(alignment)	///< Align structure to specified byte alignment
+#endif
+#ifndef VL_ATTR_ALWINLINE
 # define VL_ATTR_ALWINLINE		///< Inline, even when not optimizing
+#endif
+#ifndef VL_ATTR_NORETURN
 # define VL_ATTR_NORETURN		///< Function does not ever return
+#endif
+#ifndef VL_ATTR_PRINTF
 # define VL_ATTR_PRINTF(fmtArgNum)	///< Function with printf format checking
+#endif
+#ifndef VL_ATTR_PURE
+# define VL_ATTR_PURE			///< Function is pure (and thus also VL_MT_SAFE)
+#endif
+#ifndef VL_ATTR_UNUSED
 # define VL_ATTR_UNUSED			///< Function that may be never used
+#endif
+#ifndef VL_FUNC
 # define VL_FUNC "__func__"		///< Name of current function for error macros
+#endif
+#ifndef VL_CAPABILITY
+# define VL_ACQUIRE(...)		///< Function requires a capability/lock (-fthread-safety)
+# define VL_ACQUIRE_SHARED(...)		///< Function aquires a shared capability/lock (-fthread-safety)
+# define VL_RELEASE(...)		///< Function releases a capability/lock (-fthread-safety)
+# define VL_RELEASE_SHARED(...)		///< Function releases a shared capability/lock (-fthread-safety)
+# define VL_TRY_ACQUIRE(...)		///< Function returns bool if aquired a capability (-fthread-safety)
+# define VL_TRY_ACQUIRE_SHARED(...)	///< Function returns bool if aquired a shared capability (-fthread-safety)
+# define VL_REQUIRES(x)			///< Function requires a capability inbound (-fthread-safety)
+# define VL_EXCLUDES(x)			///< Function requires not having a capability inbound (-fthread-safety)
+# define VL_CAPABILITY(x)		///< Name of capability/lock (-fthread-safety)
+# define VL_GUARDED_BY(x)		///< Name of mutex protecting this variable (-fthread-safety)
+# define VL_SCOPED_CAPABILITY		///< Scoped threaded capability/lock (-fthread-safety)
+#endif
+#ifndef VL_LIKELY
 # define VL_LIKELY(x)	(!!(x))		///< Boolean expression more often true than false
 # define VL_UNLIKELY(x)	(!!(x))		///< Boolean expression more often false than true
+#endif
+#ifndef VL_UNREACHABLE
+# define VL_UNREACHABLE			///< Point that may never be reached
+#endif
+#ifndef VL_PREFETCH_RD
 # define VL_PREFETCH_RD(p)		///< Prefetch data with read intent
+#endif
+#ifndef VL_PREFETCH_RW
 # define VL_PREFETCH_RW(p)		///< Prefetch data with read/write intent
 #endif
 
 #ifdef VL_THREADED
 # ifdef __GNUC__
-#  define VL_THREAD	__thread	///< Storage class for thread-local storage
+#  if (__cplusplus < 201103L) && !defined(VL_THREADED_NO_C11_WARNING)
+#    error "VL_THREADED/--threads support requires C++-11 or newer only; use newer compiler"
+#  endif
 # else
 #  error "Unsupported compiler for VL_THREADED: No thread-local declarator"
 # endif
+# define VL_THREAD_LOCAL thread_local	///< Use new C++ static local thread
 #else
-# define VL_THREAD			///< Storage class for thread-local storage
+# define VL_THREAD_LOCAL		///< Use new C++ static local thread
 #endif
+#define VL_THREAD			///< Deprecated
+#define VL_STATIC_OR_THREAD static	///< Deprecated
+
+#define VL_PURE  ///< Comment tag that Function is pure (and thus also VL_MT_SAFE)
+#define VL_MT_SAFE  ///< Comment tag that function is threadsafe when VL_THREADED
+#define VL_MT_SAFE_POSTINIT  ///< Comment tag that function is threadsafe when VL_THREADED, only during normal operation (post-init)
+#define VL_MT_UNSAFE  ///< Comment tag that function is not threadsafe when VL_THREADED
+#define VL_MT_UNSAFE_ONE  ///< Comment tag that function is not threadsafe when VL_THREADED, protected to make sure single-caller
 
 #ifdef _MSC_VER
 # define VL_ULL(c) (c##ui64)	///< Add appropriate suffix to 64-bit constant
@@ -89,7 +144,42 @@
 #endif
 
 // This is not necessarily the same as #UL, depending on what the IData typedef is.
-#define VL_UL(c) ((IData)(c##UL))	///< Add appropriate suffix to 32-bit constant
+#define VL_UL(c) (static_cast<IData>(c##UL))	///< Add appropriate suffix to 32-bit constant
+
+#if defined(VL_CPPCHECK) || defined(__clang_analyzer__)
+# define VL_DANGLING(v)
+#else
+# define VL_DANGLING(v) do { (v) = NULL; } while(0)	///< After e.g. delete, set variable to NULL to indicate must not use later
+#endif
+
+//=========================================================================
+// C++-2011
+
+#if __cplusplus >= 201103L || defined(__GXX_EXPERIMENTAL_CXX0X__)
+# define VL_EQ_DELETE = delete
+# define VL_HAS_UNIQUE_PTR
+# define VL_HAS_UNORDERED_MAP
+# define VL_HAS_UNORDERED_SET
+# define vl_unique_ptr std::unique_ptr
+# define vl_unordered_map std::unordered_map
+# define vl_unordered_set std::unordered_set
+# define VL_INCLUDE_UNORDERED_MAP <unordered_map>
+# define VL_INCLUDE_UNORDERED_SET <unordered_set>
+#else
+# define VL_EQ_DELETE
+# define vl_unique_ptr std::auto_ptr
+# define vl_unordered_map std::map
+# define vl_unordered_set std::set
+# define VL_INCLUDE_UNORDERED_MAP <map>
+# define VL_INCLUDE_UNORDERED_SET <set>
+#endif
+
+//=========================================================================
+// Optimization
+
+#ifndef VL_INLINE_OPT
+# define VL_INLINE_OPT		///< "inline" if compiling all objects in single compiler run
+#endif
 
 //=========================================================================
 // Warning disabled
@@ -118,7 +208,7 @@ typedef unsigned char           uint8_t;	///< 8-bit unsigned type (backward comp
 typedef unsigned short int      uint16_t;	///< 16-bit unsigned type (backward compatibility)
 typedef unsigned char           vluint8_t;	///< 8-bit unsigned type
 typedef unsigned short int      vluint16_t;	///< 16-bit unsigned type
-# ifdef __uint32_t_defined      		// Newer Cygwin uint32_t in stdint.h as an unsigned int
+# if defined(__uint32_t_defined) || defined(___int32_t_defined)    // Newer Cygwin uint32_t in stdint.h as an unsigned int
 typedef int32_t			vlsint32_t;	///< 32-bit signed type
 typedef uint32_t		vluint32_t;	///< 32-bit unsigned type
 # else				 		// Older Cygwin has long==uint32_t
@@ -157,6 +247,7 @@ typedef signed   __int32        ssize_t;        ///< signed size_t; returned fro
 #else // Linux or compliant Unix flavors, -m64
 
 # include <stdint.h>	// Linux and most flavors
+# include <unistd.h>	// Linux ssize_t
 # include <inttypes.h>	// Solaris
 typedef uint8_t			vluint8_t;	///< 32-bit unsigned type
 typedef uint16_t		vluint16_t;	///< 32-bit unsigned type
@@ -185,6 +276,27 @@ typedef unsigned long long	vluint64_t;	///< 64-bit unsigned type
 # endif
 #endif
 
+#if defined(_WIN32) && defined(_MSC_VER)
+# if (_MSC_VER < 1900)
+#  define VL_SNPRINTF _snprintf
+# else
+#  define VL_SNPRINTF snprintf
+# endif
+# define VL_VSNPRINTF vsnprintf
+#else
+# define VL_SNPRINTF snprintf
+# define VL_VSNPRINTF vsnprintf
+#endif
+
+//=========================================================================
+// File system functions
+
+#ifdef _WIN32
+# define VL_DEV_NULL "nul"
+#else // Linux or compliant Unix flavors
+# define VL_DEV_NULL "/dev/null"
+#endif
+
 //=========================================================================
 // Integer size macros
 
@@ -198,6 +310,14 @@ typedef unsigned long long	vluint64_t;	///< 64-bit unsigned type
 #define VL_BYTES_I(nbits) (((nbits)+(VL_BYTESIZE-1))/VL_BYTESIZE)
 /// Words this number of bits needs (1 bit=1 word)
 #define VL_WORDS_I(nbits) (((nbits)+(VL_WORDSIZE-1))/VL_WORDSIZE)
+
+//=========================================================================
+// Class definition helpers
+
+// Used to declare a class as uncopyable; put after a private:
+#define VL_UNCOPYABLE(Type)  \
+    Type(const Type& other) VL_EQ_DELETE;  \
+    Type& operator= (const Type&) VL_EQ_DELETE
 
 //=========================================================================
 // Verilated function size macros

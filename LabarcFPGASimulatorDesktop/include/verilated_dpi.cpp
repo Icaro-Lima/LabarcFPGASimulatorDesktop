@@ -1,7 +1,7 @@
 // -*- mode: C++; c-file-style: "cc-mode" -*-
 //*************************************************************************
 //
-// Copyright 2009-2012 by Wilson Snyder. This program is free software; you can
+// Copyright 2009-2017 by Wilson Snyder. This program is free software; you can
 // redistribute it and/or modify it under the terms of either the GNU
 // Lesser General Public License Version 3 or the Perl Artistic License.
 // Version 2.0.
@@ -30,7 +30,9 @@
 
 // On MSVC++ we need svdpi.h to declare exports, not imports
 #define DPI_PROTOTYPES
+#undef XXTERN
 #define XXTERN DPI_EXTERN DPI_DLLESPEC
+#undef EETERN
 #define EETERN DPI_EXTERN DPI_DLLESPEC
 
 #include "vltstd/svdpi.h"
@@ -40,11 +42,11 @@
 
 // Not supported yet
 #define _VL_SVDPI_UNIMP() \
-    vl_fatal(__FILE__,__LINE__,"",(string("%%Error: Unsupported DPI function: ")+VL_FUNC).c_str())
+    VL_FATAL_MT(__FILE__,__LINE__,"",(std::string("%%Error: Unsupported DPI function: ")+VL_FUNC).c_str())
 
 // Function requires a "context" in the import declaration
 #define _VL_SVDPI_CONTEXT_WARN() \
-    VL_PRINTF("%%Warning: DPI C Function called by Verilog DPI import with missing 'context' keyword.\n");
+    VL_PRINTF_MT("%%Warning: DPI C Function called by Verilog DPI import with missing 'context' keyword.\n");
 
 //======================================================================
 //======================================================================
@@ -58,31 +60,31 @@ const char* svDpiVersion() {
 //======================================================================
 // Bit-select utility functions.
 
-svBit svGetBitselBit(const svBitVecVal* s, int i) {
+svBit svGetBitselBit(const svBitVecVal* sp, int bit) {
+    return VL_BITISSET_W(sp,bit);
+}
+svLogic svGetBitselLogic(const svLogicVecVal* sp, int bit) {
     _VL_SVDPI_UNIMP(); return 0;
 }
-svLogic svGetBitselLogic(const svLogicVecVal* s, int i) {
-    _VL_SVDPI_UNIMP(); return 0;
-}
 
-void svPutBitselBit(svBitVecVal* d, int i, svBit s) {
-    _VL_SVDPI_UNIMP();
+void svPutBitselBit(svBitVecVal* dp, int bit, svBit s) {
+    VL_ASSIGNBIT_WI(32, bit, dp, s);
 }
-void svPutBitselLogic(svLogicVecVal* d, int i, svLogic s) {
+void svPutBitselLogic(svLogicVecVal* dp, int bit, svLogic s) {
     _VL_SVDPI_UNIMP();
 }
 
-void svGetPartselBit(svBitVecVal* d, const svBitVecVal* s, int i, int w) {
+void svGetPartselBit(svBitVecVal* dp, const svBitVecVal* sp, int i, int w) {
     _VL_SVDPI_UNIMP();
 }
-void svGetPartselLogic(svLogicVecVal* d, const svLogicVecVal* s, int i, int w) {
+void svGetPartselLogic(svLogicVecVal* dp, const svLogicVecVal* sp, int i, int w) {
     _VL_SVDPI_UNIMP();
 }
 
-void svPutPartselBit(svBitVecVal* d, const svBitVecVal s, int i, int w) {
+void svPutPartselBit(svBitVecVal* dp, const svBitVecVal s, int i, int w) {
     _VL_SVDPI_UNIMP();
 }
-void svPutPartselLogic(svLogicVecVal* d, const svLogicVecVal s, int i, int w) {
+void svPutPartselLogic(svLogicVecVal* dp, const svLogicVecVal* sp, int i, int w) {
     _VL_SVDPI_UNIMP();
 }
 
@@ -102,9 +104,6 @@ int svHigh(const svOpenArrayHandle h, int d) {
     _VL_SVDPI_UNIMP(); return 0;
 }
 int svIncrement(const svOpenArrayHandle h, int d) {
-    _VL_SVDPI_UNIMP(); return 0;
-}
-int svLength(const svOpenArrayHandle h, int d) {
     _VL_SVDPI_UNIMP(); return 0;
 }
 int svDimensions(const svOpenArrayHandle h) {
@@ -264,13 +263,13 @@ svScope svGetScope() {
 
 svScope svSetScope(const svScope scope) {
     const VerilatedScope* prevScopep = Verilated::dpiScope();
-    const VerilatedScope* vscopep = (const VerilatedScope*)(scope);
+    const VerilatedScope* vscopep = reinterpret_cast<const VerilatedScope*>(scope);
     Verilated::dpiScope(vscopep);
     return (svScope)prevScopep;
 }
 
 const char* svGetNameFromScope(const svScope scope) {
-    const VerilatedScope* vscopep = (const VerilatedScope*)(scope);
+    const VerilatedScope* vscopep = reinterpret_cast<const VerilatedScope*>(scope);
     return vscopep->name();
 }
 
