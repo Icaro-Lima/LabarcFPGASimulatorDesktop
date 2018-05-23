@@ -1,3 +1,5 @@
-LabarcFPGASimulatorDesktop/bin
-LabarcFPGASimulatorDesktop/obj
-.vs
+**
+!*.cpp
+!*.sv
+!*h
+!Makefile
