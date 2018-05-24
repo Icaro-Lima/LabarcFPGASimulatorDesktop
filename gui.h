@@ -24,7 +24,7 @@ class SWI_Buttons {
     SWI_Buttons(int x, int y, int offset, int width, int height);
 };
 
-#define STR_LENGTH 50
+#define STR_LENGTH 62
 // show SystemVerilog output signal in graphic interface
 class display : public Fl_Widget {  // FLTK Widget
   char str[STR_LENGTH];

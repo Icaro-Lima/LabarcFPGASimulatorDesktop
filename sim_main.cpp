@@ -51,7 +51,6 @@ void display::draw() {
 
   lcd_labels(95,25);
   // LCD data
-  fl_font(FL_COURIER, 32);
   snprintf(str,STR_LENGTH,"%02X %08X %02X%1c%1c",
            top->lcd_pc, top->lcd_instruction, top->lcd_WriteData,
            top->lcd_MemWrite ? '*' : '_', top->lcd_Branch ? '*' : '_');

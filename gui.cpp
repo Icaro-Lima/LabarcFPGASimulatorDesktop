@@ -27,20 +27,23 @@ display::display(Fl_Window &window,int y, int offset, int width, int height) :
            this->offset = offset;  // centered leds with respect to the x-axis
          }
 
+#define DISPLAY_FONT ((Fl_Font)55)
 void display::lcd_labels(int start, int step) {
+  Fl::set_font(DISPLAY_FONT, "Lucida Console");
+  fl_font(DISPLAY_FONT, 13);
   fl_color(FL_RED);
-  fl_font(FL_COURIER, 13);
   fl_draw("  pc       instruction     WriteData MemWrite", XMARGIN, start );
   fl_draw("Branch",320,start+step);
   fl_draw("SrcA SrcB ALUResult Result ReadData MemtoReg", XMARGIN, start+3.5*step );
   fl_draw("RegWrite",320,start+2.5*step);
   fl_color(FL_BLACK);
+  fl_font(DISPLAY_FONT, 32);
 };
 
 void display::register_labels(int start, int step) {
   int y = start;
   fl_color(FL_RED);
-  fl_font(FL_COURIER, 13);
+  fl_font(DISPLAY_FONT, 13);
   fl_draw("x0  zero      ra        sp        gp ", XMARGIN, y += step );
   fl_draw("x4  tp        t0        t1        t2 ", XMARGIN, y += step );
   fl_draw("x8  s0        s1        a0        a1 ", XMARGIN, y += step );
