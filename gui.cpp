@@ -67,7 +67,7 @@ void init_gui(int argc, char** argv) {
 
 void delete_gui() {
     Fl::remove_timeout(callback);
-    delete leds;
+    delete disp;
     delete swi;
     delete window;
 }

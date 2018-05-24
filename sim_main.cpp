@@ -84,7 +84,7 @@ void callback(void*) {
   top->eval();
 
   // display SystemVerilog output in FLTK drawing
-  leds->draw();
+  disp->draw();
 
   Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
 }

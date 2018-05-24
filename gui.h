@@ -12,6 +12,8 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Toggle_Button.H>
 
+#define XMARGIN 10
+
 // set SystemVerilog input signal from graphic interface
 #define NBUTTONS 8
 class SWI_Buttons {
