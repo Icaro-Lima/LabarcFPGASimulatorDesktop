@@ -19,7 +19,7 @@ class SWI_Buttons {
     static void toggle_cb(Fl_Widget *o, SWI_Buttons* this_o); 
     char label[NBUTTONS][2];
   public:
-    SWI_Buttons();
+    SWI_Buttons(int x, int y, int offset, int width, int height);
 };
 
 // show SystemVerilog output signal in graphic interface
@@ -27,7 +27,10 @@ class LEDs : public Fl_Widget {  // FLTK Widget
   char str[100];
 public:
   void draw();
-  LEDs(int X,int Y,int W,int H);
+  LEDs(int x,int y, int offset, int width, int height);
+  LEDs(Fl_Window &window, int y, int offset, int width, int height);
+private:
+  int offset;
 };
 
 extern Fl_Window *window;

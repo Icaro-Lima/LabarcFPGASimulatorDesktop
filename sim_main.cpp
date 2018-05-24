@@ -43,7 +43,7 @@ void SWI_Buttons::toggle_cb(Fl_Widget *o, SWI_Buttons* this_o) { // this_o is th
 void LEDs::draw() {  // draw the FPGA board
   this->window()->make_current();  // needed because draw() will be called from callback
   for(int i=0; i<8; i++)
-    fl_rectf (240-i*20,50,10,20, top->LED>>i & 1 ? FL_GREEN : FL_RED);
+    fl_rectf (this->x()+(7-i)*this->offset,this->y(),this->w(),this->h(), top->LED>>i & 1 ? FL_GREEN : FL_RED);
   fl_rectf(10,80,290,100, FL_WHITE);
   fl_color(FL_BLACK);
   fl_font(FL_COURIER, 13);
