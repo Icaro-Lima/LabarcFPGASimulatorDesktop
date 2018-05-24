@@ -22,20 +22,23 @@ class SWI_Buttons {
     SWI_Buttons(int x, int y, int offset, int width, int height);
 };
 
+#define STR_LENGTH 50
 // show SystemVerilog output signal in graphic interface
-class LEDs : public Fl_Widget {  // FLTK Widget
-  char str[100];
+class display : public Fl_Widget {  // FLTK Widget
+  char str[STR_LENGTH];
 public:
   void draw();
-  LEDs(int x,int y, int offset, int width, int height);
-  LEDs(Fl_Window &window, int y, int offset, int width, int height);
+  void lcd_labels(int start, int step);
+  void register_labels(int start, int step);
+  display(int x,int y, int offset, int width, int height);
+  display(Fl_Window &window, int y, int offset, int width, int height);
 private:
   int offset;
 };
 
 extern Fl_Window *window;
 extern SWI_Buttons *swi;
-extern LEDs *leds;
+extern display *disp;
 
 void init_gui(int, char**);
 void delete_gui();

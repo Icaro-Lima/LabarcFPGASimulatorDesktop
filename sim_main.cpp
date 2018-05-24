@@ -18,9 +18,9 @@
 #include "Vtop.h"
 
 Vtop* top;   // Verilated model
-Fl_Window *window;
-SWI_Buttons *swi;
-LEDs *leds;
+Fl_Window *window; // Window representing FPGA board
+SWI_Buttons *swi;  // switches
+display *disp;     // LED, LCD, registers
 
 vluint64_t main_time = 0;       // Current Verilator simulation time
 // This is a 64-bit integer to reduce wrap over issues and
@@ -39,17 +39,38 @@ void SWI_Buttons::toggle_cb(Fl_Widget *o, SWI_Buttons* this_o) { // this_o is th
   }
 }
 
-// show SystemVerilog output signal in graphic interface
-void LEDs::draw() {  // draw the FPGA board
+void display::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
+
+  // LEDs
   for(int i=0; i<8; i++)
-    fl_rectf (this->x()+(7-i)*this->offset,this->y(),this->w(),this->h(), top->LED>>i & 1 ? FL_GREEN : FL_RED);
-  fl_rectf(10,80,290,100, FL_WHITE);
-  fl_color(FL_BLACK);
-  fl_font(FL_COURIER, 13);
-  snprintf(str,100,"pc=%02X instr=%08X r[1]=%02X",
-           top->lcd_pc, top->lcd_instruction, top->lcd_registrador[1]);
-  fl_draw(str, 10, 100 );
+    fl_rectf (this->x()+(7-i)*this->offset,this->y(),this->w(),this->h(),
+              top->LED>>i & 1 ? FL_GREEN : FL_RED);
+
+  fl_rectf(XMARGIN-2,80,385,270, FL_WHITE); // clean LCD and register window
+
+  lcd_labels(95,25);
+  // LCD data
+  fl_font(FL_COURIER, 32);
+  snprintf(str,STR_LENGTH,"%02X %08X %02X%1c%1c",
+           top->lcd_pc, top->lcd_instruction, top->lcd_WriteData,
+           top->lcd_MemWrite ? '*' : '_', top->lcd_Branch ? '*' : '_');
+  fl_draw(str, XMARGIN, 125);
+  snprintf(str,STR_LENGTH,"%02X %02X %02X %02X %02X%1c%1c",
+           top->lcd_SrcA, top->lcd_SrcB, top->lcd_ALUResult, top->lcd_Result, top->lcd_ReadData,
+           top->lcd_MemtoReg ? '*' : '_', top->lcd_RegWrite ? '*' : '_');
+  fl_draw(str, XMARGIN, 165 );
+
+  int y = 195;
+  register_labels(y,18);
+  // register values
+  #define r top->lcd_registrador
+  for(int i=0; i<32; i+=4) {
+    snprintf(str,STR_LENGTH,"        : %02x      : %02x      : %02x      : %02x",
+                            r[i], r[i+1], r[i+2], r[i+3]);
+    fl_draw(str, XMARGIN, y += 18 );
+  }
+  #undef r
 }
 
 // ****** The main action is in this callback ******
