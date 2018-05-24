@@ -17,8 +17,15 @@ SWI_Buttons::SWI_Buttons(int x, int y, int offset, int width, int height) {
   }
 }
 
-LEDs::LEDs(int x,int y,int offset,int width,int height) : Fl_Widget(x,y,width,height) { this->offset = offset; }
-LEDs::LEDs(Fl_Window &window,int y, int offset, int width, int height) : Fl_Widget(window.decorated_w()/2-(7*(offset - width)+8*width)/2,y,width,height) { this->offset = offset; } // centered leds with respect to the x-axis
+LEDs::LEDs(int x,int y,int offset,int width,int height) :
+         Fl_Widget(x,y,width,height) {
+           this->offset = offset;  // centered leds with respect to the x-axis
+}
+
+LEDs::LEDs(Fl_Window &window,int y, int offset, int width, int height) :
+         Fl_Widget(window.decorated_w()/2-(7*(offset - width)+8*width)/2,y,width,height) { 
+           this->offset = offset;  // centered leds with respect to the x-axis
+         }
 
 void init_gui(int argc, char** argv) {
   window = new Fl_Window(400,200);  // window size 100 x 100 pixels
