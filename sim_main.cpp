@@ -47,6 +47,8 @@ void display::draw() {
     fl_rectf (this->x()+(7-i)*this->offset,this->y(),this->w(),this->h(),
               top->LED>>i & 1 ? FL_GREEN : FL_RED);
 
+
+
   fl_rectf(XMARGIN-2,80,385,270, FL_WHITE); // clean LCD and register window
 
   lcd_labels(95,25);

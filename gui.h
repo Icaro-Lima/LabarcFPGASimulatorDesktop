@@ -35,7 +35,7 @@ public:
   void lcd_labels(int start, int step);
   void register_labels(int start, int step);
   display(int x,int y, int offset, int width, int height);
-  display(Fl_Window &window, int y, int offset, int width, int height);
+  display(Fl_Window *window, int y, int offset, int width, int height);
 private:
   int offset;
 };

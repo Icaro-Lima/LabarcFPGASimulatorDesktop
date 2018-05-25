@@ -22,8 +22,8 @@ display::display(int x,int y,int offset,int width,int height) :
            this->offset = offset;  // centered leds with respect to the x-axis
          }
 
-display::display(Fl_Window &window,int y, int offset, int width, int height) :
-         Fl_Widget(window.decorated_w()/2-(7*(offset - width)+8*width)/2,y,width,height) { 
+display::display(Fl_Window *window,int y, int offset, int width, int height) :
+         Fl_Widget(window->decorated_w()/2-(7*(offset - width)+8*width)/2,y,width,height) { 
            this->offset = offset;  // centered leds with respect to the x-axis
          }
 
@@ -60,7 +60,7 @@ void init_gui(int argc, char** argv) {
 
   swi = new SWI_Buttons(30,10,30,17,30);
 
-  disp = new display(*window,50,20,10,20);
+  disp = new display(window,50,20,10,20);
 
   window->end();
   window->show(argc,argv);
