@@ -50,26 +50,42 @@ void display::draw() {
   fl_rectf(XMARGIN-2,80,385,270, FL_WHITE); // clean LCD and register window
 
   lcd_labels(95,25);
+  stringstream ss;
+  ss << hex << setfill('0') << uppercase;
   // LCD data
-  snprintf(str,STR_LENGTH,"%02X %08X %02X%1c%1c",
-           top->lcd_pc, top->lcd_instruction, top->lcd_WriteData,
-           top->lcd_MemWrite ? '*' : '_', top->lcd_Branch ? '*' : '_');
-  fl_draw(str, XMARGIN, 125);
-  snprintf(str,STR_LENGTH,"%02X %02X %02X %02X %02X%1c%1c",
-           top->lcd_SrcA, top->lcd_SrcB, top->lcd_ALUResult, top->lcd_Result, top->lcd_ReadData,
-           top->lcd_MemtoReg ? '*' : '_', top->lcd_RegWrite ? '*' : '_');
-  fl_draw(str, XMARGIN, 165 );
+  // first line
+  ss << setw(2) << (int)top->lcd_pc;
+  ss << " " << setw(8) << (int)top->lcd_instruction;
+  ss << " " << setw(2) << (int)top->lcd_WriteData;
+  ss << (top->lcd_MemWrite ? '*' : '_');
+  ss << (top->lcd_Branch ? '*' : '_');
+  fl_draw(ss.str().c_str(), XMARGIN, 125);
+
+  // second line
+  ss.str(""); // reset stringstream
+  ss << setw(2) << (int)top->lcd_SrcA;
+  ss << " " << setw(2) << (int)top->lcd_SrcB;
+  ss << " " << setw(2) << (int)top->lcd_ALUResult;
+  ss << " " << setw(2) << (int)top->lcd_Result;
+  ss << " " << setw(2) << (int)top->lcd_ReadData;
+  ss << (top->lcd_MemtoReg ? '*' : '_');
+  ss << (top->lcd_RegWrite ? '*' : '_');
+  fl_draw(ss.str().c_str(), XMARGIN, 165);
 
   int y = 195;
   register_labels(y,18);
   // register values
-  #define r top->lcd_registrador
-  for(int i=0; i<32; i+=4) {
-    snprintf(str,STR_LENGTH,"        : %02x      : %02x      : %02x      : %02x",
-                            r[i], r[i+1], r[i+2], r[i+3]);
-    fl_draw(str, XMARGIN, y += 18 );
+  ss << nouppercase;
+  for(int i=0; i<32; i++) { //  for all registradores
+    if(i % 4 == 0) {  // start of line
+      ss.str(""); // reset stringstream
+      ss << "  ";
+    }
+    ss << "      : " << setw(2) << (int)top->lcd_registrador[i];
+    if(i % 4 == 3) { // end of line
+      fl_draw(ss.str().c_str(), XMARGIN, y += 18);
+    }
   }
-  #undef r
 }
 
 // ****** The main action is in this callback ******

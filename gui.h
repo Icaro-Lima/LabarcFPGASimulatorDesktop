@@ -6,11 +6,15 @@
 // Version 2.0.
 // Icaro Dantas de Araujo Lima and Elmar Melcher at UFCG, 2018
 
+#include <sstream>
+#include <iomanip>
 #include <FL/Fl.H>
 #include <FL/Fl_Double_Window.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_Toggle_Button.H>
+
+using namespace std;
 
 #define XMARGIN 10
 
@@ -24,10 +28,8 @@ class SWI_Buttons {
     SWI_Buttons(int x, int y, int offset, int width, int height);
 };
 
-#define STR_LENGTH 62
 // show SystemVerilog output signal in graphic interface
 class display : public Fl_Widget {  // FLTK Widget
-  char str[STR_LENGTH];
 public:
   void draw();
   void lcd_labels(int start, int step);
