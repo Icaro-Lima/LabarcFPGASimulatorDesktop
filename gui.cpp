@@ -56,11 +56,13 @@ void display::register_labels(int start, int step) {
 }
 
 void init_gui(int argc, char** argv) {
-  window = new Fl_Window(400,360);  // window size 100 x 100 pixels
+  window = new Fl_Window(600,360);  // window size 100 x 100 pixels
 
   swi = new SWI_Buttons(30,10,30,17,30);
 
   disp = new display(window,50,20,10,20);
+  
+  segments = new SegmentsDisplay(400, 0);
 
   window->end();
   window->show(argc,argv);

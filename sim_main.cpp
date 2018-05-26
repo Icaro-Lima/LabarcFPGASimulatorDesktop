@@ -21,6 +21,7 @@ Vtop* top;   // Verilated model
 Fl_Window *window; // Window representing FPGA board
 SWI_Buttons *swi;  // switches
 display *disp;     // LED, LCD, registers
+SegmentsDisplay *segments; // 7-segment display
 
 vluint64_t main_time = 0;       // Current Verilator simulation time
 // This is a 64-bit integer to reduce wrap over issues and
@@ -37,6 +38,16 @@ void SWI_Buttons::toggle_cb(Fl_Widget *o, SWI_Buttons* this_o) { // this_o is th
     top->SWI <<= 1; // shift left, bit zero will get value zero
     top->SWI |= this_o->b[i]->value() & 1; // set bit zero from button
   }
+}
+
+SegmentsDisplay::SegmentsDisplay(int xorigin, int yorigin) {
+	this->xorigin = xorigin;
+	this->yorigin = yorigin;
+	base = new Fl_PNG_Image("Assets/7SegmentsDisplayBase.png");
+}
+
+void SegmentsDisplay::draw() {
+	base->draw(xorigin, yorigin);
 }
 
 void display::draw() {
@@ -102,11 +113,13 @@ void callback(void*) {
 
   // display SystemVerilog output in FLTK drawing
   disp->draw();
+  
+  segments->draw();
 
   Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
 }
 
-int main(int argc, char** argv, char** env) {
+int main(int argc, char** argv, char** env) {	
     init_gui(argc,argv);
 
     Verilated::commandArgs(argc, argv);   // Remember args

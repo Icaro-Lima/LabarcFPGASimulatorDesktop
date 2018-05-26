@@ -12,6 +12,7 @@
 #include <FL/Fl_Double_Window.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Button.H>
+#include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Toggle_Button.H>
 
 using namespace std;
@@ -40,9 +41,19 @@ private:
   int offset;
 };
 
+class SegmentsDisplay {	
+	Fl_PNG_Image *base;
+	int xorigin;
+	int yorigin;
+public:
+	void draw();
+	SegmentsDisplay(int xorigin, int yorigin);
+};
+
 extern Fl_Window *window;
 extern SWI_Buttons *swi;
 extern display *disp;
+extern SegmentsDisplay *segments;
 
 void init_gui(int, char**);
 void delete_gui();
