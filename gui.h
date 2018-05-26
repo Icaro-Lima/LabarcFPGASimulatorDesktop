@@ -41,8 +41,8 @@ private:
   int offset;
 };
 
-class SegmentsDisplay {	
-	Fl_PNG_Image *base;
+class SegmentsDisplay : public Fl_Widget {	
+	Fl_PNG_Image *base, *point_on, *point_off;
 	int xorigin;
 	int yorigin;
 public:

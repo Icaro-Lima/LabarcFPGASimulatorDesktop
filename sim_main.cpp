@@ -40,14 +40,19 @@ void SWI_Buttons::toggle_cb(Fl_Widget *o, SWI_Buttons* this_o) { // this_o is th
   }
 }
 
-SegmentsDisplay::SegmentsDisplay(int xorigin, int yorigin) {
+
+SegmentsDisplay::SegmentsDisplay(int xorigin, int yorigin) : Fl_Widget(xorigin,yorigin,-1,-1) {
 	this->xorigin = xorigin;
 	this->yorigin = yorigin;
 	base = new Fl_PNG_Image("Assets/7SegmentsDisplayBase.png");
+	point_on = new Fl_PNG_Image("Assets/PointOn.png");
+	point_off = new Fl_PNG_Image("Assets/PointOff.png");
 }
 
-void SegmentsDisplay::draw() {
+void SegmentsDisplay::draw() {		
 	base->draw(xorigin, yorigin);
+	
+	(top->LED>>7 & 1 ? point_on : point_off)->draw(xorigin + 91, yorigin + 134);
 }
 
 void display::draw() {
