@@ -1,7 +1,7 @@
 *.*
 !*.cpp
 !*.sv
-!*h
+!*.h
 !Makefile
 !*.png
 
