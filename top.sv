@@ -8,6 +8,7 @@ parameter NBITS_TOP = 8, NREGS_TOP = 32;
 module top(input  logic clk_2,
            input  logic [NBITS_TOP-1:0] SWI,
            output logic [NBITS_TOP-1:0] LED,
+           output logic [NBITS_TOP-1:0] SEG,
            output logic [NINSTR_BITS-1:0] lcd_instruction,
            output logic [NBITS_TOP-1:0] lcd_registrador [0:NREGS_TOP-1],
            output logic [NBITS_TOP-1:0] lcd_pc, lcd_SrcA, lcd_SrcB,
@@ -16,6 +17,7 @@ module top(input  logic clk_2,
 
   always_comb begin
     LED <= SWI;
+    SEG <= SWI;
     lcd_WriteData <= SWI;
     lcd_pc <= 'h12;
     lcd_instruction <= 'h34567890;

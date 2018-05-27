@@ -41,13 +41,13 @@ private:
   int offset;
 };
 
-class SegmentsDisplay : public Fl_Widget {	
-	Fl_PNG_Image *base, *point_on, *point_off;
-	int xorigin;
-	int yorigin;
+class SegmentsDisplay {
+	bool first_draw;
+	bool *previous;
+	Fl_PNG_Image *base, *point_on, *point_off, *vertical_on, *vertical_off, *horizontal_on, *horizontal_off;
 public:
-	void draw();
-	SegmentsDisplay(int xorigin, int yorigin);
+	void draw(int xorigin, int yorigin);
+	SegmentsDisplay();
 };
 
 extern Fl_Window *window;

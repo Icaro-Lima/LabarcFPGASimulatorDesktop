@@ -62,7 +62,7 @@ void init_gui(int argc, char** argv) {
 
   disp = new display(window,50,20,10,20);
   
-  segments = new SegmentsDisplay(400, 0);
+  segments = new SegmentsDisplay();
 
   window->end();
   window->show(argc,argv);
