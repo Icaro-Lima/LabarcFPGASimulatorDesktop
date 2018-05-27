@@ -1,5 +1,8 @@
-**
+*.*
 !*.cpp
 !*.sv
 !*h
 !Makefile
+!*.png
+
+obj_dir/*
