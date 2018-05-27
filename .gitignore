@@ -4,5 +4,6 @@
 !*.h
 !Makefile
 !*.png
+!.gitignore
 
 obj_dir/*
