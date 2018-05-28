@@ -22,7 +22,7 @@ endif
 ifeq ($(findstring MINGW,$(shell uname)),MINGW)
   FLTK=-CFLAGS "-I/usr/local/include" -LDFLAGS "-L/usr/local/lib -mwindows -lfltk -lfltk_images -lfltk_png -lfltk_z -lole32 -luuid -lcomctl32 -lws2_32"
 else
-  FLTK=-LDFLAGS "-lfltk -lfltk_images -lfltk_png -lfltk_z"
+  FLTK=-LDFLAGS "-lfltk -lfltk_images -lpng -lz"
 endif
 
 ######################################################################

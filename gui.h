@@ -18,6 +18,7 @@
 using namespace std;
 
 #define XMARGIN 10
+#define DISPLAY_FONT ((Fl_Font)55)
 
 // set SystemVerilog input signal from graphic interface
 #define NBUTTONS 8

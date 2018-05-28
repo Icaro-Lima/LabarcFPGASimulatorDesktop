@@ -27,9 +27,7 @@ display::display(Fl_Window *window,int y, int offset, int width, int height) :
            this->offset = offset;  // centered leds with respect to the x-axis
          }
 
-#define DISPLAY_FONT ((Fl_Font)55)
 void display::lcd_labels(int start, int step) {
-  Fl::set_font(DISPLAY_FONT, "Lucida Console");
   fl_font(DISPLAY_FONT, 13);
   fl_color(FL_RED);
   fl_draw("  pc       instruction     WriteData MemWrite", XMARGIN, start );
@@ -55,11 +53,22 @@ void display::register_labels(int start, int step) {
   fl_color(FL_BLACK);
 }
 
+const char *mono_fonts[] = { "Lucida Console",
+                             "Droid Sans Mono",
+                             "Noto Mono",
+                             "" };
+
 void init_gui(int argc, char** argv) {
   window = new Fl_Window(600,360);  // window size 100 x 100 pixels
 
   swi = new SWI_Buttons(30,10,30,17,30);
 
+  int i=0;
+  do {  // search for an existin mono-space font
+    Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
+    fl_font(DISPLAY_FONT, 13);
+  } while( fl_width('w') != fl_width('i') && strlen(mono_fonts[i]) );
+    
   disp = new display(window,50,20,10,20);
   
   segments = new SegmentsDisplay();
