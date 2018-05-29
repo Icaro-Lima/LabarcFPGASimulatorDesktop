@@ -20,9 +20,10 @@ ifneq ($(words $(CURDIR)),1)
 endif
 
 ifeq ($(findstring MINGW,$(shell uname)),MINGW)
-  FLTK=-CFLAGS "-I/usr/local/include" -LDFLAGS "-L/usr/local/lib -mwindows -lfltk -lfltk_images -lfltk_png -lfltk_z -lole32 -luuid -lcomctl32 -lws2_32"
+  CFLTK=-I/usr/local/include
+  LFLTK=-L/usr/local/lib -mwindows -lfltk_images -lfltk_png -lfltk_z -lfltk -lole32 -luuid -lcomctl32 -lws2_32
 else
-  FLTK=-LDFLAGS "-lfltk -lfltk_images -lpng -lz"
+  LFLTK=-lfltk_images -lpng -lz -lfltk
 endif
 
 ######################################################################
@@ -39,9 +40,12 @@ VERILATOR = $(VERILATOR_ROOT)/bin/verilator
 endif
 
 default: gui.o
-	$(VERILATOR) -cc $(FLTK) --exe +1800-2012ext+sv top.sv sim_main.cpp ../gui.o
+	$(VERILATOR) -cc --exe +1800-2012ext+sv top.sv sim_main.cpp  ../gui.o  -CFLAGS "$(CFLTK)" -LDFLAGS "$(LFLTK)"
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
 	obj_dir/Vtop
+
+gui.o: gui.cpp gui.h
+	g++ $(CFLTK) -c gui.cpp
 
 ######################################################################
 
