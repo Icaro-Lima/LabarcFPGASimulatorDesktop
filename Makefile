@@ -24,7 +24,7 @@ ifeq ($(findstring MINGW,$(shell uname)),MINGW)
   LFLTK=-L/usr/local/lib -mwindows -lfltk_images -lfltk_png -lfltk_z -lfltk -lole32 -luuid -lcomctl32 -lws2_32
   FLTK=-CFLAGS "$(CFLTK)" -LDFLAGS "$(LFLTK)"
 else
-  LFLTK=-lfltk_images -lpng -lz -lfltk
+  LFLTK=-lfltk_images -lfltk_png -lfltk_z -lfltk
   FLTK=-LDFLAGS "$(LFLTK)"
 endif
 
