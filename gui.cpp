@@ -28,7 +28,7 @@ LEDs::LEDs(int x_origin, int y_origin, int offset) {
 	this->offset = offset;
 }
 
-void LEDs::draw() {
+void LEDs::draw() {	
 	for(int i = 0; i < 8; i++) {
 		(states[i] ? led_on : led_off)->draw(x_origin + (7 - i) * offset, y_origin);
 	}
@@ -94,7 +94,7 @@ void init_gui(int argc, char** argv) {
     
   disp = new display(window,50,20,10,20);
   
-  segments = new SegmentsDisplay();
+  segments = new SegmentsDisplay(400, 0);
 
   window->end();
   window->show(argc,argv);

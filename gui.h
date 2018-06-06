@@ -53,13 +53,15 @@ private:
   int offset;
 };
 
-class SegmentsDisplay {
+class SegmentsDisplay : public Fl_Widget {
+	int x_origin, y_origin;
 	bool first_draw;
 	bool *previous;
 	Fl_PNG_Image *base, *point_on, *point_off, *vertical_on, *vertical_off, *horizontal_on, *horizontal_off;
+	
 public:
-	void draw(int xorigin, int yorigin);
-	SegmentsDisplay();
+	void draw();
+	SegmentsDisplay(int x_origin, int y_origin);
 };
 
 extern Fl_Window *window;

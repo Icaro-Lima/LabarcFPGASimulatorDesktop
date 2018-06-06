@@ -41,7 +41,10 @@ void SWI_Buttons::toggle_cb(Fl_Widget *o, SWI_Buttons* this_o) { // this_o is th
   }
 }
 
-SegmentsDisplay::SegmentsDisplay() {
+SegmentsDisplay::SegmentsDisplay(int x_origin, int y_origin) : Fl_Widget(x_origin, y_origin, 118, 177) {
+	this->x_origin = x_origin;
+	this->y_origin = y_origin;
+	
 	this->previous = new bool[8];
 	memset(this->previous, 0, 8 * sizeof(bool));
 	
@@ -54,17 +57,19 @@ SegmentsDisplay::SegmentsDisplay() {
 	horizontal_off = new Fl_PNG_Image("Assets/HorizontalOff.png");
 }
 
-void SegmentsDisplay::draw(int xorigin, int yorigin) {		
-	base->draw(xorigin, yorigin);
+void SegmentsDisplay::draw() {	
+	this->window()->make_current();
+		
+	base->draw(x_origin, y_origin);
 	
-	(top->SEG>>0 & 1 ? horizontal_on : horizontal_off)->draw(xorigin + 26, yorigin + 25);
-	(top->SEG>>1 & 1 ? vertical_on : vertical_off)->draw(xorigin + 74, yorigin + 33);
-	(top->SEG>>2 & 1 ? vertical_on : vertical_off)->draw(xorigin + 74, yorigin + 88);
-	(top->SEG>>3 & 1 ? horizontal_on : horizontal_off)->draw(xorigin + 26, yorigin + 135);
-	(top->SEG>>4 & 1 ? vertical_on : vertical_off)->draw(xorigin + 17, yorigin + 88);
-	(top->SEG>>5 & 1 ? vertical_on : vertical_off)->draw(xorigin + 17, yorigin + 33);
-	(top->SEG>>6 & 1 ? horizontal_on : horizontal_off)->draw(xorigin + 26, yorigin + 80);
-	(top->SEG>>7 & 1 ? point_on : point_off)->draw(xorigin + 91, yorigin + 134);
+	(top->SEG>>0 & 1 ? horizontal_on : horizontal_off)->draw(x_origin + 26, y_origin + 25);
+	(top->SEG>>1 & 1 ? vertical_on : vertical_off)->draw(x_origin + 74, y_origin + 33);
+	(top->SEG>>2 & 1 ? vertical_on : vertical_off)->draw(x_origin + 74, y_origin + 88);
+	(top->SEG>>3 & 1 ? horizontal_on : horizontal_off)->draw(x_origin + 26, y_origin + 135);
+	(top->SEG>>4 & 1 ? vertical_on : vertical_off)->draw(x_origin + 17, y_origin + 88);
+	(top->SEG>>5 & 1 ? vertical_on : vertical_off)->draw(x_origin + 17, y_origin + 33);
+	(top->SEG>>6 & 1 ? horizontal_on : horizontal_off)->draw(x_origin + 26, y_origin + 80);
+	(top->SEG>>7 & 1 ? point_on : point_off)->draw(x_origin + 91, y_origin + 134);
 }
 
 void display::draw() {
@@ -129,7 +134,7 @@ void callback(void*) {
   // display SystemVerilog output in FLTK drawing
   disp->draw();
   
-  segments->draw(400, 0);
+  segments->draw();
 	
   Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
 }
