@@ -9,11 +9,11 @@
 #include <sstream>
 #include <iomanip>
 #include <FL/Fl.H>
-#include <FL/Fl_Double_Window.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Toggle_Button.H>
+#include <FL/Fl_Double_Window.H>
 
 using namespace std;
 
@@ -28,6 +28,17 @@ class SWI_Buttons {
     char label[NBUTTONS][2];
   public:
     SWI_Buttons(int x, int y, int offset, int width, int height);
+};
+
+class LEDs {
+	int x_origin, y_origin, offset;
+	Fl_PNG_Image *led_on, *led_off;
+	
+public:
+	bool *states;
+	
+	LEDs(int x_origin, int y_origin, int offset);
+	void draw();
 };
 
 // show SystemVerilog output signal in graphic interface
@@ -53,6 +64,7 @@ public:
 
 extern Fl_Window *window;
 extern SWI_Buttons *swi;
+extern LEDs *leds;
 extern display *disp;
 extern SegmentsDisplay *segments;
 

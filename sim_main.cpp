@@ -20,6 +20,7 @@
 Vtop* top;   // Verilated model
 Fl_Window *window; // Window representing FPGA board
 SWI_Buttons *swi;  // switches
+LEDs *leds;
 display *disp;     // LED, LCD, registers
 SegmentsDisplay *segments; // 7-segment display
 
@@ -39,7 +40,6 @@ void SWI_Buttons::toggle_cb(Fl_Widget *o, SWI_Buttons* this_o) { // this_o is th
     top->SWI |= this_o->b[i]->value() & 1; // set bit zero from button
   }
 }
-
 
 SegmentsDisplay::SegmentsDisplay() {
 	this->previous = new bool[8];
@@ -69,13 +69,6 @@ void SegmentsDisplay::draw(int xorigin, int yorigin) {
 
 void display::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
-
-  // LEDs
-  for(int i=0; i<8; i++)
-    fl_rectf (this->x()+(7-i)*this->offset,this->y(),this->w(),this->h(),
-              top->LED>>i & 1 ? FL_GREEN : FL_RED);
-
-
 
   fl_rectf(XMARGIN-2,80,385,270, FL_WHITE); // clean LCD and register window
 
@@ -130,6 +123,9 @@ void callback(void*) {
   // Evaluate Verilated SystemVerilog model
   top->eval();
 
+  for (int i = 0; i < 8; i++) leds->states[i] = top->LED >> i & 1;
+  leds->draw();
+
   // display SystemVerilog output in FLTK drawing
   disp->draw();
   
@@ -138,7 +134,7 @@ void callback(void*) {
   Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
 }
 
-int main(int argc, char** argv, char** env) {	
+int main(int argc, char** argv, char** env) {
     init_gui(argc,argv);
 
     Verilated::commandArgs(argc, argv);   // Remember args

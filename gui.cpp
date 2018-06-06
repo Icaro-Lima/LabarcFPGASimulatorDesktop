@@ -8,13 +8,30 @@
 
 #include "gui.h"
 
-SWI_Buttons::SWI_Buttons(int x, int y, int offset, int width, int height) {
+SWI_Buttons::SWI_Buttons(int x, int y, int offset, int individual_width, int individual_height) {
   for(int i=0; i<NBUTTONS; i++) {
     label[i][0] = i+0x30; // map integer i to ASCII digit
     label[i][1] = 0;      // terminate label as string
-    b[i] = new Fl_Toggle_Button(x + (NBUTTONS-i)*offset,y,width,height,label[i]);
+    b[i] = new Fl_Toggle_Button(x + (NBUTTONS-i)*offset,y,individual_width,individual_height,label[i]);
     b[i]->callback((Fl_Callback*)toggle_cb, this);
   }
+}
+
+LEDs::LEDs(int x_origin, int y_origin, int offset) {
+	led_on = new Fl_PNG_Image("Assets/LEDOn.png");
+	led_off = new Fl_PNG_Image("Assets/LEDOff.png");
+	
+	this->states = new bool[8];
+	
+	this->x_origin = x_origin;
+	this->y_origin = y_origin;
+	this->offset = offset;
+}
+
+void LEDs::draw() {
+	for(int i = 0; i < 8; i++) {
+		(states[i] ? led_on : led_off)->draw(x_origin + (7 - i) * offset, y_origin);
+	}
 }
 
 display::display(int x,int y,int offset,int width,int height) :
@@ -56,12 +73,16 @@ void display::register_labels(int start, int step) {
 const char *mono_fonts[] = { "Lucida Console",
                              "Droid Sans Mono",
                              "Noto Mono",
-                             "Monospace" };
+                             "Monospace",
+                             "Consolas",
+                             "" };
 
 void init_gui(int argc, char** argv) {
-  window = new Fl_Window(600,360);  // window size 100 x 100 pixels
+  window = new Fl_Window(600,360);
 
   swi = new SWI_Buttons(30,10,30,17,30);
+  
+  leds = new LEDs(55, 40, 30);
 
   int i=0;
   do {  // search for an existin mono-space font
