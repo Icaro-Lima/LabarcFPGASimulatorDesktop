@@ -78,7 +78,7 @@ const char *mono_fonts[] = { "Lucida Console",
                              "" };
 
 void init_gui(int argc, char** argv) {
-  window = new Fl_Window(600,360);
+  window = new Fl_Window(600, 360, "Labarc FPGA Simulator");
 
   swi = new SWI_Buttons(30,10,30,17,30);
   
