@@ -8,5 +8,5 @@ git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 ### Utilização
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
 
-### Vídeo
-/**/
+### Vídeo mostrando o passo a passo
+https://youtu.be/mrfyZOujHHI
