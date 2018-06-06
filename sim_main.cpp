@@ -39,6 +39,8 @@ void SWI_Buttons::toggle_cb(Fl_Widget *o, SWI_Buttons* this_o) { // this_o is th
     top->SWI <<= 1; // shift left, bit zero will get value zero
     top->SWI |= this_o->b[i]->value() & 1; // set bit zero from button
   }
+  
+  callback(NULL);
 }
 
 SegmentsDisplay::SegmentsDisplay(int x_origin, int y_origin) : Fl_Widget(x_origin, y_origin, 118, 177) {
