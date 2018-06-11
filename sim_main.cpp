@@ -43,7 +43,7 @@ void SWI_Buttons::toggle_cb(Fl_Widget *o, SWI_Buttons* this_o) { // this_o is th
   callback(NULL);
 }
 
-SegmentsDisplay::SegmentsDisplay(int x_origin, int y_origin) : Fl_Widget(x_origin, y_origin, 118, 177) {
+SegmentsDisplay::SegmentsDisplay(int x_origin, int y_origin) {
 	this->x_origin = x_origin;
 	this->y_origin = y_origin;
 	
@@ -59,9 +59,7 @@ SegmentsDisplay::SegmentsDisplay(int x_origin, int y_origin) : Fl_Widget(x_origi
 	horizontal_off = new Fl_PNG_Image("Assets/HorizontalOff.png");
 }
 
-void SegmentsDisplay::draw() {	
-	this->window()->make_current();
-		
+void SegmentsDisplay::draw() {			
 	base->draw(x_origin, y_origin);
 	
 	(top->SEG>>0 & 1 ? horizontal_on : horizontal_off)->draw(x_origin + 26, y_origin + 25);
@@ -77,9 +75,9 @@ void SegmentsDisplay::draw() {
 void display::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
 
-  fl_rectf(XMARGIN-2,80,385,270, FL_WHITE); // clean LCD and register window
+  fl_rectf(this->x() + XMARGIN - 2, 80, 385, 270, FL_WHITE); // clean LCD and register window
 
-  lcd_labels(95,25);
+  lcd_labels(95, 25);
   stringstream ss;
   ss << hex << setfill('0') << uppercase;
   // LCD data
@@ -89,8 +87,8 @@ void display::draw() {
   ss << " " << setw(2) << (int)top->lcd_WriteData;
   ss << (top->lcd_MemWrite ? '*' : '_');
   ss << (top->lcd_Branch ? '*' : '_');
-  fl_draw(ss.str().c_str(), XMARGIN, 125);
-
+  fl_draw(ss.str().c_str(), this->x() + XMARGIN, 125);
+	
   // second line
   ss.str(""); // reset stringstream
   ss << setw(2) << (int)top->lcd_SrcA;
@@ -100,25 +98,23 @@ void display::draw() {
   ss << " " << setw(2) << (int)top->lcd_ReadData;
   ss << (top->lcd_MemtoReg ? '*' : '_');
   ss << (top->lcd_RegWrite ? '*' : '_');
-  fl_draw(ss.str().c_str(), XMARGIN, 165);
-
+  fl_draw(ss.str().c_str(), this->x() + XMARGIN, 165);
+  
   int y = 195;
-  register_labels(y,18);
+  register_labels(y, 18);
   // register values
   ss << nouppercase;
-  for(int i=0; i<32; i++) { //  for all registradores
+  for(int i = 0; i < 32; i++) { //  for all registradores
     if(i % 4 == 0) {  // start of line
       ss.str(""); // reset stringstream
       ss << "  ";
     }
     ss << "      : " << setw(2) << (int)top->lcd_registrador[i];
     if(i % 4 == 3) { // end of line
-      fl_draw(ss.str().c_str(), XMARGIN, y += 18);
+      fl_draw(ss.str().c_str(), this->x() + XMARGIN, y += 18);
     }
   }
 }
-
-bool temp = true;
 
 // ****** The main action is in this callback ******
 // It controls Verilog simulation time, retrieves Verilog output and displays it.

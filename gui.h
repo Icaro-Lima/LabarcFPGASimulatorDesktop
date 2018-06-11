@@ -47,13 +47,12 @@ public:
   void draw();
   void lcd_labels(int start, int step);
   void register_labels(int start, int step);
-  display(int x,int y, int offset, int width, int height);
-  display(Fl_Window *window, int y, int offset, int width, int height);
+  display(int x, int y, int width, int height);
 private:
   int offset;
 };
 
-class SegmentsDisplay : public Fl_Widget {
+class SegmentsDisplay {
 	int x_origin, y_origin;
 	bool first_draw;
 	bool *previous;
