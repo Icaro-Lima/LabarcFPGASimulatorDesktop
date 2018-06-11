@@ -1,5 +1,5 @@
 # LabarcFPGASimulatorDesktop
-## Ubuntu 18.04 LTS
+## Ubuntu (testado no 16.04 e 18.04)
 ### Instalação
 ```
 sudo apt-get install verilator libfltk1.3-dev make g++ libpng-dev zlib1g-dev
