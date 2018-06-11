@@ -20,14 +20,24 @@ using namespace std;
 #define XMARGIN 10
 #define DISPLAY_FONT ((Fl_Font)55)
 
-// set SystemVerilog input signal from graphic interface
-#define NBUTTONS 8
-class SWI_Buttons {
-    Fl_Button *b[NBUTTONS];
-    static void toggle_cb(Fl_Widget *o, SWI_Buttons* this_o); 
-    char label[NBUTTONS][2];
-  public:
-    SWI_Buttons(int x, int y, int offset, int width, int height);
+class SWI : public Fl_Widget {
+	int x, y, id;
+	Fl_PNG_Image *swi_on, *swi_off;
+public:
+	bool state;
+	
+	virtual int handle(int event);
+	virtual void draw();
+	SWI(int x, int y, int id, Fl_PNG_Image *swi_on, Fl_PNG_Image *swi_off);
+};
+
+class SWIs {
+	SWI *swis[8];
+	Fl_PNG_Image *swi_on, *swi_off;
+public:
+	void draw();
+	void toggle_cb();
+	SWIs(int x, int y, int offset);
 };
 
 class LEDs {
@@ -64,7 +74,7 @@ public:
 };
 
 extern Fl_Window *window;
-extern SWI_Buttons *swi;
+extern SWIs *swi;
 extern LEDs *leds;
 extern display *disp;
 extern SegmentsDisplay *segments;

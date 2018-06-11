@@ -19,7 +19,7 @@
 
 Vtop* top;   // Verilated model
 Fl_Window *window; // Window representing FPGA board
-SWI_Buttons *swi;  // switches
+SWIs *swi;  // switches
 LEDs *leds;
 display *disp;     // LED, LCD, registers
 SegmentsDisplay *segments; // 7-segment display
@@ -33,14 +33,26 @@ double sc_time_stamp () {       // Called by $time in Verilog
      return main_time;          // converts to double, to match what SystemC does
 }
 
-// set SystemVerilog input signal from graphic interface
-void SWI_Buttons::toggle_cb(Fl_Widget *o, SWI_Buttons* this_o) { // this_o is this
-  for(int i=NBUTTONS-1; i>=0; i--) {  // from most significant bit to least significant bit
-    top->SWI <<= 1; // shift left, bit zero will get value zero
-    top->SWI |= this_o->b[i]->value() & 1; // set bit zero from button
-  }
-  
-  callback(NULL);
+int SWI::handle(int event) {
+	if (event == FL_PUSH) {
+		state = !state;
+		
+		if (state) {
+			top->SWI |= 1UL << id;
+		} else {
+			top->SWI &= ~(1UL << id);
+		}
+	}
+}
+
+void SWI::draw() {
+	(state ? swi_on : swi_off)->draw(x, y);
+}
+
+void SWIs::draw() {
+	for  (int i = 0; i < 8; i++) {
+		swis[i]->draw();
+	}
 }
 
 SegmentsDisplay::SegmentsDisplay(int x_origin, int y_origin) {
@@ -129,7 +141,8 @@ void callback(void*) {
   for (int i = 0; i < 8; i++) leds->states[i] = top->LED >> i & 1;
   leds->draw();
 
-  // display SystemVerilog output in FLTK drawing
+  swi->draw();
+
   disp->draw();
   
   segments->draw();

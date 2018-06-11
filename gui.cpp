@@ -8,13 +8,19 @@
 
 #include "gui.h"
 
-SWI_Buttons::SWI_Buttons(int x, int y, int offset, int individual_width, int individual_height) {
-  for(int i=0; i<NBUTTONS; i++) {
-    label[i][0] = i+0x30; // map integer i to ASCII digit
-    label[i][1] = 0;      // terminate label as string
-    b[i] = new Fl_Toggle_Button(x + (NBUTTONS-i)*offset,y,individual_width,individual_height,label[i]);
-    b[i]->callback((Fl_Callback*)toggle_cb, this);
-  }
+SWI::SWI(int x, int y, int id, Fl_PNG_Image *swi_on, Fl_PNG_Image *swi_off) : 
+	x(x), 
+	y(y), 
+	id(id), 
+	state(false), 
+	swi_on(swi_on), 
+	swi_off(swi_off), 
+	Fl_Widget(x, y, 33, 96) { }
+	
+SWIs::SWIs(int x, int y, int offset) : swi_on(new Fl_PNG_Image("Assets/SWIOn.png")), swi_off(new Fl_PNG_Image("Assets/SWIOff.png")) {
+	for (int i = 0; i < 8; i++) {
+		swis[i] = new SWI(x + offset * (7 - i), y, i, swi_on, swi_off);
+	}
 }
 
 LEDs::LEDs(int x_origin, int y_origin, int offset) {
@@ -70,13 +76,13 @@ const char *mono_fonts[] = { "Lucida Console",
                              "" };
 
 void init_gui(int argc, char** argv) {
-  int window_width = 600;
-  int window_height = 360;
+  int window_width = 800;
+  int window_height = 500;
   window = new Fl_Window(Fl::w() / 2 - window_width / 2, Fl::h() / 2 - window_height / 2, window_width, window_height, "Labarc FPGA Simulator");
 
-  swi = new SWI_Buttons(30, 10, 30, 17, 30);
+  swi = new SWIs(0, 400, 40);
   
-  leds = new LEDs(55, 40, 30);
+  leds = new LEDs(55, 30, 30);
 
   int i=0;
   do {  // search for an existin mono-space font
@@ -86,7 +92,7 @@ void init_gui(int argc, char** argv) {
     
   disp = new display(200, 20, 10, 20);
   
-  segments = new SegmentsDisplay(400, 0);
+  segments = new SegmentsDisplay(600, 0);
 
   window->end();
   window->show(argc,argv);
