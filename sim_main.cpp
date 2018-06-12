@@ -19,6 +19,7 @@
 
 Vtop* top;   // Verilated model
 Fl_Window *window; // Window representing FPGA board
+FPGA *fpga;
 SWIs *swi;  // switches
 LEDs *leds;
 display *disp;     // LED, LCD, registers
@@ -42,10 +43,12 @@ int SWI::handle(int event) {
 		} else {
 			top->SWI &= ~(1UL << id);
 		}
+		
+		this->redraw();
 	}
 }
 
-void SWI::draw() {
+void SWI::draw() {	
 	(state ? swi_on : swi_off)->draw(x, y);
 }
 
@@ -144,9 +147,11 @@ void callback(void*) {
   // Evaluate Verilated SystemVerilog model
   top->eval();
 
+
+
   leds->draw();
 
-  swi->draw();
+  //swi->draw();
 
   disp->draw();
   

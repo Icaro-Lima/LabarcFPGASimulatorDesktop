@@ -8,6 +8,12 @@
 
 #include "gui.h"
 
+FPGA::FPGA(int x, int y) : image(new Fl_PNG_Image("Assets/FPGA.png")), Fl_Widget(x, y, 658, 658) { }
+
+void FPGA::draw() {	
+	image->draw(x(), y());
+}
+
 SWI::SWI(int x, int y, int id, Fl_PNG_Image *swi_on, Fl_PNG_Image *swi_off) : 
 	x(x), 
 	y(y), 
@@ -68,28 +74,30 @@ const char *mono_fonts[] = { "Lucida Console",
                              "" };
 
 void init_gui(int argc, char** argv) {
-  int window_width = 800;
-  int window_height = 500;
-  window = new Fl_Window(Fl::w() / 2 - window_width / 2, Fl::h() / 2 - window_height / 2, window_width, window_height, "Labarc FPGA Simulator");
+	int window_width = 800;
+	int window_height = 500;
+	window = new Fl_Window(Fl::w() / 2 - window_width / 2, Fl::h() / 2 - window_height / 2, window_width, window_height, "Labarc FPGA Simulator");
 
-  swi = new SWIs(0, 400, 40);
-  
-  leds = new LEDs(55, 30, 30);
+	fpga = new FPGA(0, 0);
 
-  int i=0;
-  do {  // search for an existin mono-space font
-    Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
-    fl_font(DISPLAY_FONT, 13);
-  } while( fl_width('w') != fl_width('i') && strlen(mono_fonts[i]) );
-    
-  disp = new display(200, 20, 10, 20);
-  
-  segments = new SegmentsDisplay(600, 0);
+	swi = new SWIs(0, 400, 40);
+	  
+	leds = new LEDs(55, 30, 30);
 
-  window->end();
-  window->show(argc,argv);
+	int i=0;
+	do {  // search for an existin mono-space font
+	  Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
+	  fl_font(DISPLAY_FONT, 13);
+	} while( fl_width('w') != fl_width('i') && strlen(mono_fonts[i]) );
+		
+	disp = new display(200, 20, 10, 20);
+	  
+	segments = new SegmentsDisplay(600, 0);
 
-  Fl::add_timeout(0.25, callback);       // set up first timeout after 0.25 seconds
+	window->end();
+	window->show(argc,argv);
+
+	Fl::add_timeout(0.25, callback);       // set up first timeout after 0.25 seconds
 };
 
 void delete_gui() {

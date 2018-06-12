@@ -20,6 +20,14 @@ using namespace std;
 #define XMARGIN 10
 #define DISPLAY_FONT ((Fl_Font)55)
 
+class FPGA : public Fl_Widget {
+	Fl_PNG_Image *image;
+	
+public:
+	virtual void draw();
+	FPGA(int x, int y);
+};
+
 class SWI : public Fl_Widget {
 	int x, y, id;
 	Fl_PNG_Image *swi_on, *swi_off;
@@ -72,6 +80,7 @@ public:
 };
 
 extern Fl_Window *window;
+extern FPGA *fpga;
 extern SWIs *swi;
 extern LEDs *leds;
 extern display *disp;
