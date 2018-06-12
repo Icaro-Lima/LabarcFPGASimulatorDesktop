@@ -13,9 +13,11 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Toggle_Button.H>
-#include <FL/Fl_Double_Window.H>
+#include <FL/Fl_Window.H>
 
 #define XMARGIN 10
+#define SWIS_OFFSET 64
+#define LEDS_VERTICAL_OFFSET 230
 #define DISPLAY_FONT ((Fl_Font)55)
 
 class SWI : public Fl_Widget {
@@ -31,17 +33,18 @@ public:
 
 class SWIs : public Fl_Widget {
 	SWI *swis[8];
-	Fl_PNG_Image *swi_on, *swi_off;
 public:
+	static Fl_PNG_Image *swi_on, *swi_off;
+
 	SWIs(int x, int y, int offset);
 	virtual void draw();
 };
 
 class LEDs : public Fl_Widget {
-	int x_origin, y_origin, offset;
-	Fl_PNG_Image *led_on, *led_off;
-	
+	int x_origin, y_origin, offset;	
 public:	
+	static Fl_PNG_Image *led_on, *led_off;
+
 	LEDs(int x_origin, int y_origin, int offset);
 	virtual void draw();
 };
@@ -52,7 +55,7 @@ public:
   void draw();
   void lcd_labels(int start, int step);
   void register_labels(int start, int step);
-  display(int x, int y, int width, int height);
+  display(int x, int y);
 private:
   int offset;
 };
@@ -73,16 +76,17 @@ public:
 	static Fl_PNG_Image *image;
 
 	SWIs *swis;
-	//SegmentsDisplay *segments;
+	SegmentsDisplay *segments;
 
 	virtual void draw();
 	Board(int x, int y);
 };
 
-class FPGA : public Fl_Widget {
-	static Fl_PNG_Image *image;
-	
+class FPGA : public Fl_Widget {	
 public:
+	static Fl_PNG_Image *image;
+
+	display *disp;
 	Board *board;
 	LEDs *leds;
 
@@ -92,7 +96,6 @@ public:
 
 extern Fl_Window *window;
 extern FPGA *fpga;
-extern display *disp;
 
 void init_gui(int, char**);
 void delete_gui();

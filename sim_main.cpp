@@ -20,7 +20,6 @@
 Vtop* top;   // Verilated model
 Fl_Window *window; // Window representing FPGA board
 FPGA *fpga;
-display *disp;     // LED, LCD, registers
 
 vluint64_t main_time = 0;       // Current Verilator simulation time
 // This is a 64-bit integer to reduce wrap over issues and
@@ -41,6 +40,8 @@ int SWI::handle(int event) {
 			top->SWI &= ~(1UL << id);
 		}
 		
+		top->eval();
+		
 		fpga->damage(1);
 	}
 }
@@ -59,7 +60,7 @@ void LEDs::draw() {
 	}
 }
 
-/*void SegmentsDisplay::draw() {			
+void SegmentsDisplay::draw() {	
 	base->draw(x(), y());
 	
 	(top->SEG>>0 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 25);
@@ -70,14 +71,14 @@ void LEDs::draw() {
 	(top->SEG>>5 & 1 ? vertical_on : vertical_off)->draw(x() + 17, y() + 33);
 	(top->SEG>>6 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 80);
 	(top->SEG>>7 & 1 ? point_on : point_off)->draw(x() + 91, y() + 134);
-}*/
+}
 
 void display::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
 
-  fl_rectf(this->x() + XMARGIN - 2, 80, 385, 270, FL_WHITE); // clean LCD and register window
+  fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD and register window
 
-  lcd_labels(95, 25);
+  lcd_labels(y() + 15, 25);
   stringstream ss;
   ss << hex << setfill('0') << uppercase;
   // LCD data
@@ -87,7 +88,7 @@ void display::draw() {
   ss << " " << setw(2) << (int)top->lcd_WriteData;
   ss << (top->lcd_MemWrite ? '*' : '_');
   ss << (top->lcd_Branch ? '*' : '_');
-  fl_draw(ss.str().c_str(), this->x() + XMARGIN, 125);
+  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 45);
 	
   // second line
   ss.str(""); // reset stringstream
@@ -98,10 +99,10 @@ void display::draw() {
   ss << " " << setw(2) << (int)top->lcd_ReadData;
   ss << (top->lcd_MemtoReg ? '*' : '_');
   ss << (top->lcd_RegWrite ? '*' : '_');
-  fl_draw(ss.str().c_str(), this->x() + XMARGIN, 165);
+  fl_draw(ss.str().c_str(), this->x() + XMARGIN, y() + 80);
   
-  int y = 195;
-  register_labels(y, 18);
+  int yy = y() + 100;
+  register_labels(yy, 18);
   // register values
   ss << nouppercase;
   for(int i = 0; i < 32; i++) { //  for all registradores
@@ -111,7 +112,7 @@ void display::draw() {
     }
     ss << "      : " << setw(2) << (int)top->lcd_registrador[i];
     if(i % 4 == 3) { // end of line
-      fl_draw(ss.str().c_str(), this->x() + XMARGIN, y += 18);
+      fl_draw(ss.str().c_str(), this->x() + XMARGIN, yy += 18);
     }
   }
 }
@@ -125,9 +126,9 @@ void callback(void*) {
 
   // Evaluate Verilated SystemVerilog model
   top->eval();
-  
-  disp->draw();
-  	
+ 
+   fpga->damage(1);
+   	
   Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
 }
 
