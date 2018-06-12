@@ -26,18 +26,10 @@ SWIs::SWIs(int x, int y, int offset) : swi_on(new Fl_PNG_Image("Assets/SWIOn.png
 LEDs::LEDs(int x_origin, int y_origin, int offset) {
 	led_on = new Fl_PNG_Image("Assets/LEDOn.png");
 	led_off = new Fl_PNG_Image("Assets/LEDOff.png");
-	
-	this->states = new bool[8];
-	
+		
 	this->x_origin = x_origin;
 	this->y_origin = y_origin;
 	this->offset = offset;
-}
-
-void LEDs::draw() {	
-	for(int i = 0; i < 8; i++) {
-		(states[i] ? led_on : led_off)->draw(x_origin + (7 - i) * offset, y_origin);
-	}
 }
 
 display::display(int x, int y, int width, int height) : Fl_Widget(x, y, width, height) { }

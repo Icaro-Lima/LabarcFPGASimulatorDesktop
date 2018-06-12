@@ -44,9 +44,7 @@ class LEDs {
 	int x_origin, y_origin, offset;
 	Fl_PNG_Image *led_on, *led_off;
 	
-public:
-	bool *states;
-	
+public:	
 	LEDs(int x_origin, int y_origin, int offset);
 	void draw();
 };

@@ -55,6 +55,12 @@ void SWIs::draw() {
 	}
 }
 
+void LEDs::draw() {	
+	for(int i = 0; i < 8; i++) {
+		((top->LED >> i & 1) ? led_on : led_off)->draw(x_origin + (7 - i) * offset, y_origin);
+	}
+}
+
 SegmentsDisplay::SegmentsDisplay(int x_origin, int y_origin) {
 	this->x_origin = x_origin;
 	this->y_origin = y_origin;
@@ -138,7 +144,6 @@ void callback(void*) {
   // Evaluate Verilated SystemVerilog model
   top->eval();
 
-  for (int i = 0; i < 8; i++) leds->states[i] = top->LED >> i & 1;
   leds->draw();
 
   swi->draw();
