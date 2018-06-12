@@ -47,7 +47,7 @@ int SWI::handle(int event) {
 }
 
 void SWI::draw() {
-	(state ? swi_on : swi_off)->draw(x(), y());
+	(state ? SWIs::swi_on : SWIs::swi_off)->draw(x(), y());
 }
 
 void SWIs::draw() {

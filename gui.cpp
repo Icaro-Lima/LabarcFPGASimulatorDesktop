@@ -54,22 +54,20 @@ void Board::draw() {
 	}
 }
 
-SWI::SWI(int x, int y, int id, Fl_PNG_Image *swi_on, Fl_PNG_Image *swi_off) : 
+SWI::SWI(int x, int y, int id) : 
 	id(id), 
 	state(false), 
-	swi_on(swi_on),
-	swi_off(swi_off), 
-	Fl_Widget(x, y, 33, 96) { }
+	Fl_Widget(x, y, SWIs::swi_on->w(), SWIs::swi_on->h()) { }
 
 Fl_PNG_Image * SWIs::swi_on = new Fl_PNG_Image("Assets/SWIOn.png");
 Fl_PNG_Image * SWIs::swi_off = new Fl_PNG_Image("Assets/SWIOff.png");
 SWIs::SWIs(int x, int y, int offset) : Fl_Widget(x, y, 8 * 33 + 7 * (offset - 33) + SegmentsDisplay::base->w(), 96) {
 	for (int i = 0; i < 4; i++) {
-		swis[i] = new SWI(SegmentsDisplay::base->w() + x + offset * (7 - i), y, i, swi_on, swi_off);
+		swis[i] = new SWI(SegmentsDisplay::base->w() + x + offset * (7 - i), y, i);
 	}
 	
 	for (int i = 4; i < 8; i++) {
-		swis[i] = new SWI(x + offset * (7 - i), y, i, swi_on, swi_off);
+		swis[i] = new SWI(x + offset * (7 - i), y, i);
 	}
 }
 

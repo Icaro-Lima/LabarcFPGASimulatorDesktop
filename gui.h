@@ -22,13 +22,12 @@
 
 class SWI : public Fl_Widget {
 	int id;
-	Fl_PNG_Image *swi_on, *swi_off;
 public:
 	bool state;
 	
 	virtual void draw();
 	virtual int handle(int event);
-	SWI(int x, int y, int id, Fl_PNG_Image *swi_on, Fl_PNG_Image *swi_off);
+	SWI(int x, int y, int id);
 };
 
 class SWIs : public Fl_Widget {
