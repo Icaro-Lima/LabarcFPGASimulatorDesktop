@@ -20,10 +20,7 @@
 Vtop* top;   // Verilated model
 Fl_Window *window; // Window representing FPGA board
 FPGA *fpga;
-SWIs *swi;  // switches
-LEDs *leds;
 display *disp;     // LED, LCD, registers
-SegmentsDisplay *segments; // 7-segment display
 
 vluint64_t main_time = 0;       // Current Verilator simulation time
 // This is a 64-bit integer to reduce wrap over issues and
@@ -44,18 +41,16 @@ int SWI::handle(int event) {
 			top->SWI &= ~(1UL << id);
 		}
 		
-		this->redraw();
+		fpga->damage(1);
 	}
 }
 
-void SWI::draw() {	
-	(state ? swi_on : swi_off)->draw(x, y);
+void SWI::draw() {
+	(state ? swi_on : swi_off)->draw(x(), y());
 }
 
 void SWIs::draw() {
-	for  (int i = 0; i < 8; i++) {
-		swis[i]->draw();
-	}
+	for (int i = 0; i < 8; i++) { swis[i]->redraw(); }
 }
 
 void LEDs::draw() {	
@@ -64,34 +59,18 @@ void LEDs::draw() {
 	}
 }
 
-SegmentsDisplay::SegmentsDisplay(int x_origin, int y_origin) {
-	this->x_origin = x_origin;
-	this->y_origin = y_origin;
+/*void SegmentsDisplay::draw() {			
+	base->draw(x(), y());
 	
-	this->previous = new bool[8];
-	memset(this->previous, 0, 8 * sizeof(bool));
-	
-	base = new Fl_PNG_Image("Assets/7SegmentsDisplayBase.png");
-	point_on = new Fl_PNG_Image("Assets/PointOn.png");
-	point_off = new Fl_PNG_Image("Assets/PointOff.png");
-	vertical_on = new Fl_PNG_Image("Assets/VerticalOn.png");
-	vertical_off = new Fl_PNG_Image("Assets/VerticalOff.png");
-	horizontal_on = new Fl_PNG_Image("Assets/HorizontalOn.png");
-	horizontal_off = new Fl_PNG_Image("Assets/HorizontalOff.png");
-}
-
-void SegmentsDisplay::draw() {			
-	base->draw(x_origin, y_origin);
-	
-	(top->SEG>>0 & 1 ? horizontal_on : horizontal_off)->draw(x_origin + 26, y_origin + 25);
-	(top->SEG>>1 & 1 ? vertical_on : vertical_off)->draw(x_origin + 74, y_origin + 33);
-	(top->SEG>>2 & 1 ? vertical_on : vertical_off)->draw(x_origin + 74, y_origin + 88);
-	(top->SEG>>3 & 1 ? horizontal_on : horizontal_off)->draw(x_origin + 26, y_origin + 135);
-	(top->SEG>>4 & 1 ? vertical_on : vertical_off)->draw(x_origin + 17, y_origin + 88);
-	(top->SEG>>5 & 1 ? vertical_on : vertical_off)->draw(x_origin + 17, y_origin + 33);
-	(top->SEG>>6 & 1 ? horizontal_on : horizontal_off)->draw(x_origin + 26, y_origin + 80);
-	(top->SEG>>7 & 1 ? point_on : point_off)->draw(x_origin + 91, y_origin + 134);
-}
+	(top->SEG>>0 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 25);
+	(top->SEG>>1 & 1 ? vertical_on : vertical_off)->draw(x() + 74, y() + 33);
+	(top->SEG>>2 & 1 ? vertical_on : vertical_off)->draw(x() + 74, y() + 88);
+	(top->SEG>>3 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 135);
+	(top->SEG>>4 & 1 ? vertical_on : vertical_off)->draw(x() + 17, y() + 88);
+	(top->SEG>>5 & 1 ? vertical_on : vertical_off)->draw(x() + 17, y() + 33);
+	(top->SEG>>6 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 80);
+	(top->SEG>>7 & 1 ? point_on : point_off)->draw(x() + 91, y() + 134);
+}*/
 
 void display::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
@@ -146,17 +125,9 @@ void callback(void*) {
 
   // Evaluate Verilated SystemVerilog model
   top->eval();
-
-
-
-  leds->draw();
-
-  //swi->draw();
-
-  disp->draw();
   
-  segments->draw();
-	
+  disp->draw();
+  	
   Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
 }
 

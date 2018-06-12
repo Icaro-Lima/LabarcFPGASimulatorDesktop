@@ -15,46 +15,35 @@
 #include <FL/Fl_Toggle_Button.H>
 #include <FL/Fl_Double_Window.H>
 
-using namespace std;
-
 #define XMARGIN 10
 #define DISPLAY_FONT ((Fl_Font)55)
 
-class FPGA : public Fl_Widget {
-	Fl_PNG_Image *image;
-	
-public:
-	virtual void draw();
-	FPGA(int x, int y);
-};
-
 class SWI : public Fl_Widget {
-	int x, y, id;
+	int id;
 	Fl_PNG_Image *swi_on, *swi_off;
 public:
 	bool state;
 	
-	virtual int handle(int event);
 	virtual void draw();
+	virtual int handle(int event);
 	SWI(int x, int y, int id, Fl_PNG_Image *swi_on, Fl_PNG_Image *swi_off);
 };
 
-class SWIs {
+class SWIs : public Fl_Widget {
 	SWI *swis[8];
 	Fl_PNG_Image *swi_on, *swi_off;
 public:
-	void draw();
-	void toggle_cb();
 	SWIs(int x, int y, int offset);
+	virtual void draw();
 };
 
-class LEDs {
+class LEDs : public Fl_Widget {
 	int x_origin, y_origin, offset;
 	Fl_PNG_Image *led_on, *led_off;
 	
 public:	
 	LEDs(int x_origin, int y_origin, int offset);
-	void draw();
+	virtual void draw();
 };
 
 // show SystemVerilog output signal in graphic interface
@@ -68,23 +57,42 @@ private:
   int offset;
 };
 
-class SegmentsDisplay {
-	int x_origin, y_origin;
-	bool first_draw;
+class SegmentsDisplay : public Fl_Widget {
 	bool *previous;
-	Fl_PNG_Image *base, *point_on, *point_off, *vertical_on, *vertical_off, *horizontal_on, *horizontal_off;
+	Fl_PNG_Image *point_on, *point_off, *vertical_on, *vertical_off, *horizontal_on, *horizontal_off;
 	
 public:
-	void draw();
-	SegmentsDisplay(int x_origin, int y_origin);
+	static Fl_PNG_Image *base;
+
+	virtual void draw();
+	SegmentsDisplay(int x, int y);
+};
+
+class Board : public Fl_Widget {		
+public:
+	static Fl_PNG_Image *image;
+
+	SWIs *swis;
+	//SegmentsDisplay *segments;
+
+	virtual void draw();
+	Board(int x, int y);
+};
+
+class FPGA : public Fl_Widget {
+	static Fl_PNG_Image *image;
+	
+public:
+	Board *board;
+	LEDs *leds;
+
+	virtual void draw();
+	FPGA(int x, int y);
 };
 
 extern Fl_Window *window;
 extern FPGA *fpga;
-extern SWIs *swi;
-extern LEDs *leds;
 extern display *disp;
-extern SegmentsDisplay *segments;
 
 void init_gui(int, char**);
 void delete_gui();

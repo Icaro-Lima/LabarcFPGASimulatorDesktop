@@ -8,28 +8,46 @@
 
 #include "gui.h"
 
-FPGA::FPGA(int x, int y) : image(new Fl_PNG_Image("Assets/FPGA.png")), Fl_Widget(x, y, 658, 658) { }
+Fl_PNG_Image * FPGA::image = new Fl_PNG_Image("Assets/FPGA.png");
+FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
+	board = new Board(x + image->w() / 2 - board->image->w() / 2, y);
+	leds = new LEDs(55, 30, 30);
+}
 
-void FPGA::draw() {	
+void FPGA::draw() {
 	image->draw(x(), y());
+	board->redraw();
+	leds->redraw();
+}
+
+Fl_PNG_Image * Board::image = new Fl_PNG_Image("Assets/Board.png");
+Board::Board(int x, int y) : swis(new SWIs(x, y, 40)), /*segments(new SegmentsDisplay(x, y)), */Fl_Widget(x, y, image->w(), image->h()) {
+	
+}
+
+void Board::draw() {
+	image->draw(x(), y());
+	swis->redraw();
 }
 
 SWI::SWI(int x, int y, int id, Fl_PNG_Image *swi_on, Fl_PNG_Image *swi_off) : 
-	x(x), 
-	y(y), 
 	id(id), 
 	state(false), 
-	swi_on(swi_on), 
+	swi_on(swi_on),
 	swi_off(swi_off), 
 	Fl_Widget(x, y, 33, 96) { }
 	
-SWIs::SWIs(int x, int y, int offset) : swi_on(new Fl_PNG_Image("Assets/SWIOn.png")), swi_off(new Fl_PNG_Image("Assets/SWIOff.png")) {
-	for (int i = 0; i < 8; i++) {
+SWIs::SWIs(int x, int y, int offset) : swi_on(new Fl_PNG_Image("Assets/SWIOn.png")), swi_off(new Fl_PNG_Image("Assets/SWIOff.png")), Fl_Widget(x, y, 8 * 33 + 7 * offset / 2, 96) {
+	for (int i = 0; i < 4; i++) {
+		swis[i] = new SWI(x + offset * (7 - i), y, i, swi_on, swi_off);
+	}
+	
+	for (int i = 4; i < 8; i++) {
 		swis[i] = new SWI(x + offset * (7 - i), y, i, swi_on, swi_off);
 	}
 }
 
-LEDs::LEDs(int x_origin, int y_origin, int offset) {
+LEDs::LEDs(int x_origin, int y_origin, int offset) : Fl_Widget(x_origin, y_origin, 8 * 24 + 7 * offset / 2, 40) {
 	led_on = new Fl_PNG_Image("Assets/LEDOn.png");
 	led_off = new Fl_PNG_Image("Assets/LEDOff.png");
 		
@@ -37,6 +55,19 @@ LEDs::LEDs(int x_origin, int y_origin, int offset) {
 	this->y_origin = y_origin;
 	this->offset = offset;
 }
+
+/*Fl_PNG_Image * SegmentsDisplay::base = new Fl_PNG_Image("Assets/7SegmentsDisplayBase.png");
+SegmentsDisplay::SegmentsDisplay(int x, int y) : Fl_Widget(x, y, base->w(), base->h()) {
+	this->previous = new bool[8];
+	memset(this->previous, 0, 8 * sizeof(bool));
+	
+	point_on = new Fl_PNG_Image("Assets/PointOn.png");
+	point_off = new Fl_PNG_Image("Assets/PointOff.png");
+	vertical_on = new Fl_PNG_Image("Assets/VerticalOn.png");
+	vertical_off = new Fl_PNG_Image("Assets/VerticalOff.png");
+	horizontal_on = new Fl_PNG_Image("Assets/HorizontalOn.png");
+	horizontal_off = new Fl_PNG_Image("Assets/HorizontalOff.png");
+}*/
 
 display::display(int x, int y, int width, int height) : Fl_Widget(x, y, width, height) { }
 
@@ -74,16 +105,14 @@ const char *mono_fonts[] = { "Lucida Console",
                              "" };
 
 void init_gui(int argc, char** argv) {
-	int window_width = 800;
-	int window_height = 500;
+	int window_width = 1000;
+	int window_height = 700;
 	window = new Fl_Window(Fl::w() / 2 - window_width / 2, Fl::h() / 2 - window_height / 2, window_width, window_height, "Labarc FPGA Simulator");
 
 	fpga = new FPGA(0, 0);
 
-	swi = new SWIs(0, 400, 40);
+	//swi = new SWIs(0, 400, 40);
 	  
-	leds = new LEDs(55, 30, 30);
-
 	int i=0;
 	do {  // search for an existin mono-space font
 	  Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
@@ -92,8 +121,6 @@ void init_gui(int argc, char** argv) {
 		
 	disp = new display(200, 20, 10, 20);
 	  
-	segments = new SegmentsDisplay(600, 0);
-
 	window->end();
 	window->show(argc,argv);
 
@@ -103,7 +130,5 @@ void init_gui(int argc, char** argv) {
 void delete_gui() {
     Fl::remove_timeout(callback);
     delete disp;
-    delete swi;
     delete window;
 }
-
