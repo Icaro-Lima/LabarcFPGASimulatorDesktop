@@ -15,6 +15,13 @@
 #include <FL/Fl_Toggle_Button.H>
 #include <FL/Fl_Window.H>
 
+using std::stringstream;
+using std::hex;
+using std::setw;
+using std::setfill;
+using std::uppercase;
+using std::nouppercase;
+
 #define XMARGIN 10
 #define SWIS_OFFSET 64
 #define LEDS_VERTICAL_OFFSET 230
