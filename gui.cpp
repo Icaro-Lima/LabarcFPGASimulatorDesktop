@@ -46,9 +46,10 @@ void Board::draw() {
 		swis->redraw();
 	}
 	if (damage() & 1) {
-		image->draw(swis->x(), swis->y(), swis->w(), swis->h(), x() + swis->x(), y() + swis->y());
+		image->draw(x(), y());
+		//image->draw(swis->x(), swis->y(), swis->w(), swis->h(), x() + swis->x(), y() + swis->y());
 		swis->redraw();
-		image->draw(segments->x(), segments->y(), segments->w(), segments->h(), x() + segments->x(), y() + segments->y());
+		//image->draw(segments->x(), segments->y(), segments->w(), segments->h(), x() + segments->x(), y() + segments->y());
 		segments->redraw();
 	}
 }
