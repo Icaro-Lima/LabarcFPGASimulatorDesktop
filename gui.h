@@ -74,9 +74,6 @@ class Board : public Fl_Widget {
 public:
 	static Fl_PNG_Image *image;
 
-	SWIs *swis;
-	SegmentsDisplay *segments;
-
 	virtual void draw();
 	Board(int x, int y);
 };
@@ -85,16 +82,17 @@ class FPGA : public Fl_Widget {
 public:
 	static Fl_PNG_Image *image;
 
-	display *disp;
-	Board *board;
-	LEDs *leds;
-
 	virtual void draw();
 	FPGA(int x, int y);
 };
 
 extern Fl_Window *window;
 extern FPGA *fpga;
+extern LEDs *leds;
+extern display *disp;
+extern Board *board;
+extern SWIs *swis;
+extern SegmentsDisplay *segments;
 
 void init_gui(int, char**);
 void delete_gui();

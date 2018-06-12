@@ -20,6 +20,11 @@
 Vtop* top;   // Verilated model
 Fl_Window *window; // Window representing FPGA board
 FPGA *fpga;
+LEDs *leds;
+display *disp;
+Board *board;
+SWIs *swis;
+SegmentsDisplay *segments;
 
 vluint64_t main_time = 0;       // Current Verilator simulation time
 // This is a 64-bit integer to reduce wrap over issues and
@@ -42,7 +47,13 @@ int SWI::handle(int event) {
 		
 		top->eval();
 		
-		fpga->damage(1);
+		swis->redraw();
+		
+		segments->redraw();
+		
+		leds->redraw();
+		
+		disp->redraw();
 	}
 }
 
@@ -126,9 +137,13 @@ void callback(void*) {
 
   // Evaluate Verilated SystemVerilog model
   top->eval();
- 
-   fpga->damage(1);
-   	
+  
+  segments->redraw();
+  
+  leds->redraw();
+  
+  disp->redraw();
+    	
   Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
 }
 

@@ -9,36 +9,15 @@
 #include "gui.h"
 
 Fl_PNG_Image * FPGA::image = new Fl_PNG_Image("Assets/FPGA.png");
-FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
-	disp = new display(x + image->w() / 2, y + image->h() / 2);
-	disp->position(x + image->w() / 2 - disp->w() / 2, y + image->h() / 2);
-	
-	board = new Board(x + image->w() / 2 - board->image->w() / 2, y);
-	
-	int led_offset = 30;
-	int led_x = x + image->w() / 2 - (leds->led_on->w() * 8 + 7 * (led_offset - leds->led_on->w())) / 2;
-	leds = new LEDs(led_x, y + LEDS_VERTICAL_OFFSET, led_offset);
-}
+FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) { }
 
 void FPGA::draw() {
-	if (damage() == 0x80) {
-		image->draw(x(), y());
-	}
-	if (damage() & 1) {
-		leds->redraw();
-		board->damage(1);
-		disp->redraw();
-	}
+	image->draw(x(), y());
+	//board->damage(1);
 }
 
 Fl_PNG_Image * Board::image = new Fl_PNG_Image("Assets/Board.png");
-Board::Board(int x, int y) : 
-	swis(new SWIs(x + image->w() / 2 - (8 * SWIs::swi_on->w() + 7 * (SWIS_OFFSET - SWIs::swi_on->w()) + SegmentsDisplay::base->w()) / 2,
-	y + image->h() / 2 - SWIs::swi_on->h() / 2, SWIS_OFFSET)), 
-	segments(new SegmentsDisplay(x + image->w() / 2 - segments->base->w() / 2, y + image->h() / 2 - segments->base->h() / 2)), 
-	Fl_Widget(x, y, image->w(), image->h()) {
-		
-	}
+Board::Board(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) { }
 
 void Board::draw() {
 	if (damage() & 0x80) {
@@ -47,9 +26,7 @@ void Board::draw() {
 	}
 	if (damage() & 1) {
 		image->draw(x(), y());
-		//image->draw(swis->x(), swis->y(), swis->w(), swis->h(), x() + swis->x(), y() + swis->y());
 		swis->redraw();
-		//image->draw(segments->x(), segments->y(), segments->w(), segments->h(), x() + segments->x(), y() + segments->y());
 		segments->redraw();
 	}
 }
@@ -132,7 +109,27 @@ void init_gui(int argc, char** argv) {
 	int window_height = FPGA::image->h();;
 	window = new Fl_Window(Fl::w() / 2 - window_width / 2, Fl::h() / 2 - window_height / 2, window_width, window_height, "Labarc FPGA Simulator");
 
+	// Instance FPGA
 	fpga = new FPGA(0, 0);
+	
+	// Instance upper board of FPGA
+	board = new Board(fpga->x() + FPGA::image->w() / 2 - Board::image->w() / 2, fpga->y());
+	
+	// Instance SWITCHES
+	swis = new SWIs(board->x() + Board::image->w() / 2 - (8 * SWIs::swi_on->w() + 7 * (SWIS_OFFSET - SWIs::swi_on->w()) + SegmentsDisplay::base->w()) / 2,
+	board->y() + Board::image->h() / 2 - SWIs::swi_on->h() / 2, SWIS_OFFSET);
+	
+	// Instance 7-segment display
+	segments = new SegmentsDisplay(board->x() + Board::image->w() / 2 - SegmentsDisplay::base->w() / 2, board->y() + Board::image->h() / 2 - SegmentsDisplay::base->h() / 2);
+	
+	// Instance LED's
+	int led_offset = 30;
+	int led_x = fpga->x() + fpga->image->w() / 2 - (LEDs::led_on->w() * 8 + 7 * (led_offset - LEDs::led_on->w())) / 2;
+	leds = new LEDs(led_x, fpga->y() + LEDS_VERTICAL_OFFSET, led_offset);
+	
+	// Instance display
+	disp = new display(fpga->x() + FPGA::image->w() / 2, fpga->y() + FPGA::image->h() / 2);
+	disp->position(fpga->x() + FPGA::image->w() / 2 - disp->w() / 2, fpga->y() + FPGA::image->h() / 2);
 	  
 	int i=0;
 	do {  // search for an existin mono-space font
