@@ -21,11 +21,13 @@ using std::setw;
 using std::setfill;
 using std::uppercase;
 using std::nouppercase;
+using std::string;
 
 #define XMARGIN 10
 #define SWIS_OFFSET 64
 #define LEDS_VERTICAL_OFFSET 230
 #define DISPLAY_FONT ((Fl_Font)55)
+#define ASSETS_DIR string("Assets/")
 
 class SWI : public Fl_Widget {
 	int id;

@@ -8,7 +8,7 @@
 
 #include "gui.h"
 
-Fl_PNG_Image * FPGA::image = new Fl_PNG_Image("Assets/FPGA.png");
+Fl_PNG_Image * FPGA::image = new Fl_PNG_Image((ASSETS_DIR + "FPGA.png").c_str());
 FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) { }
 
 void FPGA::draw() {
@@ -16,7 +16,7 @@ void FPGA::draw() {
 	//board->damage(1);
 }
 
-Fl_PNG_Image * Board::image = new Fl_PNG_Image("Assets/Board.png");
+Fl_PNG_Image * Board::image = new Fl_PNG_Image((ASSETS_DIR + "Board.png").c_str());
 Board::Board(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) { }
 
 void Board::draw() {
@@ -36,8 +36,8 @@ SWI::SWI(int x, int y, int id) :
 	state(false), 
 	Fl_Widget(x, y, SWIs::swi_on->w(), SWIs::swi_on->h()) { }
 
-Fl_PNG_Image * SWIs::swi_on = new Fl_PNG_Image("Assets/SWIOn.png");
-Fl_PNG_Image * SWIs::swi_off = new Fl_PNG_Image("Assets/SWIOff.png");
+Fl_PNG_Image * SWIs::swi_on = new Fl_PNG_Image((ASSETS_DIR + "SWIOn.png").c_str());
+Fl_PNG_Image * SWIs::swi_off = new Fl_PNG_Image((ASSETS_DIR + "SWIOff.png").c_str());
 SWIs::SWIs(int x, int y, int offset) : Fl_Widget(x, y, 8 * 33 + 7 * (offset - 33) + SegmentsDisplay::base->w(), 96) {
 	for (int i = 0; i < 4; i++) {
 		swis[i] = new SWI(SegmentsDisplay::base->w() + x + offset * (7 - i), y, i);
@@ -48,25 +48,25 @@ SWIs::SWIs(int x, int y, int offset) : Fl_Widget(x, y, 8 * 33 + 7 * (offset - 33
 	}
 }
 
-Fl_PNG_Image * LEDs::led_on = new Fl_PNG_Image("Assets/LEDOn.png");
-Fl_PNG_Image * LEDs::led_off = new Fl_PNG_Image("Assets/LEDOff.png");
+Fl_PNG_Image * LEDs::led_on = new Fl_PNG_Image((ASSETS_DIR + "LEDOn.png").c_str());
+Fl_PNG_Image * LEDs::led_off = new Fl_PNG_Image((ASSETS_DIR + "LEDOff.png").c_str());
 LEDs::LEDs(int x_origin, int y_origin, int offset) : Fl_Widget(x_origin, y_origin, 8 * led_on->w() + 7 * (offset - led_on->w()), led_on->h()) {
 	this->x_origin = x_origin;
 	this->y_origin = y_origin;
 	this->offset = offset;
 }
 
-Fl_PNG_Image * SegmentsDisplay::base = new Fl_PNG_Image("Assets/7SegmentsDisplayBase.png");
+Fl_PNG_Image * SegmentsDisplay::base = new Fl_PNG_Image((ASSETS_DIR + "7SegmentsDisplayBase.png").c_str());
 SegmentsDisplay::SegmentsDisplay(int x, int y) : Fl_Widget(x, y, base->w(), base->h()) {
 	this->previous = new bool[8];
 	memset(this->previous, 0, 8 * sizeof(bool));
 	
-	point_on = new Fl_PNG_Image("Assets/PointOn.png");
-	point_off = new Fl_PNG_Image("Assets/PointOff.png");
-	vertical_on = new Fl_PNG_Image("Assets/VerticalOn.png");
-	vertical_off = new Fl_PNG_Image("Assets/VerticalOff.png");
-	horizontal_on = new Fl_PNG_Image("Assets/HorizontalOn.png");
-	horizontal_off = new Fl_PNG_Image("Assets/HorizontalOff.png");
+	point_on = new Fl_PNG_Image((ASSETS_DIR + "PointOn.png").c_str());
+	point_off = new Fl_PNG_Image((ASSETS_DIR + "PointOff.png").c_str());
+	vertical_on = new Fl_PNG_Image((ASSETS_DIR + "VerticalOn.png").c_str());
+	vertical_off = new Fl_PNG_Image((ASSETS_DIR + "VerticalOff.png").c_str());
+	horizontal_on = new Fl_PNG_Image((ASSETS_DIR + "HorizontalOn.png").c_str());
+	horizontal_off = new Fl_PNG_Image((ASSETS_DIR + "HorizontalOff.png").c_str());
 }
 
 display::display(int x, int y) : Fl_Widget(x, y, 390, 270) { }
