@@ -55,4 +55,4 @@ gui.o: gui.cpp gui.h
 
 maintainer-copy::
 clean mostlyclean distclean maintainer-clean::
-	-rm -rf obj_dir *.h.gch *.o *.s *.log *.dmp *.vpd core
+	-rm -rf obj_dir *.h.gch *.o *.log *.dmp *.vpd core
