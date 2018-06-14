@@ -27,7 +27,8 @@ using std::string;
 #define SWIS_OFFSET 64
 #define LEDS_VERTICAL_OFFSET 230
 #define DISPLAY_FONT ((Fl_Font)55)
-#define ASSETS_DIR string("Assets/")
+#define ASSETS_DIR "Assets/"
+#define ASSET(F) (string(ASSETS_DIR) + F).c_str()
 
 class SWI : public Fl_Widget {
 	int id;
