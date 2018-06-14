@@ -11,6 +11,7 @@ yum -y --enablerepo=epel install verilator fltk-devel make gcc-c++ libpng-devel 
 ```
 ### Windows 10
 Download and start https://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download
+
 In the MinGW Installation Manager select:
 mingw-developper-toolkit
 mingw32-base
@@ -46,12 +47,16 @@ Dê o comando:
 ./configure
 
 Then edit the generated file makeinclude so it reads:
+```
 LDLIBS          =  -lole32 -luuid -lcomctl32 -lws2_32
 GLDLIBS         = -lglu32 -lopengl32  -lole32 -luuid -lcomctl32 -lws2_32
+```
 
 Dê os comandos:
+```
 make
 make install
+```
 
 para termos um editor simples:
 cp test/editor.exe /usr/local/bin/
@@ -60,12 +65,18 @@ volte para a raiz do seu home:
 cd
 
 faça download de https://www.veripool.org/ftp/verilator-3.922.tgz
+and copy the file to
+C:\MinGW\msys\1.0\home\<your name>
+
+In the terminal window type:
+```
 tar xf verilator-3.922.gz
 cd verilator-3.922
 sed -i 's/, 0777//g' examples/tracing_c/sim_main.cpp
 ./configure
 make
 make install
+```
 (ignorar a mensagem de erro "preserving permissions ...: Permission denied")
 ## Utilização
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
