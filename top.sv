@@ -1,7 +1,5 @@
 // DESCRIPTION: Verilator: Systemverilog example module
 // with interface to switch buttons, LEDs, LCD and register display
-/* verilator lint_off COMBDLY */
-/* verilator lint_off WIDTH */
 
 parameter NINSTR_BITS = 32;
 parameter NBITS_TOP = 8, NREGS_TOP = 32;

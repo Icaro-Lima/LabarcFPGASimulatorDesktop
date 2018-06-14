@@ -28,6 +28,8 @@ else
   FLTK=-LDFLAGS "$(LFLTK)"
 endif
 
+WARN=-Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-COMBDLY
+
 ######################################################################
 
 
@@ -42,7 +44,7 @@ VERILATOR = $(VERILATOR_ROOT)/bin/verilator
 endif
 
 default: gui.o
-	$(VERILATOR) -cc --exe +1800-2012ext+sv top.sv sim_main.cpp ../gui.o $(FLTK)
+	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv sim_main.cpp ../gui.o $(FLTK)
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
 	obj_dir/Vtop
 
