@@ -1,4 +1,5 @@
 # LabarcFPGASimulatorDesktop
+![Alt text](MainWindow.png?raw=true "Main Window")
 ## Instalação
 ### Ubuntu (testado no 16.04, 17.10 e 18.04)
 ```
