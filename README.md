@@ -3,7 +3,9 @@
 ## Instalação
 ### Ubuntu (testado no 16.04, 17.10 e 18.04)
 ```
-sudo apt-get install verilator libfltk1.3-dev make g++ libpng-dev zlib1g-dev
+sudo add-apt-repository "deb http://cz.archive.ubuntu.com/ubuntu artful main universe"
+sudo apt-get update
+sudo apt-get install verilator=3.906-1 libfltk1.3-dev make g++ libpng-dev zlib1g-dev
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 ```
 ### CentOS 7
