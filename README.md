@@ -2,8 +2,14 @@
 ![Alt text](MainWindow.png?raw=true "Main Window")
 ## Instalação
 ### Ubuntu (testado no 16.04, 17.10 e 18.04)
+
+Baixe o `verilator_3.906-1` por este link: http://cz.archive.ubuntu.com/ubuntu/pool/universe/v/verilator/verilator_3.906-1_amd64.deb
+
+Instale o package
+
+Agora execute o seguinte, no terminal:
+
 ```
-sudo add-apt-repository "deb http://cz.archive.ubuntu.com/ubuntu artful main universe"
 sudo apt-get update
 sudo apt-get install verilator=3.906-1 libfltk1.3-dev make g++ libpng-dev zlib1g-dev
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
