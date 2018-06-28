@@ -87,6 +87,16 @@ make
 make install
 ```
 (ignorar a mensagem de erro "preserving permissions ...: Permission denied")
+## Mac OS (Testado no High Sierra)
+Baixe o _homebrew_ na sua máquina (se já tiver, não precisa baixar novamente)
+```
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
+```
+Após isso basta executar os seguintes comandos:
+```
+brew install verilator
+brew install fltk
+```
 ## Utilização
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
 
