@@ -1,7 +1,18 @@
 # LabarcFPGASimulatorDesktop
 ![Alt text](MainWindow.png?raw=true "Main Window")
 ## Instalação
-### Ubuntu (testado no 16.04, 17.10 e 18.04)
+### Ubuntu 18.04
+
+Execute o seguinte, no terminal:
+
+```
+sudo apt-get update
+sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev verilator
+git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
+cd LabarcFPGASimulatorDesktop
+make
+```
+### Ubuntu 16.04 ou 17.10
 
 Baixe o `verilator_3.906-1` por este link: http://cz.archive.ubuntu.com/ubuntu/pool/universe/v/verilator/verilator_3.906-1_amd64.deb
 
@@ -13,10 +24,17 @@ Agora execute o seguinte, no terminal:
 sudo apt-get update
 sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
+cd LabarcFPGASimulatorDesktop
+make
 ```
 ### CentOS 7
+
+Execute o seguinte, no terminal:
 ```
 yum -y --enablerepo=epel install verilator fltk-devel make gcc-c++ libpng-devel zlib-devel
+git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
+cd LabarcFPGASimulatorDesktop
+make
 ```
 ### Windows 10
 Download and start https://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download
