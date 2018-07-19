@@ -113,4 +113,4 @@ brew install fltk
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
 
 ### Vídeo mostrando o passo a passo
-https://youtu.be/mrfyZOujHHI
+https://youtu.be/mrfyZOujHHI (desatualizado)
