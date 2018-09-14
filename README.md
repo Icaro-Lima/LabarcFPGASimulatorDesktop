@@ -7,7 +7,7 @@ Execute o seguinte, no terminal:
 
 ```
 sudo apt-get update
-sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev verilator
+sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev verilator git
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 ```
 ### Ubuntu 16.04 ou 17.10
@@ -20,7 +20,7 @@ Agora execute o seguinte, no terminal:
 
 ```
 sudo apt-get update
-sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev
+sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev git
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 ```
 ### CentOS 7
