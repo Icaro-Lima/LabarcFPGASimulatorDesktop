@@ -29,7 +29,7 @@ SegmentsDisplay *segments;
 vluint64_t main_time = 0;       // Current Verilator simulation time
 // This is a 64-bit integer to reduce wrap over issues and
 // allow modulus.  You can also use a double, if you wish.
-// One main_time unit corresponds to 0.1 seconds in real time
+// One main_time unit corresponds to 0.25 seconds in real time
 
 double sc_time_stamp () {       // Called by $time in Verilog
      return main_time;          // converts to double, to match what SystemC does
@@ -144,7 +144,7 @@ void callback(void*) {
   
   disp->redraw();
     	
-  Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
+  Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.25 seconds
 }
 
 int main(int argc, char** argv, char** env) {
