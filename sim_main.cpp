@@ -94,38 +94,24 @@ void display::draw() {
   ss << hex << setfill('0') << uppercase;
   // LCD data
   // first line
-  ss << setw(2) << (int)top->lcd_pc;
-  ss << " " << setw(8) << (int)top->lcd_instruction;
-  ss << " " << setw(2) << (int)top->lcd_WriteData;
-  ss << (top->lcd_MemWrite ? '*' : '_');
-  ss << (top->lcd_Branch ? '*' : '_');
-  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 45);
+  // ss << setw(2) << (int)top->lcd_pc;
+  // ss << " " << setw(8) << (int)top->lcd_instruction;
+  // ss << " " << setw(2) << (int)top->lcd_WriteData;
+  ss << setw(16) << 0xfedcba9876543210;
+  fl_draw(ss.str().c_str(), x() + XMARGIN + 30, y() + 30);
 	
   // second line
   ss.str(""); // reset stringstream
-  ss << setw(2) << (int)top->lcd_SrcA;
-  ss << " " << setw(2) << (int)top->lcd_SrcB;
-  ss << " " << setw(2) << (int)top->lcd_ALUResult;
-  ss << " " << setw(2) << (int)top->lcd_Result;
-  ss << " " << setw(2) << (int)top->lcd_ReadData;
-  ss << (top->lcd_MemtoReg ? '*' : '_');
-  ss << (top->lcd_RegWrite ? '*' : '_');
-  fl_draw(ss.str().c_str(), this->x() + XMARGIN, y() + 80);
+  // ss << setw(2) << (int)top->lcd_SrcA;
+  // ss << " " << setw(2) << (int)top->lcd_SrcB;
+  // ss << " " << setw(2) << (int)top->lcd_ALUResult;
+  // ss << " " << setw(2) << (int)top->lcd_Result;
+  // ss << " " << setw(2) << (int)top->lcd_ReadData;
+  ss << setw(16) << (long)top->LCD;
+  fl_draw(ss.str().c_str(), this->x() + XMARGIN + 30, y() + 70);
   
   int yy = y() + 100;
   register_labels(yy, 18);
-  // register values
-  ss << nouppercase;
-  for(int i = 0; i < 32; i++) { //  for all registradores
-    if(i % 4 == 0) {  // start of line
-      ss.str(""); // reset stringstream
-      ss << "  ";
-    }
-    ss << "      : " << setw(2) << (int)top->lcd_registrador[i];
-    if(i % 4 == 3) { // end of line
-      fl_draw(ss.str().c_str(), this->x() + XMARGIN, yy += 18);
-    }
-  }
 }
 
 // ****** The main action is in this callback ******

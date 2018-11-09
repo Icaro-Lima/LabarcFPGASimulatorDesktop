@@ -69,15 +69,11 @@ SegmentsDisplay::SegmentsDisplay(int x, int y) : Fl_Widget(x, y, base->w(), base
 	horizontal_off = new Fl_PNG_Image(ASSET("HorizontalOff.png"));
 }
 
-display::display(int x, int y) : Fl_Widget(x, y, 390, 270) { }
+display::display(int x, int y) : Fl_Widget(x, y, 390, 80) { }
 
 void display::lcd_labels(int start, int step) {
   fl_font(DISPLAY_FONT, 13);
   fl_color(FL_RED);
-  fl_draw("  pc       instruction     WriteData MemWrite", this->x() + XMARGIN, start);
-  fl_draw("Branch", this->x() + 320, start+step);
-  fl_draw("SrcA SrcB ALUResult Result ReadData MemtoReg", this->x() + XMARGIN, start + 3.5 * step);
-  fl_draw("RegWrite",this->x() + 320, start + 2.5 * step);
   fl_color(FL_BLACK);
   fl_font(DISPLAY_FONT, 32);
 };
@@ -86,14 +82,6 @@ void display::register_labels(int start, int step) {
   int y = start;
   fl_color(FL_RED);
   fl_font(DISPLAY_FONT, 13);
-  fl_draw("x0  zero      ra        sp        gp ", this->x() + XMARGIN, y += step );
-  fl_draw("x4  tp        t0        t1        t2 ", this->x() + XMARGIN, y += step );
-  fl_draw("x8  s0        s1        a0        a1 ", this->x() + XMARGIN, y += step );
-  fl_draw("x12 a2        a3        a4        a5 ", this->x() + XMARGIN, y += step );
-  fl_draw("x16 a6        a7        s2        s3 ", this->x() + XMARGIN, y += step );
-  fl_draw("x20 s4        s5        s6        s7 ", this->x() + XMARGIN, y += step );
-  fl_draw("x24 s8        s9        s10       s11", this->x() + XMARGIN, y += step );
-  fl_draw("x28 t3        t4        t5        t6 ", this->x() + XMARGIN, y += step );
   fl_color(FL_BLACK);
 }
 
@@ -107,7 +95,7 @@ const char *mono_fonts[] = { "Lucida Console",
 void init_gui(int argc, char** argv) {
 	int window_width = FPGA::image->w();
 	int window_height = FPGA::image->h();;
-	window = new Fl_Window(Fl::w() / 2 - window_width / 2, Fl::h() / 2 - window_height / 2, window_width, window_height, "Labarc FPGA Simulator");
+	window = new Fl_Window(Fl::w() / 2 - window_width / 2, Fl::h() / 2 - window_height / 2, window_width, window_height - 200, "Labarc FPGA Simulator");
 
 	// Instance FPGA
 	fpga = new FPGA(0, 0);
