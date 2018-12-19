@@ -109,6 +109,26 @@ Após isso basta executar os seguintes comandos:
 brew install verilator
 brew install fltk
 ```
+### Mac Os Mojave Workaround
+Existe uma issue na biblioteca fltk no macOS Mojave, em que o simulador fica completamente vazio ao realizar `make`. O problema foi corridor por [este commit](https://github.com/fltk/fltk/commit/f76d2a2bf8c35c0c313f05bbd6deda49dd344efc). Caso este seja o seu caso, existe um *workaround* possível:
+
+1. Remover qualquer versão existente da FLTK
+`brew uninstall fltk`
+
+2. Clonar o repositório com a versão nova de FLTK
+`git clone https://github.com/fltk/fltk.git`
+
+3. Navegue até o repositório
+`cd fltk`
+
+4. Realizar checkout no commit com o fix da issue
+`git checkout f76d2a2bf8c35c0c313f05bbd6deda49dd344efc`
+
+5. Instale
+`make clean && make install`
+
+OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote disponível no Homebrew com o fix dessa issue.
+
 ## Utilização
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
 
