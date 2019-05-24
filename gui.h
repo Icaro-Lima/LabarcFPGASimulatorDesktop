@@ -69,6 +69,14 @@ private:
   int offset;
 };
 
+class hexval : public Fl_Widget {
+public:
+  void draw();
+  hexval(int x, int y);
+private:
+  int offset;
+};
+
 class SegmentsDisplay : public Fl_Widget {
 	bool *previous;
 	Fl_PNG_Image *point_on, *point_off, *vertical_on, *vertical_off, *horizontal_on, *horizontal_off;
@@ -100,6 +108,7 @@ extern Fl_Window *window;
 extern FPGA *fpga;
 extern LEDs *leds;
 extern display *disp;
+extern hexval *hexv;
 extern Board *board;
 extern SWIs *swis;
 extern SegmentsDisplay *segments;

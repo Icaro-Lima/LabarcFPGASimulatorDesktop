@@ -71,6 +71,8 @@ SegmentsDisplay::SegmentsDisplay(int x, int y) : Fl_Widget(x, y, base->w(), base
 
 display::display(int x, int y) : Fl_Widget(x, y, 390, 270) { }
 
+hexval::hexval(int x, int y) : Fl_Widget(x, y, 320, 80) { }
+
 void display::lcd_labels(int start, int step) {
   fl_font(DISPLAY_FONT, 13);
   fl_color(FL_RED);
@@ -97,12 +99,11 @@ void display::register_labels(int start, int step) {
   fl_color(FL_BLACK);
 }
 
-const char *mono_fonts[] = { "Lucida Console",
-                             "Droid Sans Mono",
-                             "Noto Mono",
+const char *mono_fonts[] = { "Consolas",
                              "Monospace",
-                             "Consolas",
-                             "" };
+                             "Noto Mono",
+                             "Droid Sans Mono",
+                             "Lucida Console", "" };
 
 void init_gui(int argc, char** argv) {
 	int window_width = FPGA::image->w();
@@ -130,6 +131,10 @@ void init_gui(int argc, char** argv) {
 	// Instance display
 	disp = new display(fpga->x() + FPGA::image->w() / 2, fpga->y() + FPGA::image->h() / 2);
 	disp->position(fpga->x() + FPGA::image->w() / 2 - disp->w() / 2, fpga->y() + FPGA::image->h() / 2 + 50 );
+
+        // Instance Hexadecimal Values
+        hexv = new hexval(fpga->x() + FPGA::image->w() / 2, fpga->y() + FPGA::image->h() / 2);
+	hexv->position(fpga->x() + FPGA::image->w() / 2 - hexv->w() / 2, fpga->y() + FPGA::image->h() / 2 - 60 );
 	  
 	int i=0;
 	do {  // search for an existin mono-space font

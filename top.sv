@@ -2,11 +2,12 @@
 // with interface to switch buttons, LEDs, LCD and register display
 
 parameter NINSTR_BITS = 32;
-parameter NBITS_TOP = 8, NREGS_TOP = 32;
+parameter NBITS_TOP = 8, NREGS_TOP = 32, NBITS_LCD = 64;
 module top(input  logic clk_2,
            input  logic [NBITS_TOP-1:0] SWI,
            output logic [NBITS_TOP-1:0] LED,
            output logic [NBITS_TOP-1:0] SEG,
+           output logic [NBITS_LCD-1:0] lcd_a, lcd_b,
            output logic [NINSTR_BITS-1:0] lcd_instruction,
            output logic [NBITS_TOP-1:0] lcd_registrador [0:NREGS_TOP-1],
            output logic [NBITS_TOP-1:0] lcd_pc, lcd_SrcA, lcd_SrcB,
@@ -29,6 +30,8 @@ module top(input  logic clk_2,
     lcd_MemtoReg <= SWI[2];
     lcd_RegWrite <= SWI[3];
     for(int i=0; i<NREGS_TOP; i++) lcd_registrador[i] <= i+i*16;
+    lcd_a <= {56'h1234567890ABCD, SWI};
+    lcd_b <= {SWI, 56'hDCBA0987654321};
   end
 
 endmodule

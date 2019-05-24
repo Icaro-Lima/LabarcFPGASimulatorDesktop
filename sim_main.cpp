@@ -21,7 +21,8 @@ Vtop* top;   // Verilated model
 Fl_Window *window; // Window representing FPGA board
 FPGA *fpga;
 LEDs *leds;
-display *disp;
+display *disp; // RISC-V processor display
+hexval *hexv; // display for two hexadecimal number of 16 digits each
 Board *board;
 SWIs *swis;
 SegmentsDisplay *segments;
@@ -128,6 +129,24 @@ void display::draw() {
   }
 }
 
+void hexval::draw() {
+  this->window()->make_current();  // needed because draw() will be called from callback
+
+  fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD window
+
+  fl_color(FL_BLACK);
+  fl_font(DISPLAY_FONT, 32);
+  stringstream ss;
+  ss << hex << setfill('0') << uppercase;
+  // LCD data first line
+  ss << setw(16) << (long)top->lcd_a;
+  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 32);
+  // second line
+  ss.str(""); // reset stringstream
+  ss << setw(16) << (long)top->lcd_b;
+  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 70);
+}
+
 // ****** The main action is in this callback ******
 // It controls Verilog simulation time, retrieves Verilog output and displays it.
 void callback(void*) { 
@@ -143,6 +162,8 @@ void callback(void*) {
   leds->redraw();
   
   disp->redraw();
+
+  hexv->redraw();
     	
   Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
 }
