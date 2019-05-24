@@ -76,7 +76,7 @@ void display::lcd_labels(int start, int step) {
   fl_color(FL_RED);
   fl_draw("  pc       instruction     WriteData MemWrite", this->x() + XMARGIN, start);
   fl_draw("Branch", this->x() + 320, start+step);
-  fl_draw("SrcA SrcB ALUResult Result ReadData MemtoReg", this->x() + XMARGIN, start + 3.5 * step);
+  fl_draw("SrcA SrcB ALUResult Result ReadData MemtoReg", this->x() + XMARGIN, start + 3.2 * step);
   fl_draw("RegWrite",this->x() + 320, start + 2.5 * step);
   fl_color(FL_BLACK);
   fl_font(DISPLAY_FONT, 32);
@@ -129,7 +129,7 @@ void init_gui(int argc, char** argv) {
 	
 	// Instance display
 	disp = new display(fpga->x() + FPGA::image->w() / 2, fpga->y() + FPGA::image->h() / 2);
-	disp->position(fpga->x() + FPGA::image->w() / 2 - disp->w() / 2, fpga->y() + FPGA::image->h() / 2);
+	disp->position(fpga->x() + FPGA::image->w() / 2 - disp->w() / 2, fpga->y() + FPGA::image->h() / 2 + 50 );
 	  
 	int i=0;
 	do {  // search for an existin mono-space font
