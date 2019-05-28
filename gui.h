@@ -3,8 +3,8 @@
 // This program is free software; you can
 // redistribute it and/or modify it under the terms of either the GNU
 // Lesser General Public License Version 3 or the Perl Artistic License
-// Version 2.0.
-// Icaro Dantas de Araujo Lima and Elmar Melcher at UFCG, 2018
+// Version 2.1.
+// Icaro Dantas de Araujo Lima and Elmar Melcher at UFCG, 2019
 
 #include <sstream>
 #include <iomanip>
