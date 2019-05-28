@@ -81,7 +81,7 @@ void display::lcd_labels(int start, int step) {
   fl_draw("SrcA SrcB ALUResult Result ReadData MemtoReg", this->x() + XMARGIN, start + 3.2 * step);
   fl_draw("RegWrite",this->x() + 320, start + 2.5 * step);
   fl_color(FL_BLACK);
-  fl_font(DISPLAY_FONT, 32);
+  fl_font(LCD_FONT, 32);
 };
 
 void display::register_labels(int start, int step) {
@@ -97,6 +97,16 @@ void display::register_labels(int start, int step) {
   fl_draw("x24 s8        s9        s10       s11", this->x() + XMARGIN, y += step );
   fl_draw("x28 t3        t4        t5        t6 ", this->x() + XMARGIN, y += step );
   fl_color(FL_BLACK);
+}
+
+void hexval::lcd_line(long v, int y_off){
+  fl_color(FL_BLACK);
+  fl_font(LCD_FONT, 32);
+  stringstream ss;
+  ss << hex << setfill('0') << uppercase;
+  // LCD data first line
+  ss << setw(16) << v;
+  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + y_off);
 }
 
 const char *mono_fonts[] = { "Consolas",
@@ -137,10 +147,13 @@ void init_gui(int argc, char** argv) {
 	hexv->position(fpga->x() + FPGA::image->w() / 2 - hexv->w() / 2, fpga->y() + FPGA::image->h() / 2 - 60 );
 	  
 	int i=0;
-	do {  // search for an existin mono-space font
+	do {  // search for an existing mono-space font
 	  Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
 	  fl_font(DISPLAY_FONT, 13);
-	} while( fl_width('w') != fl_width('i') && strlen(mono_fonts[i]) );
+	} while( fl_width('W') != fl_width('i') && strlen(mono_fonts[i]) );
+
+        Fl::set_font(LCD_FONT, "LED Counter 7");
+        if( fl_width('1') != fl_width('8') ) Fl::set_font(LCD_FONT, mono_fonts[i-1]);
 			  
 	window->end();
 	window->show(argc,argv);

@@ -27,6 +27,7 @@ using std::string;
 #define SWIS_OFFSET 64
 #define LEDS_VERTICAL_OFFSET 230
 #define DISPLAY_FONT ((Fl_Font)55)
+#define LCD_FONT ((Fl_Font)56)
 #define ASSETS_DIR "Assets/"
 #define ASSET(F) (string(ASSETS_DIR) + F).c_str()
 
@@ -62,11 +63,11 @@ public:
 class display : public Fl_Widget {  // FLTK Widget
 public:
   void draw();
-  void lcd_labels(int start, int step);
-  void register_labels(int start, int step);
   display(int x, int y);
 private:
   int offset;
+  void lcd_labels(int start, int step);
+  void register_labels(int start, int step);
 };
 
 class hexval : public Fl_Widget {
@@ -75,6 +76,7 @@ public:
   hexval(int x, int y);
 private:
   int offset;
+  void lcd_line(long v, int y_off);
 };
 
 class SegmentsDisplay : public Fl_Widget {

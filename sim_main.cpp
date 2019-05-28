@@ -134,17 +134,8 @@ void hexval::draw() {
 
   fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD window
 
-  fl_color(FL_BLACK);
-  fl_font(DISPLAY_FONT, 32);
-  stringstream ss;
-  ss << hex << setfill('0') << uppercase;
-  // LCD data first line
-  ss << setw(16) << (long)top->lcd_a;
-  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 32);
-  // second line
-  ss.str(""); // reset stringstream
-  ss << setw(16) << (long)top->lcd_b;
-  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 70);
+  lcd_line((long)top->lcd_a, 32);
+  lcd_line((long)top->lcd_b, 70);
 }
 
 // ****** The main action is in this callback ******
