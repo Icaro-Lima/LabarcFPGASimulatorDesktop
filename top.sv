@@ -15,7 +15,7 @@ module top(input  logic clk_2,
            output logic lcd_MemWrite, lcd_Branch, lcd_MemtoReg, lcd_RegWrite);
 
   always_comb begin
-    LED <= SWI & clk_2;
+    LED <= SWI | clk_2;
     SEG <= SWI;
     lcd_WriteData <= SWI;
     lcd_pc <= 'h12;
