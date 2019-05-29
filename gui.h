@@ -76,7 +76,7 @@ public:
   hexval(int x, int y);
 private:
   int offset;
-  void lcd_line(long v, int y_off);
+  void lcd_lines(long a, long b);
 };
 
 class SegmentsDisplay : public Fl_Widget {
@@ -88,6 +88,8 @@ public:
 
 	virtual void draw();
 	SegmentsDisplay(int x, int y);
+private:
+        void draw_segments(char s);
 };
 
 class Board : public Fl_Widget {		
@@ -106,16 +108,8 @@ public:
 	FPGA(int x, int y);
 };
 
-extern Fl_Window *window;
-extern FPGA *fpga;
-extern LEDs *leds;
-extern display *disp;
-extern hexval *hexv;
-extern Board *board;
-extern SWIs *swis;
-extern SegmentsDisplay *segments;
-
 void init_gui(int, char**);
+void redraw_all();
 void delete_gui();
 void callback(void*);
 

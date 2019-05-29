@@ -18,14 +18,6 @@
 #include "Vtop.h"
 
 Vtop* top;   // Verilated model
-Fl_Window *window; // Window representing FPGA board
-FPGA *fpga;
-LEDs *leds;
-display *disp; // RISC-V processor display
-hexval *hexv; // display for two hexadecimal number of 16 digits each
-Board *board;
-SWIs *swis;
-SegmentsDisplay *segments;
 
 vluint64_t main_time = 0;       // Current Verilator simulation time
 // This is a 64-bit integer to reduce wrap over issues and
@@ -46,24 +38,9 @@ int SWI::handle(int event) {
 			top->SWI &= ~(1UL << id);
 		}
 		
-		top->eval();
-		
-		swis->redraw();
-		
-		segments->redraw();
-		
-		leds->redraw();
-		
-		disp->redraw();
+		top->eval();  // Evaluate Verilated SystemVerilog model
+		redraw_all();
 	}
-}
-
-void SWI::draw() {
-	(state ? SWIs::swi_on : SWIs::swi_off)->draw(x(), y());
-}
-
-void SWIs::draw() {
-	for (int i = 0; i < 8; i++) { swis[i]->redraw(); }
 }
 
 void LEDs::draw() {	
@@ -74,15 +51,7 @@ void LEDs::draw() {
 
 void SegmentsDisplay::draw() {	
 	base->draw(x(), y());
-	
-	(top->SEG>>0 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 25);
-	(top->SEG>>1 & 1 ? vertical_on : vertical_off)->draw(x() + 74, y() + 33);
-	(top->SEG>>2 & 1 ? vertical_on : vertical_off)->draw(x() + 74, y() + 88);
-	(top->SEG>>3 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 135);
-	(top->SEG>>4 & 1 ? vertical_on : vertical_off)->draw(x() + 17, y() + 88);
-	(top->SEG>>5 & 1 ? vertical_on : vertical_off)->draw(x() + 17, y() + 33);
-	(top->SEG>>6 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 80);
-	(top->SEG>>7 & 1 ? point_on : point_off)->draw(x() + 91, y() + 134);
+	draw_segments(top->SEG);
 }
 
 void display::draw() {
@@ -134,8 +103,7 @@ void hexval::draw() {
 
   fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD window
 
-  lcd_line((long)top->lcd_a, 32);
-  lcd_line((long)top->lcd_b, 70);
+  lcd_lines((long)top->lcd_a, (long)top->lcd_b);
 }
 
 // ****** The main action is in this callback ******
@@ -145,18 +113,10 @@ void callback(void*) {
 
   top->clk_2 = !top->clk_2;       // Toggle clock
 
-  // Evaluate Verilated SystemVerilog model
-  top->eval();
-  
-  segments->redraw();
-  
-  leds->redraw();
-  
-  disp->redraw();
-
-  hexv->redraw();
+  top->eval();  // Evaluate Verilated SystemVerilog model
+  redraw_all();
     	
-  Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.1 seconds
+  Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.25 seconds
 }
 
 int main(int argc, char** argv, char** env) {

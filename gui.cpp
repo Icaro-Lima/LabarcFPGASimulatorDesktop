@@ -8,6 +8,15 @@
 
 #include "gui.h"
 
+Fl_Window *window; // Window representing FPGA board
+FPGA *fpga;
+Board *board;
+LEDs *leds;
+display *disp; // RISC-V processor display
+hexval *hexv; // display for two hexadecimal number of 16 digits each
+SegmentsDisplay *segments;
+SWIs *swis;
+
 Fl_PNG_Image * FPGA::image = new Fl_PNG_Image(ASSET("FPGA.png"));
 FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) { }
 
@@ -35,6 +44,14 @@ SWI::SWI(int x, int y, int id) :
 	id(id), 
 	state(false), 
 	Fl_Widget(x, y, SWIs::swi_on->w(), SWIs::swi_on->h()) { }
+
+void SWI::draw() {
+	(state ? SWIs::swi_on : SWIs::swi_off)->draw(x(), y());
+}
+
+void SWIs::draw() {
+	for (int i = 0; i < 8; i++) { swis[i]->redraw(); }
+}
 
 Fl_PNG_Image * SWIs::swi_on = new Fl_PNG_Image(ASSET("SWIOn.png"));
 Fl_PNG_Image * SWIs::swi_off = new Fl_PNG_Image(ASSET("SWIOff.png"));
@@ -69,6 +86,17 @@ SegmentsDisplay::SegmentsDisplay(int x, int y) : Fl_Widget(x, y, base->w(), base
 	horizontal_off = new Fl_PNG_Image(ASSET("HorizontalOff.png"));
 }
 
+void SegmentsDisplay::draw_segments(char s) {
+	(s>>0 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 25);
+	(s>>1 & 1 ? vertical_on : vertical_off)->draw(x() + 74, y() + 33);
+	(s>>2 & 1 ? vertical_on : vertical_off)->draw(x() + 74, y() + 88);
+	(s>>3 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 135);
+	(s>>4 & 1 ? vertical_on : vertical_off)->draw(x() + 17, y() + 88);
+	(s>>5 & 1 ? vertical_on : vertical_off)->draw(x() + 17, y() + 33);
+	(s>>6 & 1 ? horizontal_on : horizontal_off)->draw(x() + 26, y() + 80);
+	(s>>7 & 1 ? point_on : point_off)->draw(x() + 91, y() + 134);
+}
+
 display::display(int x, int y) : Fl_Widget(x, y, 390, 270) { }
 
 hexval::hexval(int x, int y) : Fl_Widget(x, y, 320, 80) { }
@@ -99,14 +127,18 @@ void display::register_labels(int start, int step) {
   fl_color(FL_BLACK);
 }
 
-void hexval::lcd_line(long v, int y_off){
+void hexval::lcd_lines(long a, long b){
   fl_color(FL_BLACK);
   fl_font(LCD_FONT, 32);
   stringstream ss;
   ss << hex << setfill('0') << uppercase;
   // LCD data first line
-  ss << setw(16) << v;
-  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + y_off);
+  ss << setw(16) << a;
+  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 32);
+  // LCD data second line
+  ss.str(""); // reset stringstream
+  ss << setw(16) << b;
+  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 70);  
 }
 
 const char *mono_fonts[] = { "Consolas",
@@ -161,7 +193,16 @@ void init_gui(int argc, char** argv) {
 	Fl::add_timeout(0.25, callback);       // set up first timeout after 0.25 seconds
 };
 
+void redraw_all() {
+  swis->redraw();
+  segments->redraw();
+  leds->redraw();
+  disp->redraw();
+  hexv->redraw();
+}
+
 void delete_gui() {
     Fl::remove_timeout(callback);
     delete window;
 }
+

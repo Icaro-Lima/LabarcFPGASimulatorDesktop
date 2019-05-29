@@ -1,6 +1,9 @@
 # LabarcFPGASimulatorDesktop
 ![Alt text](MainWindow.png?raw=true "Main Window")
 ## Instalação
+
+Recomenda-se a instalação desta fonte: https://www.dafont.com/led-counter-7.font
+
 ### Ubuntu 18.04
 
 Execute o seguinte, no terminal:
