@@ -98,6 +98,9 @@ public:
 
 	virtual void draw();
 	Board(int x, int y);
+
+        SWIs *swis;  // switches
+        SegmentsDisplay *segments; // seven LED segment display 
 };
 
 class FPGA : public Fl_Widget {	
@@ -106,10 +109,15 @@ public:
 
 	virtual void draw();
 	FPGA(int x, int y);
+
+	Board *board;  // printed circuit board attached to the FPGA board
+        LEDs *leds;
+        display *disp; // RISC-V processor display
+	hexval *hexv; // display for two hexadecimal number of 16 digits each
 };
 
 void init_gui(int, char**);
-void redraw_all();
+void redraw();
 void delete_gui();
 void callback(void*);
 

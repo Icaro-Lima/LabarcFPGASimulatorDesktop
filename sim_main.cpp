@@ -28,6 +28,19 @@ double sc_time_stamp () {       // Called by $time in Verilog
      return main_time;          // converts to double, to match what SystemC does
 }
 
+// ****** The main action is in this callback ******
+// It controls Verilog simulation time, retrieves Verilog output and displays it.
+void callback(void*) { 
+  main_time++;            // Verilator simulation time passes...
+
+  top->clk_2 = !top->clk_2;       // Toggle clock
+
+  top->eval();  // Evaluate Verilated SystemVerilog model
+  redraw();
+    	
+  Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.25 seconds
+}
+
 int SWI::handle(int event) {
 	if (event == FL_PUSH) {
 		state = !state;
@@ -39,7 +52,7 @@ int SWI::handle(int event) {
 		}
 		
 		top->eval();  // Evaluate Verilated SystemVerilog model
-		redraw_all();
+		redraw();
 	}
 }
 
@@ -104,19 +117,6 @@ void hexval::draw() {
   fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD window
 
   lcd_lines((long)top->lcd_a, (long)top->lcd_b);
-}
-
-// ****** The main action is in this callback ******
-// It controls Verilog simulation time, retrieves Verilog output and displays it.
-void callback(void*) { 
-  main_time++;            // Verilator simulation time passes...
-
-  top->clk_2 = !top->clk_2;       // Toggle clock
-
-  top->eval();  // Evaluate Verilated SystemVerilog model
-  redraw_all();
-    	
-  Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.25 seconds
 }
 
 int main(int argc, char** argv, char** env) {
