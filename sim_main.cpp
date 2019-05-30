@@ -38,7 +38,7 @@ void callback(void*) {
   top->eval();  // Evaluate Verilated SystemVerilog model
   redraw();
     	
-  Fl::repeat_timeout(0.25, callback);    // retrigger timeout after 0.25 seconds
+  Fl::repeat_timeout(CLOCK, callback);    // retrigger timeout for next clock change
 }
 
 int SWI::handle(int event) {
@@ -57,8 +57,8 @@ int SWI::handle(int event) {
 }
 
 void LEDs::draw() {	
-	for(int i = 0; i < 8; i++) {
-		((top->LED >> i & 1) ? led_on : led_off)->draw(x_origin + (7 - i) * offset, y_origin);
+	for(int i = 0; i < NLEDS; i++) {
+		((top->LED >> i & 1) ? led_on : led_off)->draw(x_origin + (NLEDS-1 - i) * offset, y_origin);
 	}
 }
 
@@ -72,7 +72,7 @@ void display::draw() {
 
   fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD and register window
 
-  lcd_labels(y() + 15, 25);
+  lcd_labels();
   stringstream ss;
   ss << hex << setfill('0') << uppercase;
   // LCD data
@@ -82,7 +82,7 @@ void display::draw() {
   ss << " " << setw(2) << (int)top->lcd_WriteData;
   ss << (top->lcd_MemWrite ? '*' : '_');
   ss << (top->lcd_Branch ? '*' : '_');
-  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 45);
+  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + DISPLAY_FONT_SIZE+LCD_FONT_SIZE);
 	
   // second line
   ss.str(""); // reset stringstream
@@ -93,20 +93,20 @@ void display::draw() {
   ss << " " << setw(2) << (int)top->lcd_ReadData;
   ss << (top->lcd_MemtoReg ? '*' : '_');
   ss << (top->lcd_RegWrite ? '*' : '_');
-  fl_draw(ss.str().c_str(), this->x() + XMARGIN, y() + 80);
+  fl_draw(ss.str().c_str(), this->x() + XMARGIN, y() + DISPLAY_FONT_SIZE+2*LCD_FONT_SIZE);
   
-  int yy = y() + 100;
-  register_labels(yy, 18);
+  register_labels();
+  int yy = y() + 3*DISPLAY_FONT_SIZE + 2*LCD_FONT_SIZE;
   // register values
   ss << nouppercase;
-  for(int i = 0; i < 32; i++) { //  for all registradores
-    if(i % 4 == 0) {  // start of line
+  for(int i = 0; i < NREGS; i++) { //  for all registradores
+    if(i % NREGS_PER_LINE == 0) {  // start of line
       ss.str(""); // reset stringstream
       ss << "  ";
     }
     ss << "      : " << setw(2) << (int)top->lcd_registrador[i];
-    if(i % 4 == 3) { // end of line
-      fl_draw(ss.str().c_str(), this->x() + XMARGIN, yy += 18);
+    if(i % NREGS_PER_LINE == NREGS_PER_LINE-1) { // end of line
+      fl_draw(ss.str().c_str(), this->x() + XMARGIN, yy += 1.5*DISPLAY_FONT_SIZE);
     }
   }
 }

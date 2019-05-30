@@ -23,15 +23,23 @@ using std::uppercase;
 using std::nouppercase;
 using std::string;
 
-#define XMARGIN 10
-#define SWIS_OFFSET 64
-#define LEDS_VERTICAL_OFFSET 230
-#define DISPLAY_FONT ((Fl_Font)55)
-#define DISPLAY_FONT_SIZE 13
-#define LCD_FONT ((Fl_Font)56)
-#define LCD_FONT_SIZE 32
 #define ASSETS_DIR "Assets/"
 #define ASSET(F) (string(ASSETS_DIR) + F).c_str()
+#define XMARGIN 10
+#define YMARGIN 10
+#define NSWIS 8
+#define SWIS_OFFSET 64
+#define NLEDS 8
+#define LEDS_VERTICAL_OFFSET 230
+#define LCD_FONT ((Fl_Font)56)
+#define LCD_FONT_SIZE 32
+#define LCD_NCHAR 16
+#define DISPLAY_FONT ((Fl_Font)55)
+#define DISPLAY_FONT_SIZE 13
+#define NREGS 32
+#define NREGS_PER_LINE 4
+#define NREG_LINES (NREGS/NREGS_PER_LINE)
+#define CLOCK 0.25
 
 class SWI : public Fl_Widget {
 	int id;
@@ -44,7 +52,7 @@ public:
 };
 
 class SWIs : public Fl_Widget {
-	SWI *swis[8];
+	SWI *swis[NSWIS];
 public:
 	static Fl_PNG_Image *swi_on, *swi_off;
 
@@ -68,8 +76,8 @@ public:
   display(int x, int y, int w);
 private:
   int offset;
-  void lcd_labels(int start, int step);
-  void register_labels(int start, int step);
+  void lcd_labels();
+  void register_labels();
 };
 
 class hexval : public Fl_Widget {
