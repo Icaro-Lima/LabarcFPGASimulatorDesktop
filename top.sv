@@ -31,7 +31,7 @@ module top(input  logic clk_2,
     lcd_RegWrite <= SWI[3];
     for(int i=0; i<NREGS_TOP; i++) lcd_registrador[i] <= i+i*16;
     lcd_a <= {56'h1234567890ABCD, SWI};
-    lcd_b <= {SWI, 56'hDCBA0987654321};
+    lcd_b <= {SWI, 56'hFEDCBA09876543};
   end
 
 endmodule

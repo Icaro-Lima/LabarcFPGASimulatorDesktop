@@ -27,7 +27,9 @@ using std::string;
 #define SWIS_OFFSET 64
 #define LEDS_VERTICAL_OFFSET 230
 #define DISPLAY_FONT ((Fl_Font)55)
+#define DISPLAY_FONT_SIZE 13
 #define LCD_FONT ((Fl_Font)56)
+#define LCD_FONT_SIZE 32
 #define ASSETS_DIR "Assets/"
 #define ASSET(F) (string(ASSETS_DIR) + F).c_str()
 
@@ -63,7 +65,7 @@ public:
 class display : public Fl_Widget {  // FLTK Widget
 public:
   void draw();
-  display(int x, int y);
+  display(int x, int y, int w);
 private:
   int offset;
   void lcd_labels(int start, int step);
@@ -73,7 +75,7 @@ private:
 class hexval : public Fl_Widget {
 public:
   void draw();
-  hexval(int x, int y);
+  hexval(int x, int y, int w);
 private:
   int offset;
   void lcd_lines(long a, long b);
@@ -106,10 +108,12 @@ public:
 class FPGA : public Fl_Widget {	
 public:
 	static Fl_PNG_Image *image;
+        float display_char_width;
+        float lcd_char_width;
 
 	virtual void draw();
 	FPGA(int x, int y);
-
+private:
 	Board *board;  // printed circuit board attached to the FPGA board
         LEDs *leds;
         display *disp; // RISC-V processor display

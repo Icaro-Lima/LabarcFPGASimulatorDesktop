@@ -14,6 +14,11 @@ FPGA *fpga;
 Fl_PNG_Image * FPGA::image = new Fl_PNG_Image(ASSET("FPGA.png"));
 FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
 
+       fl_font(DISPLAY_FONT, DISPLAY_FONT_SIZE);
+       display_char_width = fl_width('8') + 0.7; // all characters are equal
+       fl_font(LCD_FONT, LCD_FONT_SIZE);
+       lcd_char_width = fl_width("8") + 0.7; // all hex digit characters are equal
+
 	// Instance upper board of FPGA
 	board = new Board(this->x() + image->w() / 2 - Board::image->w() / 2, this->y());
 	
@@ -23,11 +28,12 @@ FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
 	leds = new LEDs(led_x, this->y() + LEDS_VERTICAL_OFFSET, led_offset);
 	
 	// Instance display
-	disp = new display(this->x() + image->w() / 2, this->y() + image->h() / 2);
+	disp = new display(this->x() + image->w() / 2, this->y() + image->h() / 2,
+	                   (int)(16*lcd_char_width + 8*display_char_width));
 	disp->position(this->x() + image->w() / 2 - disp->w() / 2, this->y() + image->h() / 2 + 50 );
 	  
         // Instance Hexadecimal Values
-        hexv = new hexval(this->x() + image->w() / 2, this->y() + image->h() / 2);
+        hexv = new hexval(this->x() + image->w() / 2, this->y() + image->h() / 2, (int)(16*lcd_char_width));
 	hexv->position(this->x() + image->w() / 2 - hexv->w() / 2, this->y() + image->h() / 2 - 60 );
 
 }
@@ -116,25 +122,25 @@ void SegmentsDisplay::draw_segments(char s) {
 	(s>>7 & 1 ? point_on : point_off)->draw(x() + 91, y() + 134);
 }
 
-display::display(int x, int y) : Fl_Widget(x, y, 390, 270) { }
+display::display(int x, int y, int w) : Fl_Widget(x, y, w, 270) { }
 
-hexval::hexval(int x, int y) : Fl_Widget(x, y, 330, 80) { }
+hexval::hexval(int x, int y, int w) : Fl_Widget(x, y, w, 80) { }
 
 void display::lcd_labels(int start, int step) {
-  fl_font(DISPLAY_FONT, 13);
+  fl_font(DISPLAY_FONT, DISPLAY_FONT_SIZE);
   fl_color(FL_RED);
   fl_draw("  pc       instruction     WriteData MemWrite", this->x() + XMARGIN, start);
-  fl_draw("Branch", this->x() + 330, start+step);
+  fl_draw("Branch", this->x() + 16*fpga->lcd_char_width, start+step);
   fl_draw("SrcA SrcB ALUResult Result ReadData MemtoReg", this->x() + XMARGIN, start + 3.2 * step);
-  fl_draw("RegWrite",this->x() + 330, start + 2.5 * step);
+  fl_draw("RegWrite",this->x() + 16*fpga->lcd_char_width, start + 2.5 * step);
   fl_color(FL_BLACK);
-  fl_font(LCD_FONT, 32);
+  fl_font(LCD_FONT, LCD_FONT_SIZE);
 };
 
 void display::register_labels(int start, int step) {
   int y = start;
   fl_color(FL_RED);
-  fl_font(DISPLAY_FONT, 13);
+  fl_font(DISPLAY_FONT, DISPLAY_FONT_SIZE);
   fl_draw("x0  zero      ra        sp        gp ", this->x() + XMARGIN, y += step );
   fl_draw("x4  tp        t0        t1        t2 ", this->x() + XMARGIN, y += step );
   fl_draw("x8  s0        s1        a0        a1 ", this->x() + XMARGIN, y += step );
@@ -148,7 +154,7 @@ void display::register_labels(int start, int step) {
 
 void hexval::lcd_lines(long a, long b){
   fl_color(FL_BLACK);
-  fl_font(LCD_FONT, 32);
+  fl_font(LCD_FONT, LCD_FONT_SIZE);
   stringstream ss;
   ss << hex << setfill('0') << uppercase;
   // LCD data first line
@@ -171,18 +177,19 @@ void init_gui(int argc, char** argv) {
 	int window_height = FPGA::image->h();;
 	window = new Fl_Window(Fl::w() / 2 - window_width / 2, Fl::h() / 2 - window_height / 2, window_width, window_height, "Labarc FPGA Simulator");
 
-	// Instance FPGA
-	fpga = new FPGA(0, 0);
-	
 	int i=0;
 	do {  // search for an existing mono-space font
 	  Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
-	  fl_font(DISPLAY_FONT, 13);
+	  fl_font(DISPLAY_FONT, DISPLAY_FONT_SIZE);
 	} while( fl_width('W') != fl_width('i') && strlen(mono_fonts[i]) );
 
         Fl::set_font(LCD_FONT, "LED Counter 7");
+        fl_font(LCD_FONT, LCD_FONT_SIZE);
         if( fl_width('1') != fl_width('8') ) Fl::set_font(LCD_FONT, mono_fonts[i-1]);
 			  
+	// Instance FPGA
+	fpga = new FPGA(0, 0);
+	
 	window->end();
 	window->show(argc,argv);
 
