@@ -133,7 +133,7 @@ void display::lcd_labels() {
   fl_color(FL_RED);
   fl_draw("  pc       instruction     WriteData MemWrite", x() + XMARGIN, y() + DISPLAY_FONT_SIZE);
   fl_draw("Branch", x() + LCD_NCHAR*fpga->lcd_char_width, y() + 1.5*DISPLAY_FONT_SIZE + LCD_FONT_SIZE/2);
-  fl_draw("SrcA  SrcB ALUResult Result ReadData MemtoReg", x() + XMARGIN, y() + 2*DISPLAY_FONT_SIZE + 2*LCD_FONT_SIZE);
+  fl_draw("SrcA  SrcB ALUResult Result ReadData MemtoReg", x() + XMARGIN, y() + 2*DISPLAY_FONT_SIZE + 2*LCD_FONT_SIZE + 2);
   fl_draw("RegWrite", x() + LCD_NCHAR*fpga->lcd_char_width, y() + 1.5*DISPLAY_FONT_SIZE + 1.5*LCD_FONT_SIZE);
   fl_color(FL_BLACK);
   fl_font(LCD_FONT, LCD_FONT_SIZE);
@@ -169,11 +169,13 @@ void hexval::lcd_lines(long a, long b){
   fl_draw(ss.str().c_str(), x() + XMARGIN, y() + 2*LCD_FONT_SIZE);  
 }
 
-const char *mono_fonts[] = { "Consolas",
+const char *mono_fonts[] = { "Noto Mono",
+                             "Consolas",
                              "Monospace",
-                             "Noto Mono",
                              "Droid Sans Mono",
-                             "Lucida Console", "" };
+                             "Lucida Console",
+			     "DejaVu Sans Mono",
+			     "FreeMono", "" };
 
 void init_gui(int argc, char** argv) {
 	int window_width = FPGA::image->w();
@@ -189,7 +191,7 @@ void init_gui(int argc, char** argv) {
 
         Fl::set_font(LCD_FONT, "LED Counter 7");
         fl_font(LCD_FONT, LCD_FONT_SIZE);
-        if( fl_width('1') != fl_width('8') ) Fl::set_font(LCD_FONT, mono_fonts[i-1]);
+        if( fl_width('1') != fl_width('8') || fl_width('1') != fl_width(' ') ) Fl::set_font(LCD_FONT, mono_fonts[i-1]);
 			  
 	// Instance FPGA
 	fpga = new FPGA(0, 0);

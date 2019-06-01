@@ -54,6 +54,7 @@ int SWI::handle(int event) {
 		top->eval();  // Evaluate Verilated SystemVerilog model
 		redraw();
 	}
+	return 1;
 }
 
 void LEDs::draw() {	

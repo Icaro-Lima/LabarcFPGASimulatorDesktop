@@ -4,7 +4,7 @@
 
 Recomenda-se a instalação desta fonte: https://www.dafont.com/led-counter-7.font
 
-### Ubuntu 18.04
+### Ubuntu 18.04 ou 19.04
 
 Execute o seguinte, no terminal:
 
