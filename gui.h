@@ -13,6 +13,7 @@
 #include <FL/Fl_Button.H>
 #include <FL/Fl_PNG_Image.H>
 #include <FL/Fl_Toggle_Button.H>
+#include <FL/Fl_Spinner.H>
 #include <FL/Fl_Window.H>
 
 using std::stringstream;
@@ -113,11 +114,17 @@ public:
         SegmentsDisplay *segments; // seven LED segment display 
 };
 
+class Clock : public Fl_Spinner {
+public:
+	Clock(int x, int y);
+};
+
 class FPGA : public Fl_Widget {	
 public:
 	static Fl_PNG_Image *image;
         float display_char_width;
         float lcd_char_width;
+        Clock *clk;
 
 	virtual void draw();
 	FPGA(int x, int y);
@@ -132,4 +139,5 @@ void init_gui(int, char**);
 void redraw();
 void delete_gui();
 void callback(void*);
+float clock_period();
 

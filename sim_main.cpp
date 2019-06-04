@@ -38,7 +38,7 @@ void callback(void*) {
   top->eval();  // Evaluate Verilated SystemVerilog model
   redraw();
     	
-  Fl::repeat_timeout(CLOCK, callback);    // retrigger timeout for next clock change
+  Fl::repeat_timeout(clock_period(), callback);    // retrigger timeout for next clock change
 }
 
 int SWI::handle(int event) {

@@ -27,6 +27,9 @@ FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
 	int led_x = this->x() + image->w() / 2 - (LEDs::led_on->w() * 8 + 7 * (led_offset - LEDs::led_on->w())) / 2;
 	leds = new LEDs(led_x, this->y() + LEDS_VERTICAL_OFFSET, led_offset);
 	
+        // system clock period chooser
+        clk = new Clock(this->x() + image->w()-100, this->y() + LEDS_VERTICAL_OFFSET);
+
 	// Instance display
 	disp = new display(this->x() + image->w() / 2, this->y() + image->h() / 2,
 	                   (int)(LCD_NCHAR*lcd_char_width + 8*display_char_width + XMARGIN));
@@ -43,6 +46,7 @@ void FPGA::draw() {
 	image->draw(x(), y());
 	board->redraw();
 	leds->redraw();
+        clk->redraw();
 	disp->redraw();
 	hexv->redraw();
 }
@@ -59,6 +63,19 @@ Board::Board(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
                                                    + SegmentsDisplay::base->w()) / 2,
 	                this->y() + image->h() / 2 - SWIs::swi_on->h() / 2, SWIS_OFFSET);
 
+}
+
+Clock::Clock(int x, int y) : Fl_Spinner(x, y, 50, 25, "FL_FLOAT_INPUT") {
+        type(1);
+        labelsize(8);
+        minimum(0.1);
+        maximum(3.0);
+        step(0.1);
+	value(0.5);
+}
+
+float clock_period() {
+   return fpga->clk->value()/2;
 }
 
 void Board::draw() {
@@ -199,7 +216,7 @@ void init_gui(int argc, char** argv) {
 	window->end();
 	window->show(argc,argv);
 
-	Fl::add_timeout(CLOCK, callback);       // set up first timeout for clock
+	Fl::add_timeout(clock_period(), callback);       // set up first timeout for clock
 };
 
 void redraw() {
