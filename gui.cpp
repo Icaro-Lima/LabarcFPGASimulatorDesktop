@@ -28,7 +28,7 @@ FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
 	leds = new LEDs(led_x, this->y() + LEDS_VERTICAL_OFFSET, led_offset);
 	
         // system clock period chooser
-        clk = new Clock(this->x() + image->w()-100, this->y() + LEDS_VERTICAL_OFFSET);
+        clk = new Clock(this->x() + image->w()-CLOCK_PERIOD_WIDTH-XMARGIN, this->y() + LEDS_VERTICAL_OFFSET);
 
 	// Instance display
 	disp = new display(this->x() + image->w() / 2, this->y() + image->h() / 2,
@@ -65,17 +65,14 @@ Board::Board(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
 
 }
 
-Clock::Clock(int x, int y) : Fl_Spinner(x, y, 50, 25, "FL_FLOAT_INPUT") {
+Clock::Clock(int x, int y) : Fl_Spinner(x, y, CLOCK_PERIOD_WIDTH, 25, "FL_FLOAT_INPUT") {
         type(1);
-        labelsize(6);
+        labelsize(16);
         minimum(0.1);
         maximum(3.0);
-        step(0.1);
+        step(0.5);
 	value(0.5);
-}
-
-float clock_period() {
-   return fpga->clk->value()/2;
+        textsize(18);
 }
 
 void Board::draw() {
@@ -99,13 +96,13 @@ void SWIs::draw() {
 
 Fl_PNG_Image * SWIs::swi_on = new Fl_PNG_Image(ASSET("SWIOn.png"));
 Fl_PNG_Image * SWIs::swi_off = new Fl_PNG_Image(ASSET("SWIOff.png"));
-SWIs::SWIs(int x, int y, int offset) : Fl_Widget(x, y, 8 * 33 + 7 * (offset - 33) + SegmentsDisplay::base->w(), 96) {
+SWIs::SWIs(int x, int y, int offset) : Fl_Widget(x, y, NSWIS * 33 + (NSWIS-1) * (offset - 33) + SegmentsDisplay::base->w(), 96) {
 	for (int i = 0; i < NSWIS/2; i++) {
-		swis[i] = new SWI(SegmentsDisplay::base->w() + x + offset * (7 - i), y, i);
+		swis[i] = new SWI(SegmentsDisplay::base->w() + x + offset * ((NSWIS-1) - i), y, i);
 	}
 	
 	for (int i = NSWIS/2; i < NSWIS; i++) {
-		swis[i] = new SWI(x + offset * (7 - i), y, i);
+		swis[i] = new SWI(x + offset * ((NSWIS-1) - i), y, i);
 	}
 }
 
@@ -216,15 +213,12 @@ void init_gui(int argc, char** argv) {
 	window->end();
 	window->show(argc,argv);
 
-	Fl::add_timeout(clock_period(), callback);       // set up first timeout for clock
+	Fl::add_timeout(fpga->clk->value()/2, callback);       // set up first timeout for clock
 };
-
-void redraw() {
-  fpga->redraw();
-}
 
 void delete_gui() {
     Fl::remove_timeout(callback);
+    delete fpga;
     delete window;
 }
 

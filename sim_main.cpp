@@ -36,9 +36,9 @@ void callback(void*) {
   top->clk_2 = !top->clk_2;       // Toggle clock
 
   top->eval();  // Evaluate Verilated SystemVerilog model
-  redraw();
+  fpga->redraw();
     	
-  Fl::repeat_timeout(clock_period(), callback);    // retrigger timeout for next clock change
+  Fl::repeat_timeout(fpga->clk->value()/2, callback);    // retrigger timeout for next clock change
 }
 
 int SWI::handle(int event) {
@@ -52,7 +52,7 @@ int SWI::handle(int event) {
 		}
 		
 		top->eval();  // Evaluate Verilated SystemVerilog model
-		redraw();
+		fpga->redraw();
 	}
 	return 1;
 }
@@ -138,7 +138,7 @@ int main(int argc, char** argv, char** env) {
     // Destroy Verilog model
     delete top;
 
-    delete_gui;
+    delete_gui();
 
     // Fin
     exit(0);

@@ -32,6 +32,7 @@ using std::string;
 #define SWIS_OFFSET 64
 #define NLEDS 8
 #define LEDS_VERTICAL_OFFSET 230
+#define CLOCK_PERIOD_WIDTH 50
 #define LCD_FONT ((Fl_Font)56)
 #define LCD_FONT_SIZE 32
 #define LCD_NCHAR 16
@@ -126,8 +127,8 @@ public:
         float lcd_char_width;
         Clock *clk;
 
-	virtual void draw();
 	FPGA(int x, int y);
+	virtual void draw();
 private:
 	Board *board;  // printed circuit board attached to the FPGA board
         LEDs *leds;
@@ -136,8 +137,9 @@ private:
 };
 
 void init_gui(int, char**);
-void redraw();
 void delete_gui();
 void callback(void*);
-float clock_period();
+
+extern FPGA *fpga;
+
 
