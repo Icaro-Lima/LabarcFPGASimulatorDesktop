@@ -24,7 +24,7 @@ using std::uppercase;
 using std::nouppercase;
 using std::string;
 
-#define ASSETS_DIR "/labarc/util/"
+#define ASSETS_DIR "Assets/"
 #define ASSET(F) (string(ASSETS_DIR) + F).c_str()
 #define XMARGIN 10
 #define YMARGIN 10
