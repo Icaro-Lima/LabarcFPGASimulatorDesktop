@@ -68,7 +68,7 @@ Board::Board(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
 Clock::Clock(int x, int y) : Fl_Spinner(x, y, CLOCK_PERIOD_WIDTH, 25, "FL_FLOAT_INPUT") {
         type(1);
         labelsize(16);
-        min);
+        minimum(0.5);
         maximum(3.0);
         step(0.5);
 	value(0.5);
