@@ -4,13 +4,17 @@
 
 Recomenda-se a instalação desta fonte: https://www.dafont.com/led-counter-7.font
 
-### Ubuntu 18.04 ou 19.04
+### Ubuntu 18.04 ou acima
 
 Execute o seguinte, no terminal:
 
 ```
 sudo apt-get update
-sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev verilator git
+sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev git
+wget https://www.veripool.org/ftp/verilator-3.922.tgz
+./configure
+make
+sudo make install
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 ```
 ### Ubuntu 16.04 ou 17.10
