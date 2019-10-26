@@ -117,12 +117,11 @@ make install
 
 4. Inicie o Ubuntu, escolha um nome de usuário e uma senha. Em seguida, entrará em modo de terminal.
 
-5. Vamos baixar o verilator, no terminal:
+5. Vamos baixar e instalar o verilator, no terminal:
 ```
 wget http://cz.archive.ubuntu.com/ubuntu/pool/universe/v/verilator/verilator_3.924-1_amd64.deb
+sudo dpkg -i verilator_3.924-1_amd64.deb
 ```
-  Para instalar:
-	`sudo dpkg -i verilator_3.924-1_amd64.deb`
 
 6. Execute os seguintes comandos no terminal:
 ```
