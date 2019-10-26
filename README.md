@@ -106,7 +106,48 @@ make
 make install
 ```
 (ignorar a mensagem de erro "preserving permissions ...: Permission denied")
-## Mac OS (Testado no High Sierra)
+
+### Windows 10 (Alternativa)
+1. [Baixe](https://sourceforge.net/projects/xming/) e Instale o Xming
+
+2. Após a instalação, abra o XLauch e coloque 0 no número de display. Avance todos os passos.  
+    Caso sinta dificuldade nessa parte, acesse esse [link](https://virtualizationreview.com/articles/2018/01/30/hands-on-with-wsl-graphical-apps.aspx) ou esse [vídeo](https://youtu.be/k4vFBxOFD3E)
+    
+3. Baixe e Instale o Ubuntu como subsistema do Windows na [Microsoft Store](https://www.microsoft.com/store/productId/9N9TNGVNDL3Q)
+
+4. Inicie o Ubuntu, escolha um nome de usuário e uma senha. Em seguida, entrará em modo de terminal.
+
+5. Vamos baixar o verilator, no terminal:
+```
+wget http://cz.archive.ubuntu.com/ubuntu/pool/universe/v/verilator/verilator_3.924-1_amd64.deb
+```
+  Para instalar:
+	`sudo dpkg -i verilator_3.924-1_amd64.deb`
+
+6. Execute os seguintes comandos no terminal:
+```
+sudo apt-get update
+sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev git
+git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
+```
+
+Lembre-se, sempre antes de executar o simulador, faça o passo "2" e digite no Ubuntu: export DISPLAY=:0. Esse comando é responsável por mostrar graficamente dos programas que estão rodando no Ubuntu.
+
+A pasta LabarcFPGASimulatorDesktop se encontra em: 
+```
+C:\Users\<seu_usuario>\AppData\Local\Packages\CanonicalGroupLimited.Ubuntu18.04onWindows_79rhkp1fndgsc\LocalState\rootfs\home
+```
+Lá você pode editar o top.sv, e para executar é só ir no bash do Ubuntu, entrar na pasta e dar `make`
+
+> Dica: Você pode instalar o Geany e nele editar o top.sv e com as teclas shift + f9 executar o simulador diretamente. 	
+
+> No terminal:
+
+> Para instalar: `sudo apt-get install geany`
+
+> Para executar, entre na pasta do simulador e coloque: `geany top.sv`
+
+### Mac OS (Testado no High Sierra)
 Baixe o _homebrew_ na sua máquina (se já tiver, não precisa baixar novamente)
 ```
 ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)" < /dev/null 2> /dev/null
