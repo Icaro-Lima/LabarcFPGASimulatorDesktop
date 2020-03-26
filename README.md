@@ -10,7 +10,7 @@ Execute o seguinte, no terminal:
 
 ```
 sudo apt-get update
-sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev git
+sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev git flex bison
 wget https://www.veripool.org/ftp/verilator-3.922.tgz
 tar xf verilator-3.922.tgz
 cd verilator-3.922
