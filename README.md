@@ -22,7 +22,7 @@ git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 ```
 ### Ubuntu 16.04 ou 17.10
 
-Baixe o `verilator_3.906-1` por este link: http://cz.archive.ubuntu.com/ubuntu/pool/universe/v/verilator/verilator_3.906-1_amd64.deb
+Baixe o `verilator_3.906-1` por este link: http://old-releases.ubuntu.com/ubuntu/pool/universe/v/verilator/verilator_3.906-1_amd64.deb
 
 Instale o package
 
