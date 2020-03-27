@@ -122,7 +122,7 @@ make install
 
 5. Vamos baixar e instalar o verilator, no terminal:
 ```
-wget http://cz.archive.ubuntu.com/ubuntu/pool/universe/v/verilator/verilator_3.924-1_amd64.deb
+wget http://old-releases.ubuntu.com/ubuntu/pool/universe/v/verilator/verilator_3.906-1_amd64.deb
 sudo dpkg -i verilator_3.924-1_amd64.deb
 ```
 
