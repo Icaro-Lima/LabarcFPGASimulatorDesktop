@@ -111,12 +111,13 @@ make install
 (ignorar a mensagem de erro "preserving permissions ...: Permission denied")
 
 ### Windows 10 (Alternativa)
+
 1. [Baixe](https://sourceforge.net/projects/xming/) e Instale o Xming
 
 2. Após a instalação, abra o XLauch e coloque 0 no número de display. Avance todos os passos.  
     Caso sinta dificuldade nessa parte, acesse esse [link](https://virtualizationreview.com/articles/2018/01/30/hands-on-with-wsl-graphical-apps.aspx) ou esse [vídeo](https://youtu.be/k4vFBxOFD3E)
     
-3. Baixe e Instale o Ubuntu como subsistema do Windows na [Microsoft Store](https://www.microsoft.com/store/productId/9N9TNGVNDL3Q)
+3. Baixe e Instale o Ubuntu 18.04 (20.04 comprovadamente não funciona) como subsistema do Windows na [Microsoft Store](https://www.microsoft.com/store/productId/9N9TNGVNDL3Q)
 
 4. Inicie o Ubuntu, escolha um nome de usuário e uma senha. Em seguida, entrará em modo de terminal.
 
