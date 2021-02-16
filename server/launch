@@ -1,0 +1,23 @@
+#!/bin/bash
+# argument: cable number starting at 0
+
+echo $PATH
+mkdir syn/tmp.0
+
+while : ; do # infinite loop
+  # look at last tmp directory created
+  d=$(ls -dt syn/tmp.* |head -1)
+  flock $d ./cond_copy_TOP $d
+  r=$?
+  if [[ $r -eq 1 ]]; then
+    echo "sintesizing " $d
+    cd $d
+    if CABLE=$(expr $1 + 1) make > qq.log ; then
+        timeout 300 quartus_stp -t /labarc/util/qr.tcl $1 > /dev/null 2>> qq.log
+    fi
+    echo "___________________pronto____________________" >> qq.log
+    cd
+  else
+    sleep 1
+  fi
+done
