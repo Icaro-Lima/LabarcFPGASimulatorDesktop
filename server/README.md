@@ -1,6 +1,7 @@
 These are the server files.
 They are stored here only for reference.
 
+```
 /var/www/html/hdl  (HTTP server)
    sintese.php
    send_sse.php
@@ -17,3 +18,5 @@ They are stored here only for reference.
 /labarc/util  (computer connected to FPGA board)
    vJTAG_interface.sv
    qr.tcl
+```
+
