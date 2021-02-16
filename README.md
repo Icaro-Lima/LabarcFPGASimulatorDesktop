@@ -2,7 +2,14 @@
 ![Alt text](MainWindow.png?raw=true "Main Window")
 ## Instalação
 
-Recomenda-se a instalação desta fonte: https://www.dafont.com/led-counter-7.font
+### Para todos os sistemas operacionais
+
+Recomenda-se a instalação desta fonte tipográfica: https://www.dafont.com/led-counter-7.font
+
+Antes de poder usar uma placa FPGA remotamente, você precisa enviar seu arquivo '.ssh/id_rsa.pub'
+para o professor.
+Se você não tiver este arquivo no seu computador, segue as instruções no primeiro
+quadro rosa no link http://www.linuxproblem.org/art_9.html
 
 ### Ubuntu 18.04 ou acima
 
@@ -182,9 +189,6 @@ OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote 
 
 ## Utilização
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
-
-Antes de poder usar uma placa FPGA remotamente, você precisa enviar seu arquivo '.ssh/id_rsa.pub'
-para o professor.
 
 Para usar uma placa FPGA remotamente, navegue para http://lad.dsc.ufcg.edu.br/hdl/sintese.php
 e faça upload do arquivo `top.sv`. No final da síntese deve aparecer uma instrução que
