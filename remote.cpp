@@ -175,14 +175,15 @@ int main(int argc, char** argv, char** env) {
 
     char *host;
     char *port;
+    int argc_offset;
     if(argc==2) {  // default for host is localhost
        host = (char *)"localhost";
        port = argv[1];
-       init_gui(argc-1,argv+1); // dirty argv[0] :-(
+       argc_offset = 1;
     } else {
        host = argv[1];
        port = argv[2];
-       init_gui(argc-2,argv+2); // dirty argv[0] :-(
+       argc_offset = 2;
     }   
 
   try
@@ -194,6 +195,8 @@ int main(int argc, char** argv, char** env) {
     std::cerr << "Exception: " << e.what() << "\n";
     exit(8); // exit in case of connection error
   }
+
+    init_gui(argc-argc_offset,argv+argc_offset); // dirty argv[0] :-(
 
     Fl::run();   // run the graphical interface which calls callback()
 
