@@ -5,9 +5,6 @@
 // Version 2.1.
 // Icaro Dantas de Araujo Lima and Elmar Melcher at UFCG, 2021
 
-// g++ -std=c++11 remote.cpp gui.o -o remote.bin \
-//     -lboost_system -lpthread -lfltk_images -lpng -lz -lfltk
-
 // This program is based in part on the work of the FLTK project (http://www.fltk.org) and
 // https://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/example/cpp03/echo/blocking_tcp_echo_client.cpp
 
@@ -20,8 +17,8 @@
 #include <iostream>
 #include <boost/asio.hpp>
 
-using boost::asio::ip::tcp;
-
+// declare inputs and outputs of module top as struct,
+// similar to what Verilator does automatically
 struct top_struct
    { unsigned char SWI, LED, SEG,
                    lcd_pc, lcd_SrcA, lcd_SrcB, lcd_ALUResult, lcd_Result,
@@ -32,37 +29,42 @@ struct top_struct
 
 struct top_struct *top = &top_s;
 
+// declare socket and auxiliary elements for remote connection
+using boost::asio::ip::tcp;
 boost::asio::io_service io_service;
-
 tcp::socket sock(io_service);
 tcp::resolver resolver(io_service);
+enum { max_length = 10,
+       expected_reply_length = 4 };
 
-enum { max_length = 10 };
-
+// copy information received from remote FPGA to outputs of module top
 void set_led_seg(char *reply) {
-    unsigned int r = strtol(reply, NULL, 16);  // convert from hex
-    top->LED = r & 0xFF;
-    top->SEG = r >>8;
+    unsigned int r = strtol(reply, NULL, 16);  // convert hex string to int
+    top->LED = r & 0xFF; // least significant byte is LED
+    top->SEG = r >>8;    // second least significant byte is seven segment display
 }
 
+// send a request string and treat the reply
 void send_and_set(string r) {
   try
   {
+    // send request string - typically 8 characters representing a binary number
     const char *request = r.c_str();
     size_t request_length = std::strlen(request);
     boost::asio::write(sock, boost::asio::buffer(request, request_length));
 
+    // reveive a string of 4 characters representing a hex number 
     char reply[max_length];
-    size_t reply_length = boost::asio::read(sock, boost::asio::buffer(reply, 4));
+    size_t reply_length = boost::asio::read(sock, boost::asio::buffer(reply, expected_reply_length));
     reply[reply_length] = 0; // trim
     set_led_seg(reply);
-    // receive CR and LF
+    // receive CR and LF (exactly 2 characters) and discard them
     reply_length = boost::asio::read(sock, boost::asio::buffer(reply, 2));
   }
   catch (std::exception& e)
   {
     std::cerr << "Exception: " << e.what() << "\n";
-    exit(9);
+    exit(9); // exit in case of connection error
   }
 }
 
@@ -71,7 +73,7 @@ void callback(void*) {
 
   string r;
 
-  send_and_set("00100000\n");
+  send_and_set("00100000\n");  // periodically request LED an SEG state
 
   fpga->redraw();
     	
@@ -88,7 +90,12 @@ int SWI::handle(int event) {
 			top->SWI &= ~(1UL << id);
 		}
 
-       send_and_set("0100" + std::bitset<3>(id).to_string() + (state?"1":"0") + "\n");
+	// send a string representing 8 bits as command to modify SWI
+	// the higher nibble is 0100
+	// the lower nibble consists of 3 bits for bit position
+	// and the least significant bit is the value to be assigned to that position
+	send_and_set("0100" + std::bitset<3>(id).to_string() + (state?"1":"0") + "\n");
+	// this call also updates LED and SEG
 		
        fpga->redraw();
     }
@@ -168,7 +175,7 @@ int main(int argc, char** argv, char** env) {
 
     char *host;
     char *port;
-    if(argc==2) {
+    if(argc==2) {  // default for host is localhost
        host = (char *)"localhost";
        port = argv[1];
        init_gui(argc-1,argv+1); // dirty argv[0] :-(
@@ -185,6 +192,7 @@ int main(int argc, char** argv, char** env) {
   catch (std::exception& e)
   {
     std::cerr << "Exception: " << e.what() << "\n";
+    exit(8); // exit in case of connection error
   }
 
     Fl::run();   // run the graphical interface which calls callback()
