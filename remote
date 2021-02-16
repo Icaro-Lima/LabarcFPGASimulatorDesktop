@@ -1,0 +1,11 @@
+if [ $# -ne 2 ]; then
+  echo "Usage: $0 host port"
+  exit
+fi
+p=$( ps x | grep "ssh " | grep $2:$1:$2  | cut -b-7 )
+[[ ! -z "$p" ]] && kill -9 $p && sleep 1
+ssh -p23456 -L$2:$1:$2 labarc01@lad.dsc.ufcg.edu.br -N &
+ssh_pid=$!
+./remote.bin $2
+kill -9 $ssh_pid
+
