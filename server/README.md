@@ -1,4 +1,4 @@
-These are the server files.
+These are the server files that allow using FPGA board remotely.
 They are stored here only for reference.
 
 ```
