@@ -186,7 +186,7 @@ Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite e
 Antes de poder usar uma placa FPGA remotamente, você precisa enviar seu arquivo '.ssh/id_rsa.pub'
 para o professor.
 
-Para usar uma placa FPGA remotamente, navegue para http://lad.dsc.ufcg.edu.br/hdl/sintetize.php
+Para usar uma placa FPGA remotamente, navegue para http://lad.dsc.ufcg.edu.br/hdl/sintese.php
 e faça upload do arquivo `top.sv`. No final da síntese deve aparecer uma instrução que
 pede dar o comando './remote' com dois argumentos.
 
