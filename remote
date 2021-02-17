@@ -10,26 +10,26 @@ fi
 # calculate the socket port from the FPGA number
 port=$(expr $2 + 2540)
 
-# check if a tunnel to the same destination exists and destroy it 
-p=$( ps x | grep "ssh " | grep $port:$1:$port  | cut -b-7 )
+# check if a tunnel with the same port exists and destroy it 
+p=$( ps x | grep "ssh " | grep $port: | cut -b-7 )
 [[ ! -z "$p" ]] && kill -9 $p && sleep 1
 
 # establish the tunnel
 ssh -p23456 -L$port:$1:$port labarc01@lad.dsc.ufcg.edu.br -N &
 ssh_pid=$!
 
-./remote.bin $port      # first attempt to start the GUI
-if [ $? -eq 8 ]; then   # GUI exits with Connection refused exception
+./remote.bin $port      # make first attempt to start the GUI
+if [ $? -eq 8 ]; then   # if GUI exits with Connection refused exception
    sleep 2              # delay for tunnel to get established
-   ./remote.bin $port   # second attempt start the GUI
+   ./remote.bin $port   # make second attempt start the GUI
 
-   if [ $? -eq 8 ] || [ $? -eq 9 ]; then   # again an exception
+   if [ $? -ge 8 ]; then    # again an exception
       if ps h -p $ssh_pid >/dev/null; then  # tunnel process active?
-        echo "erro: connexão remota com a placa FPGA indisponível"
+        echo "Erro: connexão remota com a placa FPGA indisponível"
         echo "Tente fazer novamente upload do top.sv"
       else
         # the tunnel command has exited
-        echo "Caso apareceu \" Permission deniedd\","
+        echo "Caso apareceu \" Permission denied\","
         echo "verifique se você enviou o seu arquivo ~/.ssh/id_rsa.pub"
         echo "para o professor. Caso sim, peça ele verificar se ele cadastrou"
         echo "o mesmo corretamente."
