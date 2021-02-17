@@ -185,10 +185,15 @@ OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote 
 ## Utilização
 Para simular, vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
 
-Para usar uma placa FPGA remotamente, navegue para http://lad.dsc.ufcg.edu.br/hdl/sintese.php
+Para usar uma placa FPGA remotamente, é preciso rodar o simulador antes.
+Navegue para http://lad.dsc.ufcg.edu.br/hdl/sintese.php
 e faça upload do arquivo `top.sv`. No final da síntese deve aparecer uma instrução que
 pede dar o comando './remote' com dois argumentos. Este comando deve ser dado dentro da pasta
-`LabarcFPGASimulatorDesktop`. É preciso rodar o simulador antes de usar uma placa FPGA remotamente.
+`LabarcFPGASimulatorDesktop`. Uma janela igual à janela do simulador aparece.
+Feche a janela para encerrar o uso da placa FPGA. Uma linha `________pronto________`
+aparece no navegador para indicar que o arquivo `top.sv` pode ser editado novamente, submetido
+a uuma nova simulação, e uploadeado novamente.
 
 ### Vídeo mostrando o passo a passo
-https://youtu.be/mrfyZOujHHI (desatualizado)
+http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
+
