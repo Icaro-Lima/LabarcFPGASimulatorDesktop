@@ -4,7 +4,8 @@
 
 ### Para todos os sistemas operacionais
 
-Recomenda-se a instalação desta fonte tipográfica: https://www.dafont.com/led-counter-7.font
+Recomenda-se a instalação desta fonte tipográfica:
+http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
 
 Antes de poder usar uma placa FPGA remotamente, você precisa enviar seu arquivo '.ssh/id_rsa.pub'
 para o professor.
