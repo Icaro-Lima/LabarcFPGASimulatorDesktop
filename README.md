@@ -26,27 +26,18 @@ make
 sudo make install
 cd ..
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
+cd LabarcFPGASimulatorDesktop
 ```
-### Ubuntu 16.04 ou 17.10
 
-Baixe o `verilator_3.906-1` por este link: http://old-releases.ubuntu.com/ubuntu/pool/universe/v/verilator/verilator_3.906-1_amd64.deb
-
-Instale o package
-
-Agora execute o seguinte, no terminal:
-
-```
-sudo apt-get update
-sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev git
-git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
-```
 ### CentOS 7
 
 Execute o seguinte, no terminal:
 ```
-yum -y --enablerepo=epel install verilator fltk-devel make gcc-c++ libpng-devel zlib-devel
+yum -y --enablerepo=epel install verilator fltk-devel make gcc-c++ libpng-devel zlib-devel boost-devel
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
+cd LabarcFPGASimulatorDesktop
 ```
+
 ### Windows 10
 Download and start https://sourceforge.net/projects/mingw/files/Installer/mingw-get-setup.exe/download
 
@@ -116,6 +107,10 @@ make
 make install
 ```
 (ignorar a mensagem de erro "preserving permissions ...: Permission denied")
+```
+git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
+cd LabarcFPGASimulatorDesktop
+```
 
 ### Windows 10 (Alternativa)
 
@@ -141,7 +136,7 @@ sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev git
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 ```
 
-Lembre-se, sempre antes de executar o simulador, faça o passo "2" e digite no Ubuntu: export DISPLAY=:0. Esse comando é responsável por mostrar graficamente dos programas que estão rodando no Ubuntu.
+Lembre-se, sempre antes de executar o simulador, faça o passo "2" e digite no Ubuntu: export DISPLAY=:0. Esse comando é responsável por mostrar graficamente janelas dos programas que estão rodando no Ubuntu.
 
 A pasta LabarcFPGASimulatorDesktop se encontra em: 
 ```
@@ -188,11 +183,12 @@ Existe uma issue na biblioteca fltk no macOS Mojave, em que o simulador fica com
 OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote disponível no Homebrew com o fix dessa issue.
 
 ## Utilização
-Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
+Para simular, vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
 
 Para usar uma placa FPGA remotamente, navegue para http://lad.dsc.ufcg.edu.br/hdl/sintese.php
 e faça upload do arquivo `top.sv`. No final da síntese deve aparecer uma instrução que
-pede dar o comando './remote' com dois argumentos.
+pede dar o comando './remote' com dois argumentos. Este comando deve ser dado dentro da pasta
+`LabarcFPGASimulatorDesktop`. É preciso rodar o simulador antes de usar uma placa FPGA remotamente.
 
 ### Vídeo mostrando o passo a passo
 https://youtu.be/mrfyZOujHHI (desatualizado)
