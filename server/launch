@@ -1,15 +1,19 @@
 #!/bin/bash
 # argument: cable number starting at 0
 
-echo $PATH
+# make sure there is at least one tmp directory so ls will not fail
 mkdir syn/tmp.0
 
 while : ; do # infinite loop
-  # look at last tmp directory created
-  d=$(ls -dt syn/tmp.* |head -1)
-  flock $d ./cond_copy_TOP $d
-  r=$?
-  if [[ $r -eq 1 ]]; then
+  # look at last tmp directories created
+  for i in {1..10}; do
+     # set d to the i-th last tmp directory
+     d=$(ls -1dt syn/tmp.* | head -$i | tail -1)
+     flock $d ./cond_copy_TOP $d  # lock and conditionally copy
+     r=$?
+     [ $r -eq 1 ] && break;  # found a directory that needs synthesis
+  done;
+  if [ $r -eq 1 ]; then
     echo "sintesizing " $d
     cd $d
     if CABLE=$(expr $1 + 1) make > qq.log ; then
