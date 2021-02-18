@@ -31,7 +31,7 @@ cd LabarcFPGASimulatorDesktop
 ```
 
 #### Vídeo mostrando o passo a passo
-http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
+http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
 
 ### CentOS 7
 
