@@ -30,6 +30,9 @@ git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
 
+#### Vídeo mostrando o passo a passo
+http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
+
 ### CentOS 7
 
 Execute o seguinte, no terminal:
@@ -195,6 +198,6 @@ Feche a janela para encerrar o uso da placa FPGA. Uma linha `________pronto_____
 aparece no navegador para indicar que o arquivo `top.sv` pode ser editado novamente, submetido
 a uuma nova simulação, e uploadeado novamente.
 
-### Vídeo mostrando o passo a passo
+#### Vídeo mostrando o passo a passo
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
 
