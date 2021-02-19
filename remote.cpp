@@ -36,14 +36,7 @@ tcp::socket sock(io_service);
 tcp::resolver resolver(io_service);
 enum { max_length = 40 };
 
-// copy information received from remote FPGA to outputs of module top
-void set_led_seg(char *reply) {
-    unsigned int r = strtol(reply, NULL, 16);  // convert hex string to int
-    top->LED = r & 0xFF; // least significant byte is LED
-    top->SEG = r >>8;    // second least significant byte is seven segment display
-}
-
-// send a request string and treat the reply
+// send a request string and receive the reply
 char *send_and_rec(string r, int expected_reply_length) {
   static char reply[max_length];
   try
@@ -68,7 +61,34 @@ char *send_and_rec(string r, int expected_reply_length) {
   return reply;
 }
 
-#include <iostream>
+// copy information received from remote FPGA to outputs of module top
+void set_led_seg(char *reply) {
+    unsigned int r = strtoul(reply, NULL, 16);  // convert hex string to int
+    top->LED = r & 0xFF; // least significant byte is LED
+    top->SEG = r >>8;    // second least significant byte is seven segment display
+}
+
+void set_lcd_ab(char *reply) {
+    top->lcd_a = strtoul(reply+16, NULL, 16);      // lcd_a are the rightmost 16 characters
+    reply[16] = 0;                                 // cut off lcd_a (reply string gets proposedly damaged)
+    top->lcd_b = strtoul(reply, NULL, 16);         // lcd_b are the first 16 characters
+}
+
+void set_pc_etc(char *reply) {
+    unsigned char flags  = strtoul(reply+22, NULL, 16); reply[22] = 0;
+    top->lcd_MemWrite    = (flags & 1)>0;
+    top->lcd_Branch      = (flags & 2)>0;
+    top->lcd_MemtoReg    = (flags & 4)>0;
+    top->lcd_RegWrite    = (flags & 8)>0;
+    top->lcd_ReadData    = strtoul(reply+20, NULL, 16); reply[20] = 0;
+    top->lcd_WriteData   = strtoul(reply+18, NULL, 16); reply[18] = 0;
+    top->lcd_Result      = strtoul(reply+16, NULL, 16); reply[16] = 0;
+    top->lcd_ALUResult   = strtoul(reply+14, NULL, 16); reply[14] = 0;
+    top->lcd_SrcB        = strtoul(reply+12, NULL, 16); reply[12] = 0;
+    top->lcd_SrcA        = strtoul(reply+10, NULL, 16); reply[10] = 0;
+    top->lcd_instruction = strtoul(reply+ 2, NULL, 16); reply[ 2] = 0;
+    top->lcd_pc          = strtoul(reply, NULL, 16);
+}
 
 // ****** The main action is in this callback ******
 void callback(void*) {
@@ -78,10 +98,8 @@ void callback(void*) {
   set_led_seg( send_and_rec("00100000\n", 4) );  // request LED and SEG state
 
   if(fpga->lcd_check->value()) {
-     char *reply = send_and_rec("00111111\n", 32);  // get both, lcd_a and lcd_b
-     top->lcd_a = strtol(reply+16, NULL, 16);       // lcd_a are the rightmost 16 characters
-     reply[16] = 0;                                 // cut off lcd_a
-     top->lcd_b = strtol(reply, NULL, 16);          // lcd_b are the first 16 characters
+     if(fpga->riscv_check->value()) set_pc_etc( send_and_rec("00100010\n", 24) );
+     else set_lcd_ab( send_and_rec("00111111\n", 32) );  // get both, lcd_a and lcd_b
   }
 
   fpga->redraw();
@@ -106,6 +124,11 @@ int SWI::handle(int event) {
 	set_led_seg( send_and_rec("0100" + std::bitset<3>(id).to_string() + (state?"1":"0") + "\n", 4) );
 	// this call also updates LED and SEG
 		
+       if(fpga->lcd_check->value()) {
+          if(fpga->riscv_check->value()) set_pc_etc( send_and_rec("00100010\n", 24) );
+	  else set_lcd_ab( send_and_rec("00111111\n", 32) );  // get both, lcd_a and lcd_b
+       }
+
        fpga->redraw();
     }
     return 1;

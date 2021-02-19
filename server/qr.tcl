@@ -119,8 +119,13 @@ proc IncomingData {sock} {
 # $line may be a command to change SWI or a command to read LED
 # however, a command to change SWI also reads LED
          get_data $line
+# the data returned are always for the command of the previous call 
+#        if lcd_a and lcd_b are requested
 	 if { [string range $line 0 3] == "0011"} then {
             puts $sock "[get_data "00111110"][get_data "00111101"][get_data "00111100"][get_data "00111011"][get_data "00111010"][get_data "00111001"][get_data "00111000"][get_data "00110111"][get_data "00110110"][get_data "00110101"][get_data "00110100"][get_data "00110011"][get_data "00110010"][get_data "00110001"][get_data "00110000"][get_data "00000000"]"
+#              if pc is requested, get also instruction up to flags
+         } elseif { [string range $line 0 7] == "00100010" } then {
+            puts $sock "[get_data "00100110"][get_data "00100101"][get_data "00100100"][get_data "00100011"][get_data "00100111"][get_data "00101000"][get_data "00101001"][get_data "00101010"][get_data "00101011"][get_data "00101100"][get_data "00101101"][get_data "00000000"]"
          } else {
 # Send the vJTAG Commands to Update the LED and SEG
 # the data returned are always for the command of the previous call 

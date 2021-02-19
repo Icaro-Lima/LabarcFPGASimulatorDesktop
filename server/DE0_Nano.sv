@@ -74,7 +74,7 @@ logic [7:0] SEG; // display de 7 segmentos com ponto
 always_comb {GPIO_0[27],GPIO_0[3],GPIO_0[1],GPIO_0[0],GPIO_0[2],GPIO_0[25],GPIO_0[31],GPIO_0[33]} <= SEG;
 
 // clock lento 
-parameter divide_by=25000000;  // divisor de clock, igual ao arquivo .sdc
+parameter divide_by=100000000;  // divisor de clock, igual ao arquivo .sdc
 // obs.: divide_by=1 nao funciona,
 //       neste caso use CLOCK_50 diretamente no lugar de CLOCK_DIV
 //       e verifique o setup slack no arquivo DE0_Nano.sta.summary
@@ -87,6 +87,11 @@ always_ff @(posedge CLOCK_50) begin
 end
 
 logic [NBITS_LCD-1:0] lcd_a, lcd_b;
+logic [NINSTR_BITS-1:0] lcd_instruction;
+logic [NBITS_TOP-1:0] lcd_registrador [0:NREGS_TOP-1];
+logic [NBITS_TOP-1:0] lcd_pc, lcd_SrcA, lcd_SrcB,
+                      lcd_ALUResult, lcd_Result, lcd_WriteData, lcd_ReadData;
+logic lcd_MemWrite, lcd_Branch, lcd_MemtoReg, lcd_RegWrite;
 
 lcd_64bit (.clk(CLOCK_50), .reset(~KEY[0]),
            .a(lcd_a), .b(lcd_b),
@@ -98,8 +103,16 @@ always_comb begin
    GPIO_1[21] <= 0; // LCD RW wired to GND on connector
 end
 
-vJTAG_interface(.SWI_JTAG(SWI_JTAG), .LED(LED), .SEG(SEG), .lcd_a(lcd_a), .lcd_b(lcd_b));
-top (.clk_2(CLOCK_DIV), .SWI(SWI),       .LED(LED), .SEG(SEG), .lcd_a(lcd_a), .lcd_b(lcd_b));
+vJTAG_interface(.SWI_JTAG(SWI_JTAG), .LED(LED), .SEG(SEG), .lcd_a(lcd_a), .lcd_b(lcd_b),
+     .lcd_pc(lcd_pc), .lcd_instruction(lcd_instruction), .lcd_SrcA(lcd_SrcA), .lcd_SrcB(lcd_SrcB),
+     .lcd_ALUResult(lcd_ALUResult), .lcd_Result(lcd_Result), .lcd_WriteData(lcd_WriteData),
+     .lcd_ReadData(lcd_ReadData), .lcd_MemWrite(lcd_MemWrite), .lcd_Branch(lcd_Branch), 
+     .lcd_MemtoReg(lcd_MemtoReg), .lcd_RegWrite(lcd_RegWrite));
+top (.clk_2(CLOCK_DIV), .SWI(SWI),       .LED(LED), .SEG(SEG), .lcd_a(lcd_a), .lcd_b(lcd_b),
+     .lcd_pc(lcd_pc), .lcd_instruction(lcd_instruction), .lcd_SrcA(lcd_SrcA), .lcd_SrcB(lcd_SrcB),
+     .lcd_ALUResult(lcd_ALUResult), .lcd_Result(lcd_Result), .lcd_WriteData(lcd_WriteData),
+     .lcd_ReadData(lcd_ReadData), .lcd_MemWrite(lcd_MemWrite), .lcd_Branch(lcd_Branch), 
+     .lcd_MemtoReg(lcd_MemtoReg), .lcd_RegWrite(lcd_RegWrite));
 
 endmodule
 
