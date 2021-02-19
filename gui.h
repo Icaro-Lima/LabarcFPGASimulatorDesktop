@@ -12,7 +12,7 @@
 #include <FL/fl_draw.H>
 #include <FL/Fl_Button.H>
 #include <FL/Fl_PNG_Image.H>
-#include <FL/Fl_Toggle_Button.H>
+#include <FL/Fl_Check_Button.H>
 #include <FL/Fl_Spinner.H>
 #include <FL/Fl_Window.H>
 
@@ -30,6 +30,7 @@ using std::string;
 #define YMARGIN 10
 #define NSWIS 8
 #define SWIS_OFFSET 64
+#define LCD_OFFSET 290
 #define NLEDS 8
 #define LEDS_VERTICAL_OFFSET 230
 #define CLOCK_PERIOD_WIDTH 50
@@ -42,6 +43,7 @@ using std::string;
 #define NREGS_PER_LINE 4
 #define NREG_LINES (NREGS/NREGS_PER_LINE)
 #define CLOCK 0.25
+#define LABEL_SIZE 16
 
 class SWI : public Fl_Widget {
 	int id;
@@ -91,6 +93,16 @@ private:
   void lcd_lines(long a, long b);
 };
 
+class LCD_check : public Fl_Check_Button {
+public:
+	LCD_check(int x, int y);
+};
+
+class RISCV_check : public Fl_Check_Button {
+public:
+	RISCV_check(int x, int y);
+};
+
 class SegmentsDisplay : public Fl_Widget {
 	bool *previous;
 	Fl_PNG_Image *point_on, *point_off, *vertical_on, *vertical_off, *horizontal_on, *horizontal_off;
@@ -125,6 +137,8 @@ public:
 	static Fl_PNG_Image *image;
         float display_char_width;
         float lcd_char_width;
+	LCD_check *lcd_check;
+	RISCV_check *riscv_check;
         Clock *clk;
 
 	FPGA(int x, int y);

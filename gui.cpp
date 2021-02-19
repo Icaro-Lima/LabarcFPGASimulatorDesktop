@@ -17,7 +17,7 @@ FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
        fl_font(DISPLAY_FONT, DISPLAY_FONT_SIZE);
        display_char_width = fl_width('8') + 0.7; // all characters are equal
        fl_font(LCD_FONT, LCD_FONT_SIZE);
-       lcd_char_width = fl_width("8") + 0.7; // all hex digit characters are equal
+       lcd_char_width = fl_width('8') + 0.7; // all hex digit characters are equal
 
 	// Instance upper board of FPGA
 	board = new Board(this->x() + image->w() / 2 - Board::image->w() / 2, this->y());
@@ -33,13 +33,15 @@ FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
 	// Instance display
 	disp = new display(this->x() + image->w() / 2, this->y() + image->h() / 2,
 	                   (int)(LCD_NCHAR*lcd_char_width + 8*display_char_width + XMARGIN));
-	disp->position(this->x() + image->w() / 2 - disp->w() / 2, this->y() + image->h() / 2 + 50 );
+	disp->position(this->x() + image->w() / 2 - disp->w() / 2, this->y() + LCD_OFFSET );
 	  
-        // Instance Hexadecimal Values
+        lcd_check = new LCD_check(this->x() + 2*XMARGIN, this->y() + LCD_OFFSET);
+        riscv_check = new RISCV_check(this->x() + 2*XMARGIN, this->y() + LCD_OFFSET + 2*LCD_FONT_SIZE+YMARGIN - LABEL_SIZE );
+
+	// Instance Hexadecimal Values
         hexv = new hexval(this->x() + image->w() / 2, this->y() + image->h() / 2,
                          (int)(LCD_NCHAR*lcd_char_width));
-	hexv->position(this->x() + image->w() / 2 - hexv->w() / 2, this->y() + image->h() / 2 - 60 );
-
+	hexv->position(this->x() + image->w() / 2 - hexv->w() / 2, this->y() + LCD_OFFSET );
 }
 
 void FPGA::draw() {
@@ -47,6 +49,8 @@ void FPGA::draw() {
 	board->redraw();
 	leds->redraw();
         clk->redraw();
+	lcd_check->redraw();
+	if(lcd_check->value()) riscv_check->redraw();
 	disp->redraw();
 	hexv->redraw();
 }
@@ -65,13 +69,23 @@ Board::Board(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
 
 }
 
-Clock::Clock(int x, int y) : Fl_Spinner(x, y, CLOCK_PERIOD_WIDTH, 25, "FL_FLOAT_INPUT") {
+LCD_check::LCD_check(int x, int y) : Fl_Check_Button(x, y, 20, 20, "LCD") {
+	labelcolor(FL_WHITE);
+        labelsize(LABEL_SIZE);
+}
+
+RISCV_check::RISCV_check(int x, int y) : Fl_Check_Button(x, y, 20, 20, "RISC-V") {
+	labelcolor(FL_WHITE);
+        labelsize(LABEL_SIZE);
+}
+
+Clock::Clock(int x, int y) : Fl_Spinner(x, y, CLOCK_PERIOD_WIDTH, 25) {
         type(1);
-        labelsize(16);
+        labelsize(LABEL_SIZE);
         minimum(0.5);
         maximum(3.0);
         step(0.5);
-	value(0.5);
+	value(3.0);
         textsize(18);
 }
 
@@ -108,7 +122,8 @@ SWIs::SWIs(int x, int y, int offset) : Fl_Widget(x, y, NSWIS * 33 + (NSWIS-1) * 
 
 Fl_PNG_Image * LEDs::led_on = new Fl_PNG_Image(ASSET("LEDOn.png"));
 Fl_PNG_Image * LEDs::led_off = new Fl_PNG_Image(ASSET("LEDOff.png"));
-LEDs::LEDs(int x_origin, int y_origin, int offset) : Fl_Widget(x_origin, y_origin, 8 * led_on->w() + 7 * (offset - led_on->w()), led_on->h()) {
+LEDs::LEDs(int x_origin, int y_origin, int offset) :
+	      Fl_Widget(x_origin, y_origin, 8 * led_on->w() + 7 * (offset - led_on->w()), led_on->h()) {
 	this->x_origin = x_origin;
 	this->y_origin = y_origin;
 	this->offset = offset;

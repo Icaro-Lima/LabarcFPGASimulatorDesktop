@@ -116,53 +116,57 @@ void SegmentsDisplay::draw() {
 void display::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
 
-  fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD and register window
+  if(fpga->lcd_check->value() && fpga->riscv_check->value()) {
+     fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD and register window
 
-  lcd_labels();
-  stringstream ss;
-  ss << hex << setfill('0') << uppercase;
-  // LCD data
-  // first line
-  ss << setw(2) << (int)top->lcd_pc;
-  ss << " " << setw(8) << (int)top->lcd_instruction;
-  ss << " " << setw(2) << (int)top->lcd_WriteData;
-  ss << (top->lcd_MemWrite ? '*' : '_');
-  ss << (top->lcd_Branch ? '*' : '_');
-  fl_draw(ss.str().c_str(), x() + XMARGIN, y() + DISPLAY_FONT_SIZE+LCD_FONT_SIZE);
+     lcd_labels();
+     stringstream ss;
+     ss << hex << setfill('0') << uppercase;
+     // LCD data
+     // first line
+     ss << setw(2) << (int)top->lcd_pc;
+     ss << " " << setw(8) << (int)top->lcd_instruction;
+     ss << " " << setw(2) << (int)top->lcd_WriteData;
+     ss << (top->lcd_MemWrite ? '*' : '_');
+     ss << (top->lcd_Branch ? '*' : '_');
+     fl_draw(ss.str().c_str(), x() + XMARGIN, y() + DISPLAY_FONT_SIZE+LCD_FONT_SIZE);
 	
-  // second line
-  ss.str(""); // reset stringstream
-  ss << setw(2) << (int)top->lcd_SrcA;
-  ss << " " << setw(2) << (int)top->lcd_SrcB;
-  ss << " " << setw(2) << (int)top->lcd_ALUResult;
-  ss << " " << setw(2) << (int)top->lcd_Result;
-  ss << " " << setw(2) << (int)top->lcd_ReadData;
-  ss << (top->lcd_MemtoReg ? '*' : '_');
-  ss << (top->lcd_RegWrite ? '*' : '_');
-  fl_draw(ss.str().c_str(), this->x() + XMARGIN, y() + DISPLAY_FONT_SIZE+2*LCD_FONT_SIZE);
+     // second line
+     ss.str(""); // reset stringstream
+     ss << setw(2) << (int)top->lcd_SrcA;
+     ss << " " << setw(2) << (int)top->lcd_SrcB;
+     ss << " " << setw(2) << (int)top->lcd_ALUResult;
+     ss << " " << setw(2) << (int)top->lcd_Result;
+     ss << " " << setw(2) << (int)top->lcd_ReadData;
+     ss << (top->lcd_MemtoReg ? '*' : '_');
+     ss << (top->lcd_RegWrite ? '*' : '_');
+     fl_draw(ss.str().c_str(), this->x() + XMARGIN, y() + DISPLAY_FONT_SIZE+2*LCD_FONT_SIZE);
   
-  register_labels();
-  int yy = y() + 3*DISPLAY_FONT_SIZE + 2*LCD_FONT_SIZE;
-  // register values
-  ss << nouppercase;
-  for(int i = 0; i < NREGS; i++) { //  for all registradores
-    if(i % NREGS_PER_LINE == 0) {  // start of line
-      ss.str(""); // reset stringstream
-      ss << "  ";
-    }
-    ss << "      : " << setw(2) << (int)top->lcd_registrador[i];
-    if(i % NREGS_PER_LINE == NREGS_PER_LINE-1) { // end of line
-      fl_draw(ss.str().c_str(), this->x() + XMARGIN, yy += 1.5*DISPLAY_FONT_SIZE);
-    }
+     register_labels();
+     int yy = y() + 3*DISPLAY_FONT_SIZE + 2*LCD_FONT_SIZE;
+     // register values
+     ss << nouppercase;
+     for(int i = 0; i < NREGS; i++) { //  for all registradores
+       if(i % NREGS_PER_LINE == 0) {  // start of line
+         ss.str(""); // reset stringstream
+         ss << "  ";
+       }
+       ss << "      : " << setw(2) << (int)top->lcd_registrador[i];
+       if(i % NREGS_PER_LINE == NREGS_PER_LINE-1) { // end of line
+         fl_draw(ss.str().c_str(), this->x() + XMARGIN, yy += 1.5*DISPLAY_FONT_SIZE);
+       }
+     }
   }
 }
 
 void hexval::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
 
-  fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD window
+  if(fpga->lcd_check->value() && !fpga->riscv_check->value()) {
+     fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD window
 
-  lcd_lines((long)top->lcd_a, (long)top->lcd_b);
+     lcd_lines((long)top->lcd_a, (long)top->lcd_b);
+  }
 }
 
 int main(int argc, char** argv, char** env) {
