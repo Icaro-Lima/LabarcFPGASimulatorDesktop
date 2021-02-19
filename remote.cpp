@@ -34,8 +34,7 @@ using boost::asio::ip::tcp;
 boost::asio::io_service io_service;
 tcp::socket sock(io_service);
 tcp::resolver resolver(io_service);
-enum { max_length = 10,
-       expected_reply_length = 4 };
+enum { max_length = 40 };
 
 // copy information received from remote FPGA to outputs of module top
 void set_led_seg(char *reply) {
@@ -45,7 +44,8 @@ void set_led_seg(char *reply) {
 }
 
 // send a request string and treat the reply
-void send_and_set(string r) {
+char *send_and_rec(string r, int expected_reply_length) {
+  static char reply[max_length];
   try
   {
     // send request string - typically 8 characters representing a binary number
@@ -53,27 +53,36 @@ void send_and_set(string r) {
     size_t request_length = std::strlen(request);
     boost::asio::write(sock, boost::asio::buffer(request, request_length));
 
-    // reveive a string of 4 characters representing a hex number 
-    char reply[max_length];
+    // reveive a string of characters representing a hex number 
     size_t reply_length = boost::asio::read(sock, boost::asio::buffer(reply, expected_reply_length));
     reply[reply_length] = 0; // trim
-    set_led_seg(reply);
     // receive CR and LF (exactly 2 characters) and discard them
-    reply_length = boost::asio::read(sock, boost::asio::buffer(reply, 2));
+    char crlf[4];
+    reply_length = boost::asio::read(sock, boost::asio::buffer(crlf, 2));
   }
   catch (std::exception& e)
   {
     std::cerr << "Exception: " << e.what() << "\n";
     exit(9); // exit in case of connection error
   }
+  return reply;
 }
+
+#include <iostream>
 
 // ****** The main action is in this callback ******
 void callback(void*) {
 
   string r;
 
-  send_and_set("00100000\n");  // periodically request LED an SEG state
+  set_led_seg( send_and_rec("00100000\n", 4) );  // request LED and SEG state
+
+  if(fpga->lcd_check->value()) {
+     char *reply = send_and_rec("00111111\n", 32);  // get both, lcd_a and lcd_b
+     top->lcd_a = strtol(reply+16, NULL, 16);       // lcd_a are the rightmost 16 characters
+     reply[16] = 0;                                 // cut off lcd_a
+     top->lcd_b = strtol(reply, NULL, 16);          // lcd_b are the first 16 characters
+  }
 
   fpga->redraw();
     	
@@ -94,7 +103,7 @@ int SWI::handle(int event) {
 	// the higher nibble is 0100
 	// the lower nibble consists of 3 bits for bit position
 	// and the least significant bit is the value to be assigned to that position
-	send_and_set("0100" + std::bitset<3>(id).to_string() + (state?"1":"0") + "\n");
+	set_led_seg( send_and_rec("0100" + std::bitset<3>(id).to_string() + (state?"1":"0") + "\n", 4) );
 	// this call also updates LED and SEG
 		
        fpga->redraw();

@@ -83,7 +83,7 @@ Clock::Clock(int x, int y) : Fl_Spinner(x, y, CLOCK_PERIOD_WIDTH, 25) {
         type(1);
         labelsize(LABEL_SIZE);
         minimum(0.5);
-        maximum(3.0);
+        maximum(2.0);
         step(0.5);
 	value(3.0);
         textsize(18);

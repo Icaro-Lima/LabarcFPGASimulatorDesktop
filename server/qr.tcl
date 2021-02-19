@@ -119,11 +119,15 @@ proc IncomingData {sock} {
 # $line may be a command to change SWI or a command to read LED
 # however, a command to change SWI also reads LED
          get_data $line
+	 if { [string range $line 0 3] == "0011"} then {
+            puts $sock "[get_data "00111110"][get_data "00111101"][get_data "00111100"][get_data "00111011"][get_data "00111010"][get_data "00111001"][get_data "00111000"][get_data "00110111"][get_data "00110110"][get_data "00110101"][get_data "00110100"][get_data "00110011"][get_data "00110010"][get_data "00110001"][get_data "00110000"][get_data "00000000"]"
+         } else {
 # Send the vJTAG Commands to Update the LED and SEG
 # the data returned are always for the command of the previous call 
-	 set led [get_data "00100001"]
-	 set seg [get_data "00000000"]
-         puts $sock $seg$led
+	    set led [get_data "00100001"]
+	    set seg [get_data "00000000"]
+            puts $sock $seg$led
+         }
       }
   }
 }
