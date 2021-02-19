@@ -1,6 +1,7 @@
 *.*
 !*.cpp
 !*.sv
+!*.tcl
 !*.h
 !Makefile
 !*.png
