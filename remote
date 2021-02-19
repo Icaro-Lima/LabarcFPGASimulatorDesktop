@@ -17,10 +17,12 @@ p=$( ps x | grep "ssh " | grep $port: | cut -b-7 )
 # establish the tunnel
 ssh -p23456 -L$port:$1:$port labarc01@lad.dsc.ufcg.edu.br -N &
 ssh_pid=$!
+sleep 0.3
+# experimentallly determined minimum delay for tunnel to get established
 
 ./remote.bin $port      # make first attempt to start the GUI
 if [ $? -eq 8 ]; then   # if GUI exits with Connection refused exception
-   sleep 2              # delay for tunnel to get established
+   sleep 2              # additional delay for tunnel to get established
    ./remote.bin $port   # make second attempt start the GUI
 
    if [ $? -ge 8 ]; then    # again an exception
