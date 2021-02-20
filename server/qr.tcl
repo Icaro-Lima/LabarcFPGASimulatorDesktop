@@ -71,12 +71,14 @@ proc get_data {send_data} {
 
 proc Start_Server {fpga} {
    set port [expr 2540 + $fpga]
+   puts stderr "Info: Starting JTAG server"
    set s [socket -server ConnAccept $port]
    puts "Info: Running Socket Server on port $port"
    set h [info hostname]
    set f [expr [string first "." $h] - 1]
-   puts stderr "<h4>Agora digite: ./remote [string range $h 0 $f] $fpga</h4>"
-   flush stderr   
+   puts stderr "   "
+   puts stderr "Agora digite: ./remote [string range $h 0 $f] $fpga"
+   flush stderr
    vwait forever
 }
 
