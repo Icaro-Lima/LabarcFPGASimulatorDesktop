@@ -16,7 +16,7 @@ if( isset($_GET["dir"]) )
    $a = "data: <br>falha - síntese não iniciou\n";
 }
 //echo the new number
-echo "retry: 1000\n". $a ."data: <br>\n\n";
+echo "retry: 500\n". $a ."data: <br>\n\n";
 ob_flush();
 ?>
 
