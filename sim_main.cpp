@@ -126,7 +126,7 @@ void hexval::draw() {
 }
 
 int main(int argc, char** argv, char** env) {
-    init_gui(argc,argv);
+    init_gui(argc,argv, (char *)"Labarc FPGA Simulator");
 
     Verilated::commandArgs(argc, argv);   // Remember args
 

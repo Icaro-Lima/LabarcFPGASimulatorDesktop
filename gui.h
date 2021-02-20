@@ -150,7 +150,7 @@ private:
 	hexval *hexv; // display for two hexadecimal number of 16 digits each
 };
 
-void init_gui(int, char**);
+void init_gui(int, char**, char *);
 void delete_gui();
 void callback(void*);
 

@@ -202,11 +202,11 @@ const char *mono_fonts[] = { "Noto Mono",
 			     "DejaVu Sans Mono",
 			     "FreeMono", "" };
 
-void init_gui(int argc, char** argv) {
+void init_gui(int argc, char** argv, char *title) {
 	int window_width = FPGA::image->w();
 	int window_height = FPGA::image->h();;
 	window = new Fl_Window(Fl::w() / 2 - window_width / 2, Fl::h() / 2 - window_height / 2,
-                               window_width, window_height, "Labarc FPGA Simulator");
+                               window_width, window_height, title);
 
 	int i=0;
 	do {  // search for an existing mono-space font

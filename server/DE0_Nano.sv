@@ -103,16 +103,8 @@ always_comb begin
    GPIO_1[21] <= 0; // LCD RW wired to GND on connector
 end
 
-vJTAG_interface(.SWI_JTAG(SWI_JTAG), .LED(LED), .SEG(SEG), .lcd_a(lcd_a), .lcd_b(lcd_b),
-     .lcd_pc(lcd_pc), .lcd_instruction(lcd_instruction), .lcd_SrcA(lcd_SrcA), .lcd_SrcB(lcd_SrcB),
-     .lcd_ALUResult(lcd_ALUResult), .lcd_Result(lcd_Result), .lcd_WriteData(lcd_WriteData),
-     .lcd_ReadData(lcd_ReadData), .lcd_MemWrite(lcd_MemWrite), .lcd_Branch(lcd_Branch), 
-     .lcd_MemtoReg(lcd_MemtoReg), .lcd_RegWrite(lcd_RegWrite));
-top (.clk_2(CLOCK_DIV), .SWI(SWI),       .LED(LED), .SEG(SEG), .lcd_a(lcd_a), .lcd_b(lcd_b),
-     .lcd_pc(lcd_pc), .lcd_instruction(lcd_instruction), .lcd_SrcA(lcd_SrcA), .lcd_SrcB(lcd_SrcB),
-     .lcd_ALUResult(lcd_ALUResult), .lcd_Result(lcd_Result), .lcd_WriteData(lcd_WriteData),
-     .lcd_ReadData(lcd_ReadData), .lcd_MemWrite(lcd_MemWrite), .lcd_Branch(lcd_Branch), 
-     .lcd_MemtoReg(lcd_MemtoReg), .lcd_RegWrite(lcd_RegWrite));
+vJTAG_interface(.*);
+top (.clk_2(CLOCK_DIV), .*);
 
 endmodule
 

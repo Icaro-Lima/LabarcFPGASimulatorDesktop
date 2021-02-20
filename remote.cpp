@@ -22,7 +22,7 @@
 struct top_struct
    { unsigned char SWI, LED, SEG,
                    lcd_pc, lcd_SrcA, lcd_SrcB, lcd_ALUResult, lcd_Result,
-                   lcd_ReadData, lcd_WriteData, lcd_registrador[32];
+                   lcd_ReadData, lcd_WriteData, lcd_registrador[NREGS];
      unsigned int lcd_instruction;
      bool lcd_RegWrite, lcd_MemWrite, lcd_MemtoReg, lcd_Branch;
      unsigned long lcd_a, lcd_b; } top_s;
@@ -90,17 +90,29 @@ void set_pc_etc(char *reply) {
     top->lcd_pc          = strtoul(reply, NULL, 16);
 }
 
+void set_regs(char *reply) {
+   for(int i=NREGS-1; i>=0; i--) {
+      top->lcd_registrador[i] = strtoul(reply+2*i, NULL, 16);
+      reply[2*i] = 0;
+   }
+}
+
+void rec_set_lcd() {
+   if(fpga->lcd_check->value()) {
+      if(fpga->riscv_check->value()) {
+         set_pc_etc( send_and_rec("00100010\n", 24) );
+         set_regs( send_and_rec("00000000\n", 32) );
+      } else set_lcd_ab( send_and_rec("00111111\n", 32) );
+  }
+}
+
 // ****** The main action is in this callback ******
 void callback(void*) {
 
   string r;
 
   set_led_seg( send_and_rec("00100000\n", 4) );  // request LED and SEG state
-
-  if(fpga->lcd_check->value()) {
-     if(fpga->riscv_check->value()) set_pc_etc( send_and_rec("00100010\n", 24) );
-     else set_lcd_ab( send_and_rec("00111111\n", 32) );  // get both, lcd_a and lcd_b
-  }
+  rec_set_lcd();
 
   fpga->redraw();
     	
@@ -124,12 +136,9 @@ int SWI::handle(int event) {
 	set_led_seg( send_and_rec("0100" + std::bitset<3>(id).to_string() + (state?"1":"0") + "\n", 4) );
 	// this call also updates LED and SEG
 		
-       if(fpga->lcd_check->value()) {
-          if(fpga->riscv_check->value()) set_pc_etc( send_and_rec("00100010\n", 24) );
-	  else set_lcd_ab( send_and_rec("00111111\n", 32) );  // get both, lcd_a and lcd_b
-       }
+        rec_set_lcd();
 
-       fpga->redraw();
+        fpga->redraw();
     }
     return 1;
 }
@@ -222,17 +231,17 @@ int main(int argc, char** argv, char** env) {
        argc_offset = 2;
     }   
 
-  try
-  {
-    boost::asio::connect(sock, resolver.resolve({host, port}));
-  }
-  catch (std::exception& e)
-  {
-    std::cerr << "Exception: " << e.what() << "\n";
-    exit(8); // exit in case of connection error
-  }
+    try
+    {
+      boost::asio::connect(sock, resolver.resolve({host, port}));
+    }
+    catch (std::exception& e)
+    {
+      std::cerr << "Exception: " << e.what() << "\n";
+      exit(8); // exit in case of connection error
+    }
 
-    init_gui(argc-argc_offset,argv+argc_offset); // dirty argv[0] :-(
+    init_gui(argc-argc_offset,argv+argc_offset, (char *)"Remote FPGA board"); // dirty argv[0] :-(
 
     Fl::run();   // run the graphical interface which calls callback()
 

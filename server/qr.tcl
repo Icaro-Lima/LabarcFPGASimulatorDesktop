@@ -121,7 +121,9 @@ proc IncomingData {sock} {
          get_data $line
 # the data returned are always for the command of the previous call 
 #        if lcd_a and lcd_b are requested
-	 if { [string range $line 0 3] == "0011"} then {
+	 if { [string range $line 0 3] == "0000"} then {           
+            puts $sock "[get_data "00000001"][get_data "00000010"][get_data "00000011"][get_data "00000100"][get_data "00000101"][get_data "00000110"][get_data "00000111"][get_data "00001000"][get_data "00001001"][get_data "00001010"][get_data "00001011"][get_data "00001100"][get_data "00001101"][get_data "00001110"][get_data "00001111"][get_data "00000000"]"
+         } elseif { [string range $line 0 3] == "0011"} then {
             puts $sock "[get_data "00111110"][get_data "00111101"][get_data "00111100"][get_data "00111011"][get_data "00111010"][get_data "00111001"][get_data "00111000"][get_data "00110111"][get_data "00110110"][get_data "00110101"][get_data "00110100"][get_data "00110011"][get_data "00110010"][get_data "00110001"][get_data "00110000"][get_data "00000000"]"
 #              if pc is requested, get also instruction up to flags
          } elseif { [string range $line 0 7] == "00100010" } then {

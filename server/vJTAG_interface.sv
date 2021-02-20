@@ -4,7 +4,7 @@ module vJTAG_interface (
         output logic [7:0] SWI_JTAG,
         input logic [NBITS_TOP-1:0] LED,
         input logic [NBITS_TOP-1:0] SEG,
-        input logic [NBITS_TOP-1:0] jtag_registrador [0:NREGS_TOP-1],
+        input logic [NBITS_TOP-1:0] lcd_registrador [0:NREGS_TOP-1],
         input logic [NBITS_LCD-1:0] lcd_a, lcd_b,
         input logic [NINSTR_BITS-1:0] lcd_instruction,
         input logic [NBITS_TOP-1:0] lcd_pc, lcd_SrcA, lcd_SrcB,
@@ -55,7 +55,7 @@ always_comb
       if (udr)
             tdo <= DR1[0];
       else begin
-              if(dr[7:5]=='b000) tdo <= jtag_registrador[dr][idx];
+              if(dr[7:5]=='b000) tdo <= lcd_registrador[dr][idx];
          else if(dr[7:5]=='b001)
             case(dr[4:0])
                'b00000: tdo <= LED[idx];
