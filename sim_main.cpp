@@ -68,10 +68,12 @@ void SegmentsDisplay::draw() {
 	draw_segments(top->SEG);
 }
 
+void rec_set_lcd() {}  // only needed for remote
+
 void display::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
 
-  if(fpga->lcd_check->value() && fpga->riscv_check->value()) {
+  if(fpga->riscv_check->value()) {
 
      fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD and register window
 
@@ -118,7 +120,7 @@ void display::draw() {
 void hexval::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
 
-  if(fpga->lcd_check->value() && !fpga->riscv_check->value()) {
+  if(fpga->lcd_check->value()) {
      fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD window
 
      lcd_lines((long)top->lcd_a, (long)top->lcd_b);

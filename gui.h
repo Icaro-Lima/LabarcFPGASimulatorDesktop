@@ -96,11 +96,13 @@ private:
 class LCD_check : public Fl_Check_Button {
 public:
 	LCD_check(int x, int y);
+	virtual int handle(int event);
 };
 
 class RISCV_check : public Fl_Check_Button {
 public:
 	RISCV_check(int x, int y);
+	virtual int handle(int event);
 };
 
 class SegmentsDisplay : public Fl_Widget {
@@ -153,6 +155,7 @@ private:
 void init_gui(int, char**, char *);
 void delete_gui();
 void callback(void*);
+void rec_set_lcd();
 
 extern FPGA *fpga;
 

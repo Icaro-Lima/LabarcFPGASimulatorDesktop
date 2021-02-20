@@ -98,12 +98,11 @@ void set_regs(char *reply) {
 }
 
 void rec_set_lcd() {
-   if(fpga->lcd_check->value()) {
-      if(fpga->riscv_check->value()) {
+   if(fpga->lcd_check->value()) set_lcd_ab( send_and_rec("00111111\n", 32) );
+   else if(fpga->riscv_check->value()) {
          set_pc_etc( send_and_rec("00100010\n", 24) );
          set_regs( send_and_rec("00000000\n", 32) );
-      } else set_lcd_ab( send_and_rec("00111111\n", 32) );
-  }
+   }
 }
 
 // ****** The main action is in this callback ******
@@ -157,7 +156,7 @@ void SegmentsDisplay::draw() {
 void display::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
 
-  if(fpga->lcd_check->value() && fpga->riscv_check->value()) {
+  if(fpga->riscv_check->value()) {
      fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD and register window
 
      lcd_labels();
@@ -203,7 +202,7 @@ void display::draw() {
 void hexval::draw() {
   this->window()->make_current();  // needed because draw() will be called from callback
 
-  if(fpga->lcd_check->value() && !fpga->riscv_check->value()) {
+  if(fpga->lcd_check->value()) {
      fl_rectf(x(), y(), w(), h(), FL_WHITE); // clean LCD window
 
      lcd_lines((long)top->lcd_a, (long)top->lcd_b);

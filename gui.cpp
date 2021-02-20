@@ -50,7 +50,7 @@ void FPGA::draw() {
 	leds->redraw();
         clk->redraw();
 	lcd_check->redraw();
-	if(lcd_check->value()) riscv_check->redraw();
+        riscv_check->redraw();
 	disp->redraw();
 	hexv->redraw();
 }
@@ -74,9 +74,29 @@ LCD_check::LCD_check(int x, int y) : Fl_Check_Button(x, y, 20, 20, "LCD") {
         labelsize(LABEL_SIZE);
 }
 
+int LCD_check::handle(int event) {
+	int r = Fl_Check_Button::handle(event);
+	if (event == FL_PUSH)  {
+	   if(value()) fpga->riscv_check->clear();
+	   rec_set_lcd();
+	   fpga->redraw();
+	}
+	return r;
+}
+
 RISCV_check::RISCV_check(int x, int y) : Fl_Check_Button(x, y, 20, 20, "RISC-V") {
 	labelcolor(FL_WHITE);
         labelsize(LABEL_SIZE);
+}
+
+int RISCV_check::handle(int event) {
+	int r = Fl_Check_Button::handle(event);
+	if (event == FL_PUSH) {
+	   if(value()) fpga->lcd_check->clear();
+	   rec_set_lcd();
+	   fpga->redraw();
+	}
+	return r;
 }
 
 Clock::Clock(int x, int y) : Fl_Spinner(x, y, CLOCK_PERIOD_WIDTH, 25) {
