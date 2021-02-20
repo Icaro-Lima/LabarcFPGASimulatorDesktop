@@ -39,7 +39,7 @@ using std::string;
 #define LCD_NCHAR 16
 #define DISPLAY_FONT ((Fl_Font)55)
 #define DISPLAY_FONT_SIZE 13
-#define NREGS 32
+#define NREGS 16 // use reduced register count to optimize remote FPGA response time
 #define NREGS_PER_LINE 4
 #define NREG_LINES (NREGS/NREGS_PER_LINE)
 #define CLOCK 0.25
