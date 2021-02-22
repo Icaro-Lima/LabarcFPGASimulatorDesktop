@@ -1,0 +1,1 @@
+while true ; do nc -l -p 2525 -c ./search_copy_TOP; done

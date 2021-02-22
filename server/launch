@@ -5,15 +5,9 @@
 mkdir syn/tmp.0
 
 while : ; do # infinite loop
-  # look at last tmp directories created
-  for i in {1..10}; do
-     # set d to the i-th last tmp directory
-     d=$(ls -1dt syn/tmp.* | head -$i | tail -1)
-     flock $d ./cond_copy_TOP $d  # lock and conditionally copy
-     r=$?
-     [ $r -eq 1 ] && break;  # found a directory that needs synthesis
-  done;
-  if [ $r -eq 1 ]; then
+  # get a directory to work on
+  while ! d=$(curl -s lad:2525); do sleep 0.1; done
+  if [[ $d = *[![:space:]]* ]]; then
     echo "sintesizing " $d
     cd $d
     if CABLE=$(expr $1 + 1) make > qq.log ; then

@@ -1,7 +1,0 @@
-# is there exactly one file in it ?
-if [ "`ls $1 | wc -w`" == "1" ]; then
-  cp /labarc/TOP/[^t]* $1
-  exit 1
-else
-  exit 0
-fi   

@@ -1,0 +1,16 @@
+# only one instance of this process is allowed to run at any given time
+# look at last tmp directories created
+for i in {1..10}; do
+   r=0  # prepare to break from loop with result "not found"
+   # set d to the i-th last tmp directory
+   d=$(ls -1dt syn/tmp.* | head -$i | tail -1)
+   # is there exactly one file in it ?
+   if [ "`ls -1 $d | wc -w`" == "1" ]; then
+     cp /labarc/TOP/* $d
+     # there is no file named top.sv in lad:/labarc/TOP
+     r=1  # result "found"
+     break
+   fi
+done
+echo -e "HTTP/1.1 200 OK\n"
+[ $r -eq 1 ] && echo $d; # found a directory that needs synthesis
