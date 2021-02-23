@@ -4,7 +4,7 @@
 if [ $# -ne 2 ]; then
   echo "Usage: $0 host FPGA"
   echo "  host is the name of a computer located in LAD"
-  echi "  FPGA is the number of the FPGA connected to this computer"
+  echo "  FPGA is the number of the FPGA connected to this computer"
   exit
 fi
 # calculate the socket port from the FPGA number

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Upload your files</title>
+  <title>remote FPGA</title>
 </head>
 <body>
   <form enctype="multipart/form-data" action="sintese.php" method="POST">
