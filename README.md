@@ -187,18 +187,18 @@ Existe uma issue na biblioteca fltk no macOS Mojave, em que o simulador fica com
 OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote disponível no Homebrew com o fix dessa issue.
 
 ## Utilização
-**Para simular**, vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
+**Para simular**, vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar `make`.
 
 A direita dos LED na interface gráfica do simulador é possível ajustar o período do sinal `clk_2`.
 
 **Para usar uma placa FPGA remotamente**, é preciso rodar o simulador antes.
 Navegue para http://lad.dsc.ufcg.edu.br/hdl/sintese.php
 e faça upload do arquivo `top.sv`. No final da síntese deve aparecer uma instrução que
-pede dar o comando './remote' com dois argumentos. Este comando deve ser dado dentro da pasta
+pede dar o comando `./remote` com dois argumentos. Este comando deve ser dado dentro da pasta
 `LabarcFPGASimulatorDesktop`. Uma janela igual à janela do simulador aparece.
 
 A direita dos LED na interface gráfica do simulador é possível ajustar o período de atualização
-da interface gráfica com relação ao que está aparecendo na placa FPGA de fato.
+da interface gráfica com relação ao que está aparecendo na placa FPGA.
 
 Feche a janela para encerrar o uso da placa FPGA. Uma linha `________pronto________`
 aparece no navegador para indicar que o arquivo `top.sv` pode ser editado novamente, submetido
