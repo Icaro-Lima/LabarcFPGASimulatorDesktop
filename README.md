@@ -7,10 +7,12 @@
 Recomenda-se a instalação desta fonte tipográfica:
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
 
-Antes de poder usar uma placa FPGA remotamente, você precisa enviar seu arquivo '.ssh/id_rsa.pub'
+Antes de poder usar uma placa FPGA remotamente, você precisa enviar o contéudo do seu arquivo `~/.ssh/id_rsa.pub`
 para o professor.
 Se você não tiver este arquivo no seu computador, segue as instruções no primeiro
 quadro rosa no link http://www.linuxproblem.org/art_9.html
+
+Para poder imprimir o arquivo, dê o comando `cat ~/.ssh/id_rsa.pub`
 
 ### Ubuntu 18.04 ou acima
 
@@ -187,16 +189,22 @@ Existe uma issue na biblioteca fltk no macOS Mojave, em que o simulador fica com
 OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote disponível no Homebrew com o fix dessa issue.
 
 ## Utilização
-Para simular, vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar 'make'.
+**Para simular**, vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar `make`.
 
-Para usar uma placa FPGA remotamente, é preciso rodar o simulador antes.
+A direita dos LED na interface gráfica do simulador é possível ajustar o período do sinal `clk_2`.
+
+**Para usar uma placa FPGA remotamente**, é preciso rodar o simulador antes.
 Navegue para http://lad.dsc.ufcg.edu.br/hdl/sintese.php
 e faça upload do arquivo `top.sv`. No final da síntese deve aparecer uma instrução que
-pede dar o comando './remote' com dois argumentos. Este comando deve ser dado dentro da pasta
+pede dar o comando `./remote` com dois argumentos. Este comando deve ser dado dentro da pasta
 `LabarcFPGASimulatorDesktop`. Uma janela igual à janela do simulador aparece.
+
+A direita dos LED na interface gráfica do simulador é possível ajustar o período de atualização
+da interface gráfica com relação ao que está aparecendo na placa FPGA.
+
 Feche a janela para encerrar o uso da placa FPGA. Uma linha `________pronto________`
 aparece no navegador para indicar que o arquivo `top.sv` pode ser editado novamente, submetido
-a uuma nova simulação, e uploadeado novamente.
+a uma nova simulação, e uploadeado novamente.
 
 #### Vídeo mostrando o passo a passo
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
