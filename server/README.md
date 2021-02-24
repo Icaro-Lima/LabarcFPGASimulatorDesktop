@@ -8,6 +8,7 @@ lad:/var/www/html/hdl  (HTTP server)
 
 lad:/labarc/TOP  (this directory gets copied to user server home)
    DE0_Nano.sv
+   DE0_SOC.sv
    Makefile
 
 /labarc/util  (computer connected to FPGA board)

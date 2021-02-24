@@ -67,11 +67,13 @@ logic [7:0] SWI_JTAG; // chaves pretas pelo JTAG
 `ifdef SWIJTAG
 always_comb SWI <= SWI_JTAG;
 `else
-always_comb SWI <= {GPIO_0[4],GPIO_0[6],GPIO_0[8],GPIO_0[5],GPIO_0[21],GPIO_0[23],GPIO_0[29],GPIO_0[18]};
+always_comb SWI <= {GPIO_0[ 4],GPIO_0[ 6],GPIO_0[ 8],GPIO_0[ 5],
+	            GPIO_0[21],GPIO_0[23],GPIO_0[29],GPIO_0[18]};
 `endif
 
 logic [7:0] SEG; // display de 7 segmentos com ponto
-always_comb {GPIO_0[27],GPIO_0[3],GPIO_0[1],GPIO_0[0],GPIO_0[2],GPIO_0[25],GPIO_0[31],GPIO_0[33]} <= SEG;
+always_comb {GPIO_0[27],GPIO_0[ 3],GPIO_0[ 1],GPIO_0[ 0],
+	     GPIO_0[ 2],GPIO_0[25],GPIO_0[31],GPIO_0[33]} <= SEG;
 
 // clock lento 
 parameter divide_by=100000000;  // divisor de clock, igual ao arquivo .sdc
