@@ -75,8 +75,9 @@ proc Start_Server {fpga} {
    set s [socket -server ConnAccept $port]
    puts "Info: Running Socket Server on port $port"
    set h [info hostname]
-   set f [expr [string first "." $h] - 1]
-   puts stderr "<h4>Agora digite: ./remote [string range $h 0 $f] $fpga</h4>"
+   set f [string first "." $h]
+   if { $f != -1 } { set h [string range $h 0 [expr $f - 1] ] }
+   puts stderr "<h4>Agora digite: ./remote $h $fpga</h4>"
    flush stderr
    vwait forever
 }

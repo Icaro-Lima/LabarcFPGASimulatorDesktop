@@ -14,6 +14,9 @@ quadro rosa no link http://www.linuxproblem.org/art_9.html
 
 Para poder imprimir o arquivo, dê o comando `cat ~/.ssh/id_rsa.pub`
 
+Em alguns gerenciadores de arquivo, a pasta `.ssh` não aparece.
+Em alguns destes, apertar as teclas `Ctrl+h` faz a pasta aparecer.
+
 ### Ubuntu 18.04 ou acima
 
 Execute o seguinte, no terminal:
