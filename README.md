@@ -10,12 +10,10 @@ Work inspired from https://fpga-vision-lab.h-brs.de/weblab/login
 Recomenda-se a instalação desta fonte tipográfica:
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
 
-Antes de poder usar uma placa FPGA remotamente, você precisa enviar o contéudo do seu arquivo `~/.ssh/id_rsa.pub`
-para o professor.
+Antes de poder usar uma placa FPGA remotamente, você precisa fazer upload do seu arquivo `~/.ssh/id_rsa.pub`
+aqui: http://lad.dsc.ufcg.edu.br/hdl/id.php
 Se você não tiver este arquivo no seu computador, segue as instruções no primeiro
 quadro rosa no link http://www.linuxproblem.org/art_9.html
-
-Para poder imprimir o arquivo, dê o comando `cat ~/.ssh/id_rsa.pub`
 
 Em alguns gerenciadores de arquivo, a pasta `.ssh` não aparece.
 Em alguns destes, apertar as teclas `Ctrl+h` faz a pasta aparecer.
