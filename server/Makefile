@@ -28,7 +28,8 @@ else
   FLTK=-LDFLAGS "$(LFLTK)"
 endif
 
-HDL_SIM=top.sv /labarc/util/inst_sim.sv /labarc/util/memo_sim.sv
+UTIL=/labarc/util
+HDL_SIM=top.sv $(UTIL)/inst_sim.sv $(UTIL)/memo_sim.sv
 WARN=-Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-COMBDLY
 TMP=/tmp${subst $(HOME),,${PWD}}
 CUR=${PWD}
@@ -53,13 +54,13 @@ default:
 
 sim: inst.objdump
 	mkdir -p $(TMP)/obj
-	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv $(HDL_SIM) /labarc/util/sim_main.cpp /labarc/util/gui.o $(FLTK)
+	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv -y $(UTIL)/sim $(HDL_SIM) $(UTIL)/sim_main.cpp $(UTIL)/gui.o $(FLTK)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
 	$(TMP)/obj/Vtop
 
 # from assembly to object dump
 .s.objdump :
-	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -T/labarc/util/link.ld $< && \
+	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -T$(UTIL)/link.ld $< && \
 	riscv32-unknown-elf-objdump -s -j .text | egrep " [0-9a-f]{4} [0-9a-f]{8}" | cut -b7-41 > $@
 
 # from C to assembly

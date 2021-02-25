@@ -10,7 +10,7 @@ They are stored here only for reference.
 /labarc/TOP  (this directory gets copied to a directory in /home/labarc01)
    DE0_Nano.sv
    DE0_SOC.sv
-   Makefile
+   Makefile      and also .qpf .qsf .sdc
 ```
 #### NFS clients and JTAG servers where FPGA boards are connected
 ```
@@ -52,10 +52,12 @@ and then returns the directory name to the `launch` command.
 When a `launch` command obtains a diretory name, it performs synthesis,
 configures its FPGA board, and starts a JTAG server using `qr.tcl`.
 Output messages are put into a log file which is periodically being read
-by the user's browser. A command called `remote` that allows the user to connect
-to the JTAG server is informed.
+by the user's browser. A command called `remote` that allows the user
+to connect to the JTAG server is informed.
 
-However, this command `remote` needs to create a ssh tunnel through the SSH server
+See parent direcotry for the `remote` command.
+
+However, the command `remote` needs to create a ssh tunnel through the SSH server
 to the JTAG server.
 For this purpose, the user's `~/.ssh/id_rsa.pub` key needs to be listed in
 the `authorized_keys` file of the SSH server.
