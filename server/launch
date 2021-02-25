@@ -6,7 +6,7 @@ mkdir syn/tmp.0
 
 while : ; do # infinite loop
   # get a directory to work on
-  while ! d=$(curl -s lad:2525); do sleep 0.1; done
+  while ! d=$(curl -s lad:2525); do sleep 1; done
   if [[ $d = *[![:space:]]* ]]; then
     echo "sintesizing " $d
     cd $d
