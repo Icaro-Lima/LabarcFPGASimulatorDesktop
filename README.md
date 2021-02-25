@@ -1,5 +1,8 @@
-# LabarcFPGASimulatorDesktop
+# Labarc FPGA Simulator and Remote LAB
 ![Alt text](MainWindow.png?raw=true "Main Window")
+
+Work inspired from https://fpga-vision-lab.h-brs.de/weblab/login
+
 ## Instalação
 
 ### Para todos os sistemas operacionais
