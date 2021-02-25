@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>remote FPGA</title>
+  <title>Upload your files</title>
 </head>
 <body>
   <form enctype="multipart/form-data" action="sintese.php" method="POST">
-    <p>First simulate, then upload Your top.sv</p>
-    <input type="file" name="uploaded_file"></input><br />
-    <br>
+    <p>Primeiro simule, depois faça upload do seu arquivo top.sv</p>
+    <p>Para ganhar centavos, você precisa colocar seu nome na primeira linha do top.sv
+       <b>igualzinho</b> como ele consta no Controle Academico.
+       No início da linha, você precisa marcar a mesma como comentário.
+       Entre o marcador de comentário e seu nome deve ter exatamente 1 espaço.</p>
+    <p> Na segunda linha, em comentário, deve constar o nome do exercício ou do circuito.</p>
+    <input type="file" name="uploaded_file"></input>
+    <br style="line-height:180%">
     <input type="submit" value="Upload"></input>
   </form>
 <?PHP
