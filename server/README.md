@@ -1,29 +1,64 @@
 These are the server files that allow using FPGA board remotely.
 They are stored here only for reference.
 
+#### HTTP+NFS+MUTEX+SSH server
 ```
-lad:/var/www/html/hdl  (HTTP server)
+/var/www/html/hdl
    sintese.php
    send_sse.php
 
-lad:/labarc/TOP  (this directory gets copied to user server home)
+/labarc/TOP  (this directory gets copied to user server home)
    DE0_Nano.sv
    DE0_SOC.sv
    Makefile
-
-/labarc/util  (computer connected to FPGA board)
+```
+#### HTTP+NFS clients and JTAG servers where FPGA boards are connected
+```
+/labarc/util
    vJTAG_interface.sv
    qr.tcl
-
-~labarc01   (user server home)
+```
+#### NFS mounted /home/labarc01
+```
    launch.sh
    launch
    search_copy_TOP
    search_copy_TOP_server
 ```
+### How it works
 
-The file launch.sh has the commands needed to run launch,
-which runs on the computer connected to FPGA board
-The same procedure is used for search_copy_TOP_server,
-however, this command runs on the NFS server (in our case same as HTTP server)
+HTTP server, NFS server, MUTEX server, and SSH server are running on the same computer.
+The /home directory is shared with other computers via NFS.
+The MUTEX server process `search_copy_TOP_server` is running
+from the labarc01 account.
+The HTTP server has write access to /home/labarc01.
 
+When the user clicks `Upload`, 
+the HTTP server creates a new directory in /home/labarc01 and
+puts the uploaded Systemverilog file `top.sv` into it.
+The HTTP server has no FPGA board connected to it.
+
+FPGA boards are connected to several computers which are all NFS clients.
+There is a `launch` command running, one for each FPGA board connected.
+The `launch` commands are started according to `labarc.sh`.
+Periodically, the `launch` command tries to connect to the MUTEX server.
+
+The MUTEX server allows only one connection at a time.
+The MUTEX server executes the comamnd `search_copy_TOP` which looks for a
+directory where there is exactly one file in it.
+If it finds such a directory, it copies files from `/labarc/TOP` into it
+and then returns the directory name to the `launch` command.
+
+When a `launch` command obtains a diretory name, it performs synthesis,
+configures its FPGA board, and starts a JTAG server.
+Output messages are put into a log file which is periodically being read
+by the user's browser. A command called `remote` that allows the user to connect
+to the JTAG server is informed.
+
+However, this command `remote` needs to create a ssh tunnel through the SSH server
+to the JTAG server.
+For this purpose, the user's `~/.ssh/id_rsa.pub` key needs to be listed in
+the `authorized_keys` file of the SSH server.
+
+The command `remote` calls `remote.bin` which is compiled from `remote.cpp`
+and uses the same GUI as the simulation to interact with the JTAG server.
