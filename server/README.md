@@ -12,7 +12,7 @@ They are stored here only for reference.
    DE0_SOC.sv
    Makefile
 ```
-#### HTTP+NFS clients and JTAG servers where FPGA boards are connected
+#### NFS clients and JTAG servers where FPGA boards are connected
 ```
 /labarc/util
    vJTAG_interface.sv
