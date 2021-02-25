@@ -7,7 +7,7 @@ They are stored here only for reference.
    sintese.php
    send_sse.php
 
-/labarc/TOP  (this directory gets copied to user server home)
+/labarc/TOP  (this directory gets copied to a directory in /home/labarc01)
    DE0_Nano.sv
    DE0_SOC.sv
    Makefile
@@ -50,7 +50,7 @@ If it finds such a directory, it copies files from `/labarc/TOP` into it
 and then returns the directory name to the `launch` command.
 
 When a `launch` command obtains a diretory name, it performs synthesis,
-configures its FPGA board, and starts a JTAG server.
+configures its FPGA board, and starts a JTAG server using `qr.tcl`.
 Output messages are put into a log file which is periodically being read
 by the user's browser. A command called `remote` that allows the user to connect
 to the JTAG server is informed.
