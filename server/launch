@@ -2,7 +2,7 @@
 # argument: cable number starting at 0
 
 # make sure there is at least one tmp directory so ls will not fail
-mkdir syn/tmp.0
+mkdir -p syn/tmp.0
 
 while : ; do # infinite loop
   # get a directory to work on
