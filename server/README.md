@@ -1,4 +1,4 @@
-These are the server files that allow using FPGA board remotely.
+These are the server files that allow using FPGA boards remotely.
 They are stored here only for reference.
 
 #### HTTP+NFS+MUTEX+SSH server
@@ -6,8 +6,9 @@ They are stored here only for reference.
 /var/www/html/hdl
    sintese.php
    send_sse.php
+   id.php
 
-/labarc/TOP  (this directory gets copied to a directory in /home/labarc01)
+/labarc/TOP  (this files get copied to a directory in /home/labarc01)
    DE0_Nano.sv
    DE0_SOC.sv
    Makefile      and also .qpf .qsf .sdc
@@ -18,7 +19,7 @@ They are stored here only for reference.
    vJTAG_interface.sv
    qr.tcl
 ```
-#### NFS mounted /home/labarc01
+#### NFS mounted /home/labarc01 in server and clients
 ```
    launch.sh
    launch
@@ -28,23 +29,23 @@ They are stored here only for reference.
 ### How it works
 
 HTTP server, NFS server, MUTEX server, and SSH server are running on the same computer.
-The /home directory is shared with other computers via NFS.
+The /home directory is shared via NFS.
 The MUTEX server process `search_copy_TOP_server` is running
 from the labarc01 account.
 The HTTP server has write access to /home/labarc01.
 
-When the user clicks `Upload`, 
+When the user clicks `Upload` in `/var/www/html/hdl/sintese.php`,
 the HTTP server creates a new directory in /home/labarc01 and
 puts the uploaded Systemverilog file `top.sv` into it.
 The HTTP server has no FPGA board connected to it.
 
 FPGA boards are connected to several computers which are all NFS clients.
-There is a `launch` command running, one for each FPGA board connected.
-The `launch` commands are started according to `labarc.sh`.
+There is a `launch` command running, one for each FPGA board.
+The `launch` commands are started by user labarc01 according to `labarc.sh`.
 Periodically, the `launch` command tries to connect to the MUTEX server.
 
 The MUTEX server allows only one connection at a time.
-The MUTEX server executes the comamnd `search_copy_TOP` which looks for a
+The MUTEX server executes the comamnd `search_copy_TOP`, which looks for a
 directory where there is exactly one file in it.
 If it finds such a directory, it copies files from `/labarc/TOP` into it
 and then returns the directory name to the `launch` command.
@@ -55,7 +56,7 @@ Output messages are put into a log file which is periodically being read
 by the user's browser. A command called `remote` that allows the user
 to connect to the JTAG server is informed.
 
-See parent direcotry for the `remote` command.
+See parent directory for the `remote` command.
 
 However, the command `remote` needs to create a ssh tunnel through the SSH server
 to the JTAG server.
