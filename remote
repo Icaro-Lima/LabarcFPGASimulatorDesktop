@@ -15,9 +15,9 @@ p=$( ps x | grep "ssh " | grep $port: | cut -b-7 )
 [[ ! -z "$p" ]] && kill -9 $p && sleep 1
 
 # establish the tunnel
-ssh -p23456 -L$port:$1:$port labarc01@lad.dsc.ufcg.edu.br -N &
+ssh -oStrictHostKeyChecking=no -p23456 -L$port:$1:$port labarc01@lad.dsc.ufcg.edu.br -N &
 ssh_pid=$!
-sleep 0.4
+sleep 0.5
 # experimentallly determined minimum delay for tunnel to get established
 
 ./remote.bin $port      # make first attempt to start the GUI

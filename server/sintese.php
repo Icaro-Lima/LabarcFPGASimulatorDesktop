@@ -6,11 +6,10 @@
 <body>
   <form enctype="multipart/form-data" action="sintese.php" method="POST">
     <p>Primeiro simule, depois faça upload do seu arquivo top.sv</p>
-    <p>Para ganhar centavos, você precisa colocar seu nome na primeira linha do top.sv
-       <b>igualzinho</b> como ele consta no Controle Academico.
-       No início da linha, você precisa marcar a mesma como comentário.
-       Entre o marcador de comentário e seu nome deve ter exatamente 1 espaço.</p>
-    <p> Na segunda linha, em comentário, deve constar o nome do exercício ou do circuito.</p>
+    <p>Para ganhar centavos, você precisa colocar seu nome na primeira linha do top.sv<br>
+       No início da linha, você precisa marcar a mesma como comentário.</p>
+    <p>Na segunda linha, em comentário, deve constar o nome do exercício ou do circuito.<br>
+      Se quiser, pode colocar sua matrícula na segunda linha, mas não na primeira linha.</p>
     <input type="file" name="uploaded_file"></input>
     <br style="line-height:180%">
     <input type="submit" value="Upload"></input>
