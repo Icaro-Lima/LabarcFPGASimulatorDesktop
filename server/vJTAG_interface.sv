@@ -55,23 +55,41 @@ always_comb
       if (udr)
             tdo <= DR1[0];
       else begin
+/* dr   7   6   5   4   3   2   1   0     dr bit position
+ ---------------------------------------------------------------------------------------
+        0   0   0   register number       read RISC-V register
+        0   0   1   0   0   0   0   0     read LED
+        0   0   1   0   0   0   0   1     read SEG
+        0   0   1   0   0   0   1   1     read RISC-V pc
+        0   0   1   0   0   1   byte      read one byte of RISC-V instruction (4 bytes)
+        0   0   1   0   1   0   0   0     read RISV-V SrcA bus
+        0   0   1   0   1   0   0   1     read RISV-V SrcB bus
+        0   0   1   0   1   0   1   0     read RISV-V ALUResult bus
+        0   0   1   0   1   0   1   1     read RISV-V Result bus
+        0   0   1   0   1   1   0   0     read RISV-V WriteData bus
+        0   0   1   0   1   1   0   1     read RISV-V ReadData bus
+        0   0   1   0   1   1   1   0     read RISV-V flags (RegWrite,MemtoReg,Branch,MemWrite)
+        0   0   1   1   0   byte nr.      read one byte of 1st LCD display line (8 bytes)
+        0   0   1   1   1   byte nr.      read one byte of 2nd LCD display line (8 bytes)
+	0   1   0   0 SWI position value  set SWI position to value, read LED  
+*/
               if(dr[7:5]=='b000) tdo <= lcd_registrador[dr][idx];
          else if(dr[7:5]=='b001)
             case(dr[4:0])
                'b00000: tdo <= LED[idx];
                'b00001: tdo <= SEG[idx];
-               'b00010: tdo <= lcd_pc[idx];
-               'b00011: tdo <= lcd_instruction[idx];
-               'b00100: tdo <= lcd_instruction[idx+8];
-               'b00101: tdo <= lcd_instruction[idx+16];
-               'b00110: tdo <= lcd_instruction[idx+24];
-               'b00111: tdo <= lcd_SrcA[idx];
-               'b01000: tdo <= lcd_SrcB[idx];
-               'b01001: tdo <= lcd_ALUResult[idx];
-               'b01010: tdo <= lcd_Result[idx];
-               'b01011: tdo <= lcd_WriteData[idx];
-               'b01100: tdo <= lcd_ReadData[idx];
-               'b01101: case(idx)
+               'b00011: tdo <= lcd_pc[idx];
+               'b00100: tdo <= lcd_instruction[idx];
+               'b00101: tdo <= lcd_instruction[idx+8];
+               'b00110: tdo <= lcd_instruction[idx+16];
+               'b00111: tdo <= lcd_instruction[idx+24];
+               'b01000: tdo <= lcd_SrcA[idx];
+               'b01001: tdo <= lcd_SrcB[idx];
+               'b01010: tdo <= lcd_ALUResult[idx];
+               'b01011: tdo <= lcd_Result[idx];
+               'b01100: tdo <= lcd_WriteData[idx];
+               'b01101: tdo <= lcd_ReadData[idx];
+               'b01110: case(idx)
                            0: tdo <= lcd_MemWrite;
                            1: tdo <= lcd_Branch;
                            2: tdo <= lcd_MemtoReg;

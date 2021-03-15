@@ -100,7 +100,7 @@ void set_regs(char *reply) {
 void rec_set_lcd() {
    if(fpga->lcd_check->value()) set_lcd_ab( send_and_rec("00111111\n", 32) );
    else if(fpga->riscv_check->value()) {
-         set_pc_etc( send_and_rec("00100010\n", 24) );
+         set_pc_etc( send_and_rec("00100011\n", 24) );
          set_regs( send_and_rec("00000000\n", 32) );
    }
 }
