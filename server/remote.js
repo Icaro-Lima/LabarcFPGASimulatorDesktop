@@ -1,13 +1,30 @@
+let name = "";
+let fpga = "";
+
 function sse_listener(event) {
-   var r = event.data.indexOf("<h4>Agora digite: ./remote ");
-   if( r == -1 ) {
-      //write the received data to the page
-      document.getElementById("serverData").innerHTML = event.data;
-   } else {
-      var name_fpga = event.data.substr(r+27).split(" ");
-      document.getElementById("serverData").innerHTML = name_fpga[0] + name_fpga[1];
+   if(name == "") {
+      var r = event.data.indexOf("<h4>Agora digite: ./remote ");
+      if( r == -1 ) {
+         //write the received data to the page
+         document.getElementById("serverData").innerHTML = event.data;
+      } else {
+         var name_fpga = event.data.substr(r+27).split(" ");
+         document.getElementById("serverData").innerHTML = event.data.substring(0,r)
+                                                + "<h4>Agora pode usar aqui: </h4>";
+         name = name_fpga[0];
+         fpga = name_fpga[1];
+         swi7.onpointerdown = swi7_click;
+         swi6.onpointerdown = swi6_click;
+         swi5.onpointerdown = swi5_click;
+         swi4.onpointerdown = swi4_click;
+         swi3.onpointerdown = swi3_click;
+         swi2.onpointerdown = swi2_click;
+         swi1.onpointerdown = swi1_click;
+         swi0.onpointerdown = swi0_click;
+         setInterval(update, 1000);
+      }
    }
-};
+}
 
 //check for browser support
 if(typeof(EventSource)!=="undefined") {
@@ -64,9 +81,6 @@ let s4 = false;
 let s5 = false;
 let s6 = false;
 let s7 = false;
-
-let name = "leia";
-let fpga = "0";
 
 function swi7_click(event) {
   s7 = !s7;
@@ -140,20 +154,10 @@ function swi0_click(event) {
   oReq.send();
 }
 
-swi7.onpointerdown = swi7_click;
-swi6.onpointerdown = swi6_click;
-swi5.onpointerdown = swi5_click;
-swi4.onpointerdown = swi4_click;
-swi3.onpointerdown = swi3_click;
-swi2.onpointerdown = swi2_click;
-swi1.onpointerdown = swi1_click;
-swi0.onpointerdown = swi0_click;
-
 function update() {
   oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
 	           + name + "&fpga=" + fpga + "&data=00100000" );
   oReq.send();
 }
 
-let si = setInterval(update, 1000);
 
