@@ -19,7 +19,7 @@
      !empty($_FILES['uploaded_file']['name']) &&
      !empty($_FILES['uploaded_file']['tmp_name']) )
   {
-    $path = "uploads";
+    $path = trim(shell_exec("mktemp -d -p /home/labarc01/syn 2>&1"));
     $file = $path . "/" . basename( $_FILES['uploaded_file']['name']);
     exec("chmod g+rwx ". $path, $o, $chp);
     if( $chp != 0 ) {

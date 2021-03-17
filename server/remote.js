@@ -22,6 +22,7 @@ function sse_listener(event) {
          swi1.onpointerdown = swi1_click;
          swi0.onpointerdown = swi0_click;
          setInterval(update, 1000);
+         window.onbeforeunload = exit_fpga;
       }
    }
 }
@@ -160,4 +161,9 @@ function update() {
   oReq.send();
 }
 
+function exit_fpga(event) {
+  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
+	           + name + "&fpga=" + fpga + "&data=exit" );
+  oReq.send();
+}
 
