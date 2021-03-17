@@ -77,7 +77,7 @@ proc Start_Server {fpga} {
    set h [info hostname]
    set f [string first "." $h]
    if { $f != -1 } { set h [string range $h 0 [expr $f - 1] ] }
-   puts stderr "<h4>Agora digite: ./remote $h $fpga</h4>"
+   puts stderr "<h4>Agora digite: ./remote $h $fpga </h4>"
    flush stderr
    vwait forever
 }

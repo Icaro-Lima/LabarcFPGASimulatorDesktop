@@ -34,6 +34,27 @@
           } else {
              echo "The file ". basename( $_FILES['uploaded_file']['name'])
                   ." has been uploaded.<br>\n";
+             echo "
+<div id=\"serverData\">Solicitando síntese</div>
+<script type=\"text/javascript\">
+//check for browser support
+if(typeof(EventSource)!==\"undefined\") {
+        //create an object, passing it the name and location of the server side script
+        var eSource = new EventSource(\"send_sse.php?dir=". $path ."\");
+	eSource.onmessage = function(event) {
+                var r = event.data.indexOf(\"<h4>Agora digite: ./remote \");
+                if( r == -1 ) {
+                   //write the received data to the page
+                   document.getElementById(\"serverData\").innerHTML = event.data;
+		} else {
+		   var name_fpga = event.data.substr(r+27).split(\" \");
+		   document.getElementById(\"serverData\").innerHTML = name_fpga[0] + name_fpga[1];
+                }
+	};
+} else document.getElementById(\"serverData\").innerHTML=
+          \"Whoops! Your browser does not receive server-sent events.\";
+</script>
+	\n";
              echo file_get_contents("fpga.html");
 	     echo "<script src=\"remote.js\"></script>\n";
 
