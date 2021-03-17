@@ -1,4 +1,21 @@
-"use strict";
+function sse_listener(event) {
+   var r = event.data.indexOf("<h4>Agora digite: ./remote ");
+   if( r == -1 ) {
+      //write the received data to the page
+      document.getElementById("serverData").innerHTML = event.data;
+   } else {
+      var name_fpga = event.data.substr(r+27).split(" ");
+      document.getElementById("serverData").innerHTML = name_fpga[0] + name_fpga[1];
+   }
+};
+
+//check for browser support
+if(typeof(EventSource)!=="undefined") {
+        //create an object, passing it the name and location of the server side script
+        var eSource = new EventSource("send_sse.php?dir=" + path);
+	eSource.onmessage = sse_listener;
+} else document.getElementById("serverData").innerHTML=
+          "Whoops! Your browser does not receive server-sent events.";
 
 function reqListener() {
   let r = Number("0x" + this.responseText);
@@ -65,7 +82,7 @@ function swi6_click(event) {
   if(s6) swi6.src = "components/switchOn.png";
   else   swi6.src = "components/switchOff.png"; 
   oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100110" + (s7 ? "1" : "0") );
+	           + name + "&fpga=" + fpga + "&data=0100110" + (s6 ? "1" : "0") );
   oReq.send();
 }
 
@@ -74,7 +91,7 @@ function swi5_click(event) {
   if(s5) swi5.src = "components/switchOn.png";
   else   swi5.src = "components/switchOff.png"; 
   oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100101" + (s7 ? "1" : "0") );
+	           + name + "&fpga=" + fpga + "&data=0100101" + (s5 ? "1" : "0") );
   oReq.send();
 }
 
@@ -83,7 +100,7 @@ function swi4_click(event) {
   if(s4) swi4.src = "components/switchOn.png";
   else   swi4.src = "components/switchOff.png"; 
   oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100100" + (s7 ? "1" : "0") );
+	           + name + "&fpga=" + fpga + "&data=0100100" + (s4 ? "1" : "0") );
   oReq.send();
 }
 
@@ -92,7 +109,7 @@ function swi3_click(event) {
   if(s3) swi3.src = "components/switchOn.png";
   else   swi3.src = "components/switchOff.png"; 
   oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100011" + (s7 ? "1" : "0") );
+	           + name + "&fpga=" + fpga + "&data=0100011" + (s3 ? "1" : "0") );
   oReq.send();
 }
 
@@ -101,7 +118,7 @@ function swi2_click(event) {
   if(s2) swi2.src = "components/switchOn.png";
   else   swi2.src = "components/switchOff.png"; 
   oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100010" + (s7 ? "1" : "0") );
+	           + name + "&fpga=" + fpga + "&data=0100010" + (s2 ? "1" : "0") );
   oReq.send();
 }
 
@@ -110,7 +127,7 @@ function swi1_click(event) {
   if(s1) swi1.src = "components/switchOn.png";
   else   swi1.src = "components/switchOff.png"; 
   oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100001" + (s7 ? "1" : "0") );
+	           + name + "&fpga=" + fpga + "&data=0100001" + (s1 ? "1" : "0") );
   oReq.send();
 }
 
@@ -119,7 +136,7 @@ function swi0_click(event) {
   if(s0) swi0.src = "components/switchOn.png";
   else   swi0.src = "components/switchOff.png"; 
   oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100000" + (s7 ? "1" : "0") );
+	           + name + "&fpga=" + fpga + "&data=0100000" + (s0 ? "1" : "0") );
   oReq.send();
 }
 
