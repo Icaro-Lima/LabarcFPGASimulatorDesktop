@@ -10,9 +10,9 @@
        No início da linha, você precisa marcar a mesma como comentário.</p>
     <p>Na segunda linha, em comentário, deve constar o nome do exercício ou do circuito.<br>
       Se quiser, pode colocar sua matrícula na segunda linha, mas não na primeira linha.</p>
-    <input type="file" name="uploaded_file"></input>
+    <input type="file" name="uploaded_file" id=browse></input>
     <br style="line-height:180%">
-    <input type="submit" value="Upload"></input>
+    <input type="submit" value="Upload" id=upload></input>
   </form>
 <?PHP
   if(!empty($_FILES['uploaded_file']) &&
@@ -34,7 +34,7 @@
           } else {
              echo "The file ". basename( $_FILES['uploaded_file']['name'])
                   ." has been uploaded.<br>\n";
-             echo "<div id=\"serverData\">Solicitando síntese</div>\n";
+             echo "<div id=\"serverData\"><h4>Solicitando síntese</h4></div>\n";
              echo file_get_contents("fpga.html");
 	     echo "<script type=\"text/javascript\">\n";
 	     echo "let path = \"". $path ."\";";
