@@ -10,16 +10,6 @@ Work inspired from https://fpga-vision-lab.h-brs.de/weblab/login
 Recomenda-se a instalação desta fonte tipográfica:
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
 
-Antes de poder usar uma placa FPGA remotamente, você precisa fazer upload do seu arquivo `~/.ssh/id_rsa.pub`
-aqui: http://lad.ufcg.edu.br/hdl/id.php
-
-Se você não tiver este arquivo no seu computador, no caso de qualquer distribuição linux, 
-segue as instruções no primeiro quadro rosa no link http://www.linuxproblem.org/art_9.html.
-Para Windows, recomendamos o link https://ubuntu.com/tutorials/ssh-keygen-on-windows.
-
-Em alguns gerenciadores de arquivo, a pasta `.ssh` não aparece.
-Em alguns destes, apertar as teclas `Ctrl+h` faz a pasta aparecer.
-
 ### Ubuntu 18.04 ou acima
 
 Execute o seguinte, no terminal:
@@ -200,17 +190,10 @@ OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote 
 A direita dos LED na interface gráfica do simulador é possível ajustar o período do sinal `clk_2`.
 
 **Para usar uma placa FPGA remotamente**, é preciso rodar o simulador antes.
-Navegue para http://lad.dsc.ufcg.edu.br/hdl/sintese.php
-e faça upload do arquivo `top.sv`. No final da síntese deve aparecer uma instrução que
-pede dar o comando `./remote` com dois argumentos. Este comando deve ser dado dentro da pasta
-`LabarcFPGASimulatorDesktop`. Uma janela igual à janela do simulador aparece.
+Navegue para http://lad.dsc.ufcg.edu.br/hdl/remote.php
+e faça upload do arquivo `top.sv`. No final da síntese um desenho parecido à janela do simulador aparece.
 
-A direita dos LED na interface gráfica do simulador é possível ajustar o período de atualização
-da interface gráfica com relação ao que está aparecendo na placa FPGA.
-
-Feche a janela para encerrar o uso da placa FPGA. Uma linha `________pronto________`
-aparece no navegador para indicar que o arquivo `top.sv` pode ser editado novamente, submetido
-a uma nova simulação, e uploadeado novamente.
+Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-la para outro usuário.
 
 #### Vídeo mostrando o passo a passo
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
