@@ -58,7 +58,7 @@ if(typeof(EventSource)!=="undefined") {
           "Whoops! Your browser does not receive server-sent events.";
 
 function reqListener() {
- if(this.responseText.charCodeAt(0) < 0x40) { // first character is a digit
+ if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   let r = Number("0x" + this.responseText);
   if(r&0x0001) led0.src = "components/ledOn.png";
   else         led0.src = "components/ledOff.png";

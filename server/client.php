@@ -4,14 +4,15 @@
     $host    = $_GET["name"];
     $port    = $_GET["fpga"] + 2540;
     $message = $_GET["data"] . "\n";
+    // Error messages must start with letter 'S'
     // create socket
-    $socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Could not create socket\n");
+    $socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Socket creation failed\n");
     // connect to server
-    $result = socket_connect($socket, $host, $port) or die("Could not connect to server\n");  
+    $result = socket_connect($socket, $host, $port) or die("Server connection failed\n");  
     // send string to server
-    socket_write($socket, $message, strlen($message)) or die("Could not send data to server\n");
+    socket_write($socket, $message, strlen($message)) or die("Sending data failed\n");
     // get server response
-    $result = socket_read ($socket, 4) or die("Could not read server response\n");
+    $result = socket_read ($socket, 4) or die("Server response failed\n");
     echo $result;
     // close socket
     socket_close($socket);
