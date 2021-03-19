@@ -4,11 +4,13 @@ They are stored here only for reference.
 #### HTTP+NFS+MUTEX+SSH server
 ```
 /var/www/html/hdl
-   sintese.php
+   remote.php
+   remote.js
    send_sse.php
-   id.php
+   client.php
+   fpga.html
 
-/labarc/TOP  (this files get copied to a directory in /home/labarc01)
+/labarc/TOP  (this files get copied to a directory in /home/labarc01/syn)
    DE0_Nano.sv
    DE0_SOC.sv
    Makefile      and also .qpf .qsf .sdc
@@ -34,8 +36,8 @@ The MUTEX server process `search_copy_TOP_server` is running
 from the labarc01 account.
 The HTTP server has write access to /home/labarc01.
 
-When the user clicks `Upload` in `/var/www/html/hdl/sintese.php`,
-the HTTP server creates a new directory in /home/labarc01 and
+When the user clicks `Upload` in `remote.php`,
+the HTTP server creates a new directory in /home/labarc01/syn and
 puts the uploaded Systemverilog file `top.sv` into it.
 The HTTP server has no FPGA board connected to it.
 
@@ -46,22 +48,22 @@ Periodically, the `launch` command tries to connect to the MUTEX server.
 
 The MUTEX server allows only one connection at a time.
 The MUTEX server executes the comamnd `search_copy_TOP`, which looks for a
-directory where there is exactly one file in it.
+directory in /home/labarc01/syn which has exactly one file in it.
 If it finds such a directory, it copies files from `/labarc/TOP` into it
 and then returns the directory name to the `launch` command.
 
 When a `launch` command obtains a diretory name, it performs synthesis,
 configures its FPGA board, and starts a JTAG server using `qr.tcl`.
 Output messages are put into a log file which is periodically being read
-by the user's browser. A command called `remote` that allows the user
-to connect to the JTAG server is informed.
+by the user's browser using `send_sse.php`.
+After starting the JTAG server, an output message is sent informing the computer
+name and the FPGA number. The user's browser runs `remote.js` which uses
+this information to make requests to the JTAG server via `client.php`.
+The return values from these requests animate the graphical interface
+of the FPGA board in `fpga.html`.
 
-See parent directory for the `remote` command.
+Closing the browser tab of window os clicking on the `Browse...` or `Upload` button
+sends an exit message to the JTAG server. This makes the FPGA available for
+another run.
+If no such exit message is received, the JTAG server is killed after 5 minutes.
 
-However, the command `remote` needs to create a ssh tunnel through the SSH server
-to the JTAG server.
-For this purpose, the user's `~/.ssh/id_rsa.pub` key needs to be listed in
-the `authorized_keys` file of the SSH server.
-
-The command `remote` calls `remote.bin` which is compiled from `remote.cpp`
-and uses the same GUI as the simulation to interact with the JTAG server.
