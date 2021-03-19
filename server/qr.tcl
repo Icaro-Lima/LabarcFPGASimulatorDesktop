@@ -35,33 +35,13 @@ foreach device_name [get_device_names -hardware_name $usbblaster_name] {
 }
 puts "Info: Select device: $test_device.";
 
-
-# Open device 
-proc openport {} {
-	global usbblaster_name
-        global test_device
-	open_device -hardware_name $usbblaster_name -device_name $test_device
-}
-
-
-# Close device.  Just used if communication error occurs
-proc closeport { } {
-	catch {device_unlock}
-	catch {close_device}
-}
-
 proc get_data {send_data} {
-	openport   
-	device_lock -timeout 10000
-
 	device_virtual_ir_shift -instance_index 0 -ir_value 1 -no_captured_ir_value
 	set tdi [device_virtual_dr_shift -dr_value $send_data -instance_index 0  -length 8]
 	# Set IR back to 0, which is bypass mode
 	device_virtual_ir_shift -instance_index 0 -ir_value 0 -no_captured_ir_value
   
-	closeport
-
-	set tdibin [binary format B8 $tdi]
+	set tdibin [binary format B8 [string range $tdi 6 7][string range $tdi 0 5]]
 	binary scan $tdibin H2 tdihex
 	return $tdihex
 }
@@ -70,6 +50,10 @@ proc get_data {send_data} {
 #Code Dervied from Tcl Developer Exchange – http://www.tcl.tk/about/netserver.html
 
 proc Start_Server {fpga} {
+   global usbblaster_name
+   global test_device
+   open_device -hardware_name $usbblaster_name -device_name $test_device
+
    set port [expr 2540 + $fpga]
    puts stderr "Info: Starting JTAG server"
    set s [socket -server ConnAccept $port]
@@ -108,16 +92,22 @@ proc IncomingData {sock} {
 # Check end of file or abnormal connection drop,
 # then write the data to the vJTAG
 
-   if {[eof $sock] || [catch {gets $sock line}]} {
+   if {[eof $sock] || [catch {gets $sock line}] || 
+       ( [string length $line] > 0 && [string length $line] < 8 ) } {
+      set end_of_file [eof $sock]
       close $sock
       puts stderr "Info: Close connection from $conn(addr,$sock)"
       flush stderr   
       unset conn(addr,$sock)
-      exit 0
+      if { ! $end_of_file } {
+         catch {close_device}
+         exit 0
+      }
    } else {
 # Before the connection is closed we get an emtpy data transmission. Let’s check for it and trap it
-      set data_len [string length $line]
-      if {$data_len != "0"} then {
+      if { [string length $line] == 8 } then {
+         device_lock -timeout 10000
+
 # $line may be a command to change SWI or a command to read LED
 # however, a command to change SWI also reads LED
          get_data $line
@@ -146,6 +136,8 @@ proc IncomingData {sock} {
 	    set seg [get_data "00000000"]
             puts $sock $seg$led
          }
+
+         catch {device_unlock}
       }
   }
 }
