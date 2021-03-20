@@ -1,16 +1,7 @@
 ##############################################################################################
-############################# vJTAG Socket Interface #########################################
+############################# vJTAG Socket nterface ##########################################
 ##############################################################################################
 
-# The socket recieves as input a string containing 8 binary digits.
-# Each digit is coded as an ASCII character.
-# The socket returns a string containing between 4 and 32 hexadecimal digits.
-# Each digit is coded as an ASCII character.
-# Each pair of digits represent a byte, so between 2 and 16 bytes of information are returned.
-# See table near line 125 for the function performed for each input value,
-# and the meaning of the bytes returned.
-
-# This code is derived from here:
 # http://idlelogiclabs.com/2012/04/15/talking-to-the-de0-nano-using-the-virtual-jtag-interface/
 
 #This portion of the script is derived from some of the examples from Altera
@@ -80,8 +71,6 @@ proc ConnAccept {sock addr port} {
 
 # Record the client’s information
 
-   puts stderr "Info: Accept connection from $addr $port"
-   flush stderr
    set conn(addr,$sock) [list $addr $port]
 
 # Ensure that each "puts" by the server
@@ -105,8 +94,6 @@ proc IncomingData {sock} {
        ( [string length $line] > 0 && [string length $line] < 8 ) } {
       set end_of_file [eof $sock]
       close $sock
-      puts stderr "Info: Close connection from $conn(addr,$sock)"
-      flush stderr   
       unset conn(addr,$sock)
       if { ! $end_of_file } {
          catch {close_device}
