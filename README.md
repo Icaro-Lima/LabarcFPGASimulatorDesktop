@@ -134,7 +134,7 @@ sudo dpkg -i verilator_3.906-1_amd64.deb
 6. Execute os seguintes comandos no terminal:
 ```
 sudo apt-get update
-sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev git
+sudo apt-get install libfltk1.3-dev make g++ libpng-dev zlib1g-dev git libboost-all-dev
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 ```
 
