@@ -15,6 +15,26 @@
     <input type="submit" value="Upload" id=upload></input>
   </form>
 <?PHP
+  // Function to get the client IP address
+  function get_client_ip() {
+    $ipaddress = '';
+    if (getenv('HTTP_CLIENT_IP'))
+        $ipaddress = getenv('HTTP_CLIENT_IP');
+    else if(getenv('HTTP_X_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+    else if(getenv('HTTP_X_FORWARDED'))
+        $ipaddress = getenv('HTTP_X_FORWARDED');
+    else if(getenv('HTTP_FORWARDED_FOR'))
+        $ipaddress = getenv('HTTP_FORWARDED_FOR');
+    else if(getenv('HTTP_FORWARDED'))
+       $ipaddress = getenv('HTTP_FORWARDED');
+    else if(getenv('REMOTE_ADDR'))
+        $ipaddress = getenv('REMOTE_ADDR');
+    else
+        $ipaddress = 'UNKNOWN';
+    return $ipaddress;
+  }
+
   if(!empty($_FILES['uploaded_file']) &&
      !empty($_FILES['uploaded_file']['name']) &&
      !empty($_FILES['uploaded_file']['tmp_name']) )
@@ -31,7 +51,10 @@
           exec("chmod g+r ". $file, $o, $chf);
           if( $chp != 0 || $chf != 0 ) {
               echo "Error changing the file permissions in ". $file;
-          } else {
+	  } else {
+             // Put enough space befire the IP so that even one-digit IPs
+             // can be read grabbing the last 18 characters of the file. 
+             file_put_contents($file, "\n//           " . get_client_ip() . "\n", FILE_APPEND);
              echo "The file ". basename( $_FILES['uploaded_file']['name'])
                   ." has been uploaded.<br>\n";
              echo "<div id=\"serverData\"><h4>Solicitando síntese</h4></div>\n";

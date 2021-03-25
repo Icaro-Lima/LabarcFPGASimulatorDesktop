@@ -47,6 +47,11 @@ proc get_data {send_data} {
 }
 
 
+set svf [open top.sv]
+seek $svf -18 end
+# IP has max 4*(3+1) characters, one for line feed and one for security
+set upload_ip [string trim [read $svf 18]]
+
 #Code Dervied from Tcl Developer Exchange – http://www.tcl.tk/about/netserver.html
 
 proc Start_Server {fpga} {
@@ -86,12 +91,13 @@ proc ConnAccept {sock addr port} {
 
 proc IncomingData {sock} {
    global conn
+   global upload_ip
 
 # Check end of file or abnormal connection drop,
 # then write the data to the vJTAG
 
    if {[eof $sock] || [catch {gets $sock line}] || 
-       ( [string length $line] > 0 && [string length $line] < 8 ) } {
+       ( [string length $line] > 0 && [string index $line 0] == "e" ) } {
       set end_of_file [eof $sock]
       close $sock
       unset conn(addr,$sock)
@@ -101,15 +107,20 @@ proc IncomingData {sock} {
       }
    } else {
 # Before the connection is closed we get an emtpy data transmission. Let’s check for it and trap it
-      if { [string length $line] == 8 } then {
+      if { [string length $line] >= 8 } then {
+         set cmd_ip [split $line]
+         lassign $cmd_ip cmd ip
+         if { $upload_ip != $ip } then {
+            puts stderr "IP mismatch upload=$upload_ip command=$ip $cmd"
+         }
          device_lock -timeout 10000
 
-# $line may be a command to change SWI or a command to read LED
+# $cmd may be a command to change SWI or a command to read LED
 # however, a command to change SWI also reads LED
-         get_data $line
+         get_data $cmd
 # the data returned are always for the command of the previous call
 
-#  $line   # of bytes
+#  $cmd    # of bytes
 #          returned       description
 # -------------------------------------------------------------------
 # 0000xxxx     16      RISC-V registers 0 to 15
@@ -118,12 +129,12 @@ proc IncomingData {sock} {
 # all others    2      LED and SEG
 
 #        if lcd_a and lcd_b are requested
-	 if { [string range $line 0 3] == "0000"} then {           
+	 if { [string range $cmd 0 3] == "0000"} then {           
             puts $sock "[get_data "00000001"][get_data "00000010"][get_data "00000011"][get_data "00000100"][get_data "00000101"][get_data "00000110"][get_data "00000111"][get_data "00001000"][get_data "00001001"][get_data "00001010"][get_data "00001011"][get_data "00001100"][get_data "00001101"][get_data "00001110"][get_data "00001111"][get_data "00000000"]"
-         } elseif { [string range $line 0 3] == "0011"} then {
+         } elseif { [string range $cmd 0 3] == "0011"} then {
             puts $sock "[get_data "00111110"][get_data "00111101"][get_data "00111100"][get_data "00111011"][get_data "00111010"][get_data "00111001"][get_data "00111000"][get_data "00110111"][get_data "00110110"][get_data "00110101"][get_data "00110100"][get_data "00110011"][get_data "00110010"][get_data "00110001"][get_data "00110000"][get_data "00000000"]"
 #              if pc is requested, get also instruction up to flags
-         } elseif { [string range $line 0 7] == "00100011" } then {
+         } elseif { [string range $cmd 0 7] == "00100011" } then {
             puts $sock "[get_data "00100111"][get_data "00100110"][get_data "00100101"][get_data "00100100"][get_data "00101000"][get_data "00101001"][get_data "00101010"][get_data "00101011"][get_data "00101100"][get_data "00101101"][get_data "00101110"][get_data "00000000"]"
          } else {
 # Send the vJTAG Commands to Update the LED and SEG
