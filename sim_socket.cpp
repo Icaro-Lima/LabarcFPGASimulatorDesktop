@@ -1,5 +1,15 @@
+// Labarc FPGA Simulator Socket Server
+// This file is derived from:
+// verilator-3.922/examples/hello_world_c/sim_main.cpp
+// This program is free software; you can
+// redistribute it and/or modify it under the terms of either the GNU
+// Lesser General Public License Version 3 or the Perl Artistic License
+// Version 2.1.
+// Icaro Dantas de Araujo Lima and Elmar Melcher at UFCG, 2021
+
 #include <iostream>
 #include <iomanip>
+#include <string>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
@@ -9,6 +19,7 @@ using std::string;
 using std::cout;
 using std::setfill;
 using std::setw;
+using std::setbase;
 using std::hex;
 using std::endl;
 
@@ -29,11 +40,13 @@ double sc_time_stamp () {       // Called by $time in Verilog
      return main_time;          // converts to double, to match what SystemC does
 }
 
+// service for timer and socket
 io_service io;
+
 boost::posix_time::seconds interval(1);  // 1 second
 deadline_timer timer(io, interval);
 
-void tick(const boost::system::error_code& /*e*/) {
+void tick(const boost::system::error_code& ) {
 
     main_time++;            // Verilator simulation time passes...
 
@@ -53,32 +66,40 @@ void tick(const boost::system::error_code& /*e*/) {
 tcp::socket socket_(io);
 //listener for new connection
 tcp::acceptor *acceptor_;
-boost::asio::streambuf sb;
+// buffer for string received from socket
+boost::asio::streambuf binp;
 
-void send_(tcp::socket & socket, const string& message) {
-    const string msg = message + "\n";
-    write( socket, buffer(message) );
-}
-
-void write_handle(const boost::system::error_code&, size_t);
+void write_handle(const boost::system::error_code&, size_t); // prototype
 
 void read_handle(const boost::system::error_code& err, size_t bytes_transferred)  {
     if (!err) {
-         std::istream is(&sb);
-         std::string line;
-         std::getline(is, line);
-         cout << line << endl;
+         // get command from input stream
+         std::istream is(&binp);
+         char cmd_str[8];
+         is >> cmd_str;
+         char eol;
+         is >> eol;
+	 unsigned short cmd = std::__cxx11::stoi(cmd_str, 0, 2); 
+	 // decode command
+         if ( (cmd & 0xF0) == 0x40) { // set/reset SWI
+            unsigned short p =  1<<((cmd & 0xE)>>1); // bit position
+            if( cmd&1 ) top->SWI |= p;  // set bit at position
+            else        top->SWI &= ~p; // clear bit at position
+            top->eval();  // Evaluate Verilated SystemVerilog model
+         }
          // assemble output string
-         boost::asio::streambuf b;
-         std::ostream sout(&b);
+         boost::asio::streambuf bout;
+         std::ostream sout(&bout);
          sout << std::setfill('0') << std::hex << std::setw(2)
-              << (int)top->SEG << std::setw(2) << (int)top->LED << endl;
+              << (int)top->SEG << std::setw(2) << (int)top->LED << '\r' << endl;
          //write operation
-         async_write(socket_, b, write_handle);
+         async_write(socket_, bout, write_handle);
     } else {
          if (err != error::eof) {
              std::cerr << "read error: " << err.message() << std::endl;
          }
+         // EOF, socket connection was terminated
+         //
          socket_.close();
 
          // Destroy Verilog model
@@ -91,7 +112,8 @@ void read_handle(const boost::system::error_code& err, size_t bytes_transferred)
 
 void write_handle(const boost::system::error_code& err, size_t bytes_transferred) {
     if (!err) {
-       async_read_until(socket_, sb, '\n', read_handle);
+       // next read operation
+       async_read_until(socket_, binp, '\n', read_handle);
     } else {
        std::cerr << "write error: " << err.message() << endl;
        socket_.close();
@@ -102,9 +124,9 @@ void accept_handler(const boost::system::error_code& error)
 {
   if (!error)
   {
-    cout << "accepted" << endl;
+    cout << "Connection accepted" << endl;
     //read operation
-    async_read_until(socket_, sb, '\n', read_handle);
+    async_read_until(socket_, binp, '\n', read_handle);
   }
 }
 
@@ -115,6 +137,7 @@ int main(int argc, char** argv, char** env) {
       std::cerr << "Usage: " << argv[0] << " <port>\n";
       return 1;
     }
+    int port =  atoi(argv[1]);
 
     // Construct the Verilated model, from Vtop.h generated from Verilating "top.v"
     top = new Vtop;
@@ -125,13 +148,15 @@ int main(int argc, char** argv, char** env) {
     Verilated::commandArgs(argc, argv);   // Remember args
 
     //assign port number
-    acceptor_ = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), atoi(argv[1]) ));
+    acceptor_ = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), port ));
  
     // Schedule the timer for the first time:
     timer.async_wait(tick);
 
     //waiting for connection
     acceptor_->async_accept(socket_, accept_handler);
+
+    cout << "Agora digite: ./remote.bin " << port << endl;
 
     // Enter timer IO loop and never return.
     // The timer will fire for the first time 1 second from now.
