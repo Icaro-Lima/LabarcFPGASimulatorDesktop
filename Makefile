@@ -56,7 +56,7 @@ remote.bin: remote.cpp gui.o
 socket:
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv sim_socket.cpp $(BOOSTLIB)
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
-	obj_dir/Vtop
+	obj_dir/Vtop 2540
 
 gui.o: gui.cpp gui.h
 	$(CXX) $(CFLTK) -c gui.cpp

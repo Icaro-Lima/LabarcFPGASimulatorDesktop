@@ -38,12 +38,13 @@ void tick(const boost::system::error_code& /*e*/) {
     timer.async_wait(tick);
 }
 
+// https://www.codeproject.com/Articles/1264257/Socket-Programming-in-Cplusplus-using-boost-asio-T
 
 io_service io_socket;
-//listener for new connection
-tcp::acceptor acceptor_(io_socket, tcp::endpoint(tcp::v4(), 2540 ));
 //socket creation 
 tcp::socket socket_(io_socket);
+//listener for new connection
+tcp::acceptor *acceptor_;
 
 string read_(tcp::socket & socket) {
     streambuf buf;
@@ -59,7 +60,7 @@ void send_(tcp::socket & socket, const string& message) {
 
 void socket_run() {
     //waiting for connection
-    acceptor_.accept(socket_);
+    acceptor_->accept(socket_);
     //read operation
     string message = read_(socket_);
     cout << message << endl;
@@ -70,6 +71,12 @@ void socket_run() {
 
 int main(int argc, char** argv, char** env) {
 
+    if (argc < 2)
+    {
+      std::cerr << "Usage: " << argv[0] << " <port>\n";
+      return 1;
+    }
+
     // Construct the Verilated model, from Vtop.h generated from Verilating "top.v"
     top = new Vtop;
 
@@ -78,13 +85,15 @@ int main(int argc, char** argv, char** env) {
 
     Verilated::commandArgs(argc, argv);   // Remember args
 
+    // Schedule the timer for the first time:
+    timer.async_wait(tick);
+
+    acceptor_ = new tcp::acceptor(io_socket, tcp::endpoint(tcp::v4(), atoi(argv[1]) ));
     socket_run();
     // now, in a terminal window:
     //    telnet localhost 2540
     //    Oi
 
-    // Schedule the timer for the first time:
-    timer.async_wait(tick);
     // Enter IO loop. The timer will fire for the first time 1 second from now:
     io_tick.run();
 
