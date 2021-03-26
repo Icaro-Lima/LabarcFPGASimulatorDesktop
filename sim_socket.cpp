@@ -35,7 +35,6 @@ deadline_timer timer(io, interval);
 
 void tick(const boost::system::error_code& /*e*/) {
 
-    cout << "tick" << endl;
     main_time++;            // Verilator simulation time passes...
 
     top->clk_2 = !top->clk_2;       // Toggle clock
@@ -61,6 +60,8 @@ void send_(tcp::socket & socket, const string& message) {
     write( socket, buffer(message) );
 }
 
+void write_handle(const boost::system::error_code&, size_t);
+
 void read_handle(const boost::system::error_code& err, size_t bytes_transferred)  {
     if (!err) {
          std::istream is(&sb);
@@ -68,20 +69,29 @@ void read_handle(const boost::system::error_code& err, size_t bytes_transferred)
          std::getline(is, line);
          cout << line << endl;
          // assemble output string
-         std::stringstream stream;
-         stream << std::setfill('0') << std::setw(2) << std::hex << (int)top->LED << endl;
+         boost::asio::streambuf b;
+         std::ostream sout(&b);
+         sout << std::setfill('0') << std::hex << std::setw(2)
+              << (int)top->SEG << std::setw(2) << (int)top->LED << endl;
          //write operation
-         send_(socket_, stream.str());    
-         async_read_until(socket_, sb, '\n', read_handle);
+         async_write(socket_, b, write_handle);
     } else {
-         std::cerr << "read error: " << err.message() << std::endl;
+         if (err != error::eof) {
+             std::cerr << "read error: " << err.message() << std::endl;
+         }
          socket_.close();
+
+         // Destroy Verilog model
+         delete top;
+
+         // Fin
+         exit(0);
     }
 }
 
 void write_handle(const boost::system::error_code& err, size_t bytes_transferred) {
     if (!err) {
-       cout << "Server sent Hello message!"<< endl;
+       async_read_until(socket_, sb, '\n', read_handle);
     } else {
        std::cerr << "write error: " << err.message() << endl;
        socket_.close();
@@ -123,13 +133,7 @@ int main(int argc, char** argv, char** env) {
     //waiting for connection
     acceptor_->async_accept(socket_, accept_handler);
 
-    // Enter timer IO loop and never return. The timer will fire for the first time 1 second from now.
+    // Enter timer IO loop and never return.
+    // The timer will fire for the first time 1 second from now.
     io.run();
-
-    // Destroy Verilog model
-    delete top;
-
-    cout << "Exit" << endl;
-    // Fin
-    exit(0);
 }
