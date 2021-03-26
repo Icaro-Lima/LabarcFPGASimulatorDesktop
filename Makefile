@@ -26,6 +26,7 @@ ifeq ($(findstring MINGW,$(shell uname)),MINGW)
 else
   LFLTK=-lfltk_images -lpng -lz -lfltk
   FLTK=-LDFLAGS "$(LFLTK)"
+  BOOSTLIB=-LDFLAGS "-lboost_system -lpthread"
   BOOST=-std=c++11 -lboost_system -lpthread
 endif
 
@@ -51,6 +52,11 @@ default: remote.bin
 
 remote.bin: remote.cpp gui.o
 	$(CXX) $(CFLTK) remote.cpp gui.o -o remote.bin $(BOOST) $(LFLTK)
+
+socket:
+	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv sim_socket.cpp $(BOOSTLIB)
+	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
+	obj_dir/Vtop
 
 gui.o: gui.cpp gui.h
 	$(CXX) $(CFLTK) -c gui.cpp
