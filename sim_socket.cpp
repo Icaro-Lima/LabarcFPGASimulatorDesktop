@@ -28,9 +28,9 @@ double sc_time_stamp () {       // Called by $time in Verilog
      return main_time;          // converts to double, to match what SystemC does
 }
 
-io_service io_tick;
+io_service io;
 boost::posix_time::seconds interval(1);  // 1 second
-deadline_timer timer(io_tick, interval);
+deadline_timer timer(io, interval);
 
 void tick(const boost::system::error_code& /*e*/) {
 
@@ -49,9 +49,8 @@ void tick(const boost::system::error_code& /*e*/) {
 
 // https://www.codeproject.com/Articles/1264257/Socket-Programming-in-Cplusplus-using-boost-asio-T
 
-io_service io_socket;
 //socket creation 
-tcp::socket socket_(io_socket);
+tcp::socket socket_(io);
 //listener for new connection
 tcp::acceptor *acceptor_;
 
@@ -67,9 +66,10 @@ void send_(tcp::socket & socket, const string& message) {
     write( socket, buffer(message) );
 }
 
-void socket_run() {
-    //waiting for connection
-    acceptor_->accept(socket_);
+void accept_handler(const boost::system::error_code& error)
+{
+  if (!error)
+  {
     //read operation
     string message = read_(socket_);
     cout << message << endl;
@@ -78,6 +78,8 @@ void socket_run() {
     stream << std::setfill('0') << std::setw(2) << std::hex << (int)top->LED << endl;
     //write operation
     send_(socket_, stream.str());    
+    acceptor_->async_accept(socket_, accept_handler);
+  }
 }
 
 int main(int argc, char** argv, char** env) {
@@ -97,17 +99,16 @@ int main(int argc, char** argv, char** env) {
     Verilated::commandArgs(argc, argv);   // Remember args
 
     //assign socket port number
-    acceptor_ = new tcp::acceptor(io_socket, tcp::endpoint(tcp::v4(), atoi(argv[1]) ));
+    acceptor_ = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), atoi(argv[1]) ));
 
     // Schedule the timer for the first time:
     timer.async_wait(tick);
 
-    int pid;
-    // Enter timer IO loop and never return. The timer will fire for the first time 1 second from now.
-    if ( (pid=fork()) ==0) io_tick.run();
-    else  socket_run();
+    //waiting for connection
+    acceptor_->async_accept(socket_, accept_handler);
 
-    kill(pid, SIGKILL); // kill timer
+    // Enter timer IO loop and never return. The timer will fire for the first time 1 second from now.
+    io.run();
 
     // Destroy Verilog model
     delete top;
