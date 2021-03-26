@@ -1,10 +1,14 @@
 #include <iostream>
+#include <iomanip>
 #include <boost/asio.hpp>
 
 using namespace boost::asio;
 using ip::tcp;
 using std::string;
 using std::cout;
+using std::setfill;
+using std::setw;
+using std::hex;
 using std::endl;
 
 // Include common Verilator routines
@@ -31,6 +35,11 @@ deadline_timer timer(io_tick, interval);
 void tick(const boost::system::error_code& /*e*/) {
 
     cout << "tick" << endl;
+    main_time++;            // Verilator simulation time passes...
+
+    top->clk_2 = !top->clk_2;       // Toggle clock
+
+    top->eval();  // Evaluate Verilated SystemVerilog model
 
     // Reschedule the timer for 1 second in the future:
     timer.expires_at(timer.expires_at() + interval);
@@ -64,9 +73,11 @@ void socket_run() {
     //read operation
     string message = read_(socket_);
     cout << message << endl;
+    // assemble output string
+    std::stringstream stream;
+    stream << std::setfill('0') << std::setw(2) << std::hex << (int)top->LED << endl;
     //write operation
-    send_(socket_, "Hello From Server!");
-    cout << "Servent sent Hello message to Client!" << endl;
+    send_(socket_, stream.str());    
 }
 
 int main(int argc, char** argv, char** env) {
