@@ -38,16 +38,34 @@ void tick(const boost::system::error_code& /*e*/) {
     timer.async_wait(tick);
 }
 
+
+io_service io_socket;
+//listener for new connection
+tcp::acceptor acceptor_(io_socket, tcp::endpoint(tcp::v4(), 2540 ));
+//socket creation 
+tcp::socket socket_(io_socket);
+
 string read_(tcp::socket & socket) {
-       streambuf buf;
-       read_until( socket, buf, "\n" );
-       string data = buffer_cast<const char*>(buf.data());
-       return data;
+    streambuf buf;
+    read_until( socket, buf, "\n" );
+    string data = buffer_cast<const char*>(buf.data());
+    return data;
 }
 
 void send_(tcp::socket & socket, const string& message) {
-       const string msg = message + "\n";
-       write( socket, buffer(message) );
+    const string msg = message + "\n";
+    write( socket, buffer(message) );
+}
+
+void socket_run() {
+    //waiting for connection
+    acceptor_.accept(socket_);
+    //read operation
+    string message = read_(socket_);
+    cout << message << endl;
+    //write operation
+    send_(socket_, "Hello From Server!");
+    cout << "Servent sent Hello message to Client!" << endl;
 }
 
 int main(int argc, char** argv, char** env) {
@@ -60,14 +78,10 @@ int main(int argc, char** argv, char** env) {
 
     Verilated::commandArgs(argc, argv);   // Remember args
 
-    io_service io_socket;
-    //listen for new connection
-    tcp::acceptor acceptor_(io_socket, tcp::endpoint(tcp::v4(), 2540 ));
-    //socket creation 
-    tcp::socket socket_(io_socket);
-    //waiting for connection
-    acceptor_.accept(socket_);
-    // now, in a terminal window:  telnet localhost 2540
+    socket_run();
+    // now, in a terminal window:
+    //    telnet localhost 2540
+    //    Oi
 
     // Schedule the timer for the first time:
     timer.async_wait(tick);
