@@ -1,6 +1,7 @@
 #include <iostream>
 #include <iomanip>
 #include <boost/asio.hpp>
+#include <boost/bind.hpp>
 
 using namespace boost::asio;
 using ip::tcp;
@@ -53,32 +54,47 @@ void tick(const boost::system::error_code& /*e*/) {
 tcp::socket socket_(io);
 //listener for new connection
 tcp::acceptor *acceptor_;
-
-string read_(tcp::socket & socket) {
-    streambuf buf;
-    read_until( socket, buf, "\n" );
-    string data = buffer_cast<const char*>(buf.data());
-    return data;
-}
+boost::asio::streambuf sb;
 
 void send_(tcp::socket & socket, const string& message) {
     const string msg = message + "\n";
     write( socket, buffer(message) );
 }
 
+void read_handle(const boost::system::error_code& err, size_t bytes_transferred)  {
+    if (!err) {
+         std::istream is(&sb);
+         std::string line;
+         std::getline(is, line);
+         cout << line << endl;
+         // assemble output string
+         std::stringstream stream;
+         stream << std::setfill('0') << std::setw(2) << std::hex << (int)top->LED << endl;
+         //write operation
+         send_(socket_, stream.str());    
+         async_read_until(socket_, sb, '\n', read_handle);
+    } else {
+         std::cerr << "read error: " << err.message() << std::endl;
+         socket_.close();
+    }
+}
+
+void write_handle(const boost::system::error_code& err, size_t bytes_transferred) {
+    if (!err) {
+       cout << "Server sent Hello message!"<< endl;
+    } else {
+       std::cerr << "write error: " << err.message() << endl;
+       socket_.close();
+    }
+}
+
 void accept_handler(const boost::system::error_code& error)
 {
   if (!error)
   {
+    cout << "accepted" << endl;
     //read operation
-    string message = read_(socket_);
-    cout << message << endl;
-    // assemble output string
-    std::stringstream stream;
-    stream << std::setfill('0') << std::setw(2) << std::hex << (int)top->LED << endl;
-    //write operation
-    send_(socket_, stream.str());    
-    acceptor_->async_accept(socket_, accept_handler);
+    async_read_until(socket_, sb, '\n', read_handle);
   }
 }
 
@@ -98,9 +114,9 @@ int main(int argc, char** argv, char** env) {
 
     Verilated::commandArgs(argc, argv);   // Remember args
 
-    //assign socket port number
+    //assign port number
     acceptor_ = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), atoi(argv[1]) ));
-
+ 
     // Schedule the timer for the first time:
     timer.async_wait(tick);
 
