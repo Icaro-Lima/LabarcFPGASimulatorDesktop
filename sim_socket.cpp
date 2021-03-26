@@ -85,21 +85,23 @@ int main(int argc, char** argv, char** env) {
 
     Verilated::commandArgs(argc, argv);   // Remember args
 
+    //assign socket port number
+    acceptor_ = new tcp::acceptor(io_socket, tcp::endpoint(tcp::v4(), atoi(argv[1]) ));
+
     // Schedule the timer for the first time:
     timer.async_wait(tick);
 
-    acceptor_ = new tcp::acceptor(io_socket, tcp::endpoint(tcp::v4(), atoi(argv[1]) ));
-    socket_run();
-    // now, in a terminal window:
-    //    telnet localhost 2540
-    //    Oi
+    int pid;
+    // Enter timer IO loop and never return. The timer will fire for the first time 1 second from now.
+    if ( (pid=fork()) ==0) io_tick.run();
+    else  socket_run();
 
-    // Enter IO loop. The timer will fire for the first time 1 second from now:
-    io_tick.run();
+    kill(pid, SIGKILL); // kill timer
 
     // Destroy Verilog model
     delete top;
 
+    cout << "Exit" << endl;
     // Fin
     exit(0);
 }
