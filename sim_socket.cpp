@@ -12,6 +12,7 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/process.hpp>
 
 using namespace boost::asio;
 using ip::tcp;
@@ -159,10 +160,11 @@ int main(int argc, char** argv, char** env) {
 
     if (argc < 2)
     {
-      std::cerr << "Usage: " << argv[0] << " <port>\n";
+      std::cerr << "Usage: " << argv[0] << " <fpga>\n";
       return 1;
     }
-    int port =  atoi(argv[1]);
+    int fpga = atoi(argv[1]);
+    int port = fpga +2540;
 
     // Construct the Verilated model, from Vtop.h generated from Verilating "top.v"
     top = new Vtop;
@@ -181,7 +183,12 @@ int main(int argc, char** argv, char** env) {
     //waiting for connection
     acceptor_->async_accept(socket_, accept_handler);
 
-    cout << "Agora digite: ./remote.bin " << port << endl;
+#ifdef LAD
+    cout << "<h4>Agora digite: ./remote "
+         << ip::host_name() << " " << fpga << " </h4>" << endl;
+#else
+    boost::process::spawn("remote.bin", std::__cxx11::to_string(port));
+#endif
 
     // Enter timer IO loop and never return.
     // The timer will fire for the first time 1 second from now.
