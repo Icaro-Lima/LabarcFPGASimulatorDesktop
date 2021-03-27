@@ -50,13 +50,13 @@ default: remote.bin
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
 	obj_dir/Vtop
 
-remote.bin: remote.cpp gui.o
-	$(CXX) $(CFLTK) remote.cpp gui.o -o remote.bin $(BOOST) $(LFLTK)
-
-socket:
+socket: remote.bin
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv sim_socket.cpp $(BOOSTLIB)
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
 	obj_dir/Vtop 0
+
+remote.bin: remote.cpp gui.o
+	$(CXX) $(CFLTK) remote.cpp gui.o -o remote.bin $(BOOST) $(LFLTK)
 
 gui.o: gui.cpp gui.h
 	$(CXX) $(CFLTK) -c gui.cpp
