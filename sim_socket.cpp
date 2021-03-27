@@ -28,6 +28,7 @@ using std::endl;
 
 // Include Verilator model header, generated from Verilating "top.v"
 #include "Vtop.h"
+#define NREGS 16
 
 Vtop* top;   // Verilated model
 
@@ -71,6 +72,9 @@ boost::asio::streambuf binp;
 
 void write_handle(const boost::system::error_code&, size_t); // prototype
 
+// macro for SystemVerilog top module output
+#define s(top_port)  std::setw(2) << (unsigned short)top->top_port
+
 void read_handle(const boost::system::error_code& err, size_t bytes_transferred)  {
     if (!err) {
          // get command from input stream
@@ -90,8 +94,29 @@ void read_handle(const boost::system::error_code& err, size_t bytes_transferred)
          // assemble output string
          boost::asio::streambuf bout;
          std::ostream sout(&bout);
-         sout << std::setfill('0') << std::hex << std::setw(2)
-              << (int)top->SEG << std::setw(2) << (int)top->LED << '\r' << endl;
+         sout << std::setfill('0') << std::hex;
+//  $cmd    # of bytes
+//          returned       description
+// -------------------------------------------------------------------
+// 0000xxxx     16      RISC-V registers 0 to 15
+// 00100011     12      RISC-V pc, instruction, SrcA, SrcB, ..., flags
+// 0011xxxx     16      LCD 1st and 2nd line
+// all others    2      LED and SEG
+	 if ( (cmd & 0xF0) == 0x00) {
+            for (int i=0; i<NREGS; i++) sout << s(lcd_registrador[i]);
+         } else if ( (cmd & 0xF0) == 0x30) {
+            sout << std::setw(16) << (unsigned long)top->lcd_b
+                 << std::setw(16) << (unsigned long)top->lcd_a;
+         } else if (cmd == 0x23) {
+            sout << s(lcd_pc) << std::setw(8) << (unsigned int)top->lcd_instruction
+                 << s(lcd_SrcA) << s(lcd_SrcB) << s(lcd_ALUResult) << s(lcd_Result)
+                 << s(lcd_WriteData) << s(lcd_ReadData)
+                 << std::setw(2) << ( (top->lcd_RegWrite <<3) | (top->lcd_MemtoReg <<2) 
+                                    | (top->lcd_Branch   <<1) |  top->lcd_MemWrite     ); 
+         } else {
+            sout << s(SEG) << s(LED);
+         }
+         sout << '\r' << endl;
          //write operation
          async_write(socket_, bout, write_handle);
     } else {
