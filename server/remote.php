@@ -2,7 +2,8 @@
 <html>
 <head>
     <style>
-      @font-face { font-family: LCD; src: url('led_counter-7.ttf'); } 
+      @font-face { font-family: LCD; src: url('led_counter-7.ttf'); }
+      .label { font-family: Courier New; color:red; font-weight: bold; }
     </style>
   <title>LABARC- uso remoto</title>
 </head>

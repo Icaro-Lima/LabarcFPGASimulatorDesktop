@@ -47,6 +47,14 @@ function sse_listener(event) {
          led5.src = "components/ledOff.png";
          led6.src = "components/ledOff.png";
          led7.src = "components/ledOff.png";
+         if (display == "RISC") { 
+            risc1.innerHTML = 
+                  "&nbsp; pc &nbsp; &nbsp; &nbsp; &nbsp; instruction " +
+                  "&nbsp; &nbsp; &nbsp;&nbsp; WriteData MemWrite Branch";
+            risc2.innerHTML =
+                  "SrcA &nbsp; &nbsp; SrcB &nbsp; ALUResult " +
+                  "Result ReadData MemtoReg RegWrite";
+         }
          eSource.removeEventListener("message", sse_listener);
       }
    }
@@ -253,5 +261,7 @@ function exit_fpga(event) {
   led6.src = "components/ledNada.png";
   led7.src = "components/ledNada.png";
   document.getElementById("LCD").innerHTML = "";
+  risc1.innerHTML = "";
+  risc2.innerHTML = "";
 }
 
