@@ -34,6 +34,8 @@
     // get server response
     if( substr_compare($message,"0011",0,4) == 0 ) {
        $nr = 32;
+    } if( substr_compare( $message,"00100011",0,8) == 0 ) {
+       $nr = 24;
     } else {
        $nr = 4;
     }

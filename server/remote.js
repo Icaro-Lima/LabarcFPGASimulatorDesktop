@@ -52,6 +52,7 @@ function sse_listener(event) {
    }
 }
 
+
 //check for browser support
 if(typeof(EventSource)!=="undefined") {
         //create an object, passing it the name and location of the server side script
@@ -61,13 +62,35 @@ if(typeof(EventSource)!=="undefined") {
           "Whoops! Your browser does not receive server-sent events.";
 
 
+// JTAG client request for RISC-V LCD
+var riscLcdReq = new XMLHttpRequest();
+
+function riscLcdReqListener() {
+ if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
+  var r = this.responseText.toUpperCase();
+  let f = Number("0x" + r.substr(22,2));         
+  document.getElementById("LCD").innerHTML =
+     //       PC               instruction           WriteData
+     r.substr( 0,2) + " " + r.substr( 2,8) + " " + r.substr(18,2) + 
+     //      MemWrite           Branch
+     ( f&0x01 ? "*" : "_" ) + ( f&0x02 ? "*" : "_" ) + "<br>" +
+     //       SrcA              SrcB                ALUResult
+     r.substr(10,2) + " " + r.substr(12,2) + " " + r.substr(14,2) + " " + 
+     //       Result            ReadData
+     r.substr(16,2) + " " + r.substr(20,2) + 
+     //       Memto Reg         RegWrite
+     ( f&0x04 ? "*" : "_" ) + ( f&0x08 ? "*" : "_" );
+ }
+}
+riscLcdReq.onload = riscLcdReqListener;
+
 // JTAG client request for LCD
 var lcdReq = new XMLHttpRequest();
 
 function lcdReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
-  document.getElementById("LCD").innerHTML = this.responseText.slice(-16).toUpperCase() + "<br>"
-                                           + this.responseText.slice(0,16).toUpperCase();
+  var r = this.responseText.toUpperCase();
+  document.getElementById("LCD").innerHTML = r.slice(-16) + "<br>" + r.slice(0,16);
  }
 }
 lcdReq.onload = lcdReqListener;
@@ -113,6 +136,9 @@ function ledSegReqListener() {
   if(display == "LCD") {
       lcdReq.open("get", name + fpga + "&data=00110000" );
       lcdReq.send();
+  } else if (display == "RISC") {
+      riscLcdReq.open("get", name + fpga + "&data=00100011" );
+      riscLcdReq.send();
   }
  }
 }
