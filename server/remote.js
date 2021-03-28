@@ -9,7 +9,7 @@ function sse_listener(event) {
       if( r == -1 ) { // if the "Agora..." string was not found, we are still synthesizing 
          //write the received data to the page
          document.getElementById("serverData").innerHTML = event.data;
-      } else {
+      } else { // string found, FPGA is configured and JTAG server was started
          //write the received data to the page, but without "Agora..." string
          document.getElementById("serverData").innerHTML = event.data.substring(0,r) + "<br>\n";
          // extract computer name and FPGA number
@@ -60,6 +60,19 @@ if(typeof(EventSource)!=="undefined") {
 } else document.getElementById("serverData").innerHTML=
           "Whoops! Your browser does not receive server-sent events.";
 
+var lcdReq = new XMLHttpRequest(); // JTAG client request for LCD
+
+function lcdReqListener() {
+ if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
+  document.getElementById("LCD").innerHTML = this.responseText.slice(-16).toUpperCase() + "<br>"
+                                           + this.responseText.slice(0,16).toUpperCase();
+ }
+}
+
+lcdReq.onload = lcdReqListener;
+
+var ledSegReq = new XMLHttpRequest(); // JTAG client request for LED and SEG
+
 function ledSegReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   let r = Number("0x" + this.responseText);
@@ -99,7 +112,6 @@ function ledSegReqListener() {
  }
 }
 
-var ledSegReq = new XMLHttpRequest();
 ledSegReq.onload = ledSegReqListener;
 
 let s0 = false;
