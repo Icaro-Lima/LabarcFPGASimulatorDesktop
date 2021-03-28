@@ -60,7 +60,9 @@ if(typeof(EventSource)!=="undefined") {
 } else document.getElementById("serverData").innerHTML=
           "Whoops! Your browser does not receive server-sent events.";
 
-var lcdReq = new XMLHttpRequest(); // JTAG client request for LCD
+
+// JTAG client request for LCD
+var lcdReq = new XMLHttpRequest();
 
 function lcdReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
@@ -68,10 +70,10 @@ function lcdReqListener() {
                                            + this.responseText.slice(0,16).toUpperCase();
  }
 }
-
 lcdReq.onload = lcdReqListener;
 
-var ledSegReq = new XMLHttpRequest(); // JTAG client request for LED and SEG
+// JTAG client request for LED and SEG
+var ledSegReq = new XMLHttpRequest();
 
 function ledSegReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
@@ -108,10 +110,12 @@ function ledSegReqListener() {
   else         seg6.src = "components/segNada.png";
   if(r&0x8000) seg7.src = "components/seg7.png";
   else         seg7.src = "components/segNada.png";
-  if(display == "LCD") document.getElementById("LCD").innerHTML = "1234";
+  if(display == "LCD") {
+      lcdReq.open("get", name + fpga + "&data=00110000" );
+      lcdReq.send();
+  }
  }
 }
-
 ledSegReq.onload = ledSegReqListener;
 
 let s0 = false;
@@ -196,6 +200,7 @@ function exit_fpga(event) {
   ledSegReq.open("get", name + fpga + "&data=exit" );
   ledSegReq.send();
   clearInterval(si);
+  // make GUI disappear from page
   swi0.src = "components/switchNada.png";
   swi1.src = "components/switchNada.png";
   swi2.src = "components/switchNada.png";
