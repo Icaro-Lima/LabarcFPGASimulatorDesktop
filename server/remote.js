@@ -1,20 +1,22 @@
-let name = "";
-let fpga = "";
-var si;
-var eSource;
+let name = "";  // computer name string for GET request to JTAG client
+let fpga = "";  // FPGA number string for GET request to JTAG client
+var si;  // periodic interval timer for GUI refresh
+var eSource;  // event dsource for synthesizer output update
 
 function sse_listener(event) {
    if(name == "") {
       var r = event.data.indexOf("<h4>Agora digite: ./remote ");
-      if( r == -1 ) {
+      if( r == -1 ) { // if the "Agora..." string was not found, we are still synthesizing 
          //write the received data to the page
          document.getElementById("serverData").innerHTML = event.data;
       } else {
+         //write the received data to the page, but without "Agora..." string
+         document.getElementById("serverData").innerHTML = event.data.substring(0,r) + "<br>\n";
+         // extract computer name and FPGA number
          var name_fpga = event.data.substr(r+27).split(" ");
-         document.getElementById("serverData").innerHTML = event.data.substring(0,r)
-		                                           + "<br>\n";
-         name = name_fpga[0];
-         fpga = name_fpga[1];
+         name = "client.php?name=" + name_fpga[0];
+         fpga = "&fpga=" + name_fpga[1];
+         // register GUI event handlers
          swi7.onpointerdown = swi7_click;
          swi6.onpointerdown = swi6_click;
          swi5.onpointerdown = swi5_click;
@@ -27,6 +29,7 @@ function sse_listener(event) {
          window.onbeforeunload = exit_fpga;
          browse.onclick = exit_fpga;
          upload.onclick = exit_fpga;
+         // make GUI appear on page
          swi0.src = "components/switchOff.png";
          swi1.src = "components/switchOff.png";
          swi2.src = "components/switchOff.png";
@@ -57,7 +60,7 @@ if(typeof(EventSource)!=="undefined") {
 } else document.getElementById("serverData").innerHTML=
           "Whoops! Your browser does not receive server-sent events.";
 
-function reqListener() {
+function ledSegReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   let r = Number("0x" + this.responseText);
   if(r&0x0001) led0.src = "components/ledOn.png";
@@ -96,8 +99,8 @@ function reqListener() {
  }
 }
 
-var oReq = new XMLHttpRequest();
-oReq.onload = reqListener;
+var ledSegReq = new XMLHttpRequest();
+ledSegReq.onload = ledSegReqListener;
 
 let s0 = false;
 let s1 = false;
@@ -112,74 +115,74 @@ function swi7_click(event) {
   s7 = !s7;
   if(s7) swi7.src = "components/switchOn.png";
   else   swi7.src = "components/switchOff.png"; 
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100111" + (s7 ? "1" : "0") );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=0100111" + (s7 ? "1" : "0") );
+  ledSegReq.send();
 }
 
 function swi6_click(event) {
   s6 = !s6;
   if(s6) swi6.src = "components/switchOn.png";
   else   swi6.src = "components/switchOff.png"; 
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100110" + (s6 ? "1" : "0") );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=0100110" + (s6 ? "1" : "0") );
+  ledSegReq.send();
 }
 
 function swi5_click(event) {
   s5 = !s5;
   if(s5) swi5.src = "components/switchOn.png";
   else   swi5.src = "components/switchOff.png"; 
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100101" + (s5 ? "1" : "0") );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=0100101" + (s5 ? "1" : "0") );
+  ledSegReq.send();
 }
 
 function swi4_click(event) {
   s4 = !s4;
   if(s4) swi4.src = "components/switchOn.png";
   else   swi4.src = "components/switchOff.png"; 
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100100" + (s4 ? "1" : "0") );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=0100100" + (s4 ? "1" : "0") );
+  ledSegReq.send();
 }
 
 function swi3_click(event) {
   s3 = !s3;
   if(s3) swi3.src = "components/switchOn.png";
   else   swi3.src = "components/switchOff.png"; 
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100011" + (s3 ? "1" : "0") );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=0100011" + (s3 ? "1" : "0") );
+  ledSegReq.send();
 }
 
 function swi2_click(event) {
   s2 = !s2;
   if(s2) swi2.src = "components/switchOn.png";
   else   swi2.src = "components/switchOff.png"; 
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100010" + (s2 ? "1" : "0") );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=0100010" + (s2 ? "1" : "0") );
+  ledSegReq.send();
 }
 
 function swi1_click(event) {
   s1 = !s1;
   if(s1) swi1.src = "components/switchOn.png";
   else   swi1.src = "components/switchOff.png"; 
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100001" + (s1 ? "1" : "0") );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=0100001" + (s1 ? "1" : "0") );
+  ledSegReq.send();
 }
 
 function swi0_click(event) {
   s0 = !s0;
   if(s0) swi0.src = "components/switchOn.png";
   else   swi0.src = "components/switchOff.png"; 
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100000" + (s0 ? "1" : "0") );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=0100000" + (s0 ? "1" : "0") );
+  ledSegReq.send();
 }
 
 function update() {
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=00100000" );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=00100000" );
+  ledSegReq.send();
 }
 
 function exit_fpga(event) {
-  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=exit" );
-  oReq.send();
+  ledSegReq.open("get", name + fpga + "&data=exit" );
+  ledSegReq.send();
   clearInterval(si);
   swi0.src = "components/switchNada.png";
   swi1.src = "components/switchNada.png";
@@ -206,5 +209,6 @@ function exit_fpga(event) {
   led5.src = "components/ledNada.png";
   led6.src = "components/ledNada.png";
   led7.src = "components/ledNada.png";
+  document.getElementById("LCD").innerHTML = "";
 }
 
