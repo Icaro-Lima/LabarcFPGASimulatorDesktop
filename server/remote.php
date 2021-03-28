@@ -1,6 +1,9 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+    <style>
+      @font-face { font-family: LCD; src: url('led_counter-7.ttf'); } 
+    </style>
   <title>LABARC- uso remoto</title>
 </head>
 <body>
@@ -11,6 +14,8 @@
     <p>Na segunda linha, em comentário, deve constar o nome do exercício ou do circuito.<br>
       Se quiser, pode colocar sua matrícula na segunda linha, mas não na primeira linha.</p>
     <input type="file" name="uploaded_file" id=browse></input>
+    <input type="radio" name="display" value="LCD"> LCD
+    <input type="radio" name="display" value="RISC"> RISC-V
     <br style="line-height:180%">
     <input type="submit" value="Upload" id=upload></input>
   </form>
@@ -61,6 +66,7 @@
              echo file_get_contents("fpga.html");
 	     echo "<script type=\"text/javascript\">\n";
 	     echo "let path = \"". $path ."\";";
+	     echo "let display = \"". $_POST["display"] ."\";";
              echo file_get_contents("remote.js");
 	     echo "</script>\n";
           }

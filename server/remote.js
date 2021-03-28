@@ -92,6 +92,7 @@ function reqListener() {
   else         seg6.src = "components/segNada.png";
   if(r&0x8000) seg7.src = "components/seg7.png";
   else         seg7.src = "components/segNada.png";
+  if(display == "LCD") document.getElementById("LCD").innerHTML = "1234";
  }
 }
 
@@ -111,8 +112,7 @@ function swi7_click(event) {
   s7 = !s7;
   if(s7) swi7.src = "components/switchOn.png";
   else   swi7.src = "components/switchOff.png"; 
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100111" + (s7 ? "1" : "0") );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100111" + (s7 ? "1" : "0") );
   oReq.send();
 }
 
@@ -120,8 +120,7 @@ function swi6_click(event) {
   s6 = !s6;
   if(s6) swi6.src = "components/switchOn.png";
   else   swi6.src = "components/switchOff.png"; 
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100110" + (s6 ? "1" : "0") );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100110" + (s6 ? "1" : "0") );
   oReq.send();
 }
 
@@ -129,8 +128,7 @@ function swi5_click(event) {
   s5 = !s5;
   if(s5) swi5.src = "components/switchOn.png";
   else   swi5.src = "components/switchOff.png"; 
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100101" + (s5 ? "1" : "0") );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100101" + (s5 ? "1" : "0") );
   oReq.send();
 }
 
@@ -138,8 +136,7 @@ function swi4_click(event) {
   s4 = !s4;
   if(s4) swi4.src = "components/switchOn.png";
   else   swi4.src = "components/switchOff.png"; 
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100100" + (s4 ? "1" : "0") );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100100" + (s4 ? "1" : "0") );
   oReq.send();
 }
 
@@ -147,8 +144,7 @@ function swi3_click(event) {
   s3 = !s3;
   if(s3) swi3.src = "components/switchOn.png";
   else   swi3.src = "components/switchOff.png"; 
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100011" + (s3 ? "1" : "0") );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100011" + (s3 ? "1" : "0") );
   oReq.send();
 }
 
@@ -156,8 +152,7 @@ function swi2_click(event) {
   s2 = !s2;
   if(s2) swi2.src = "components/switchOn.png";
   else   swi2.src = "components/switchOff.png"; 
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100010" + (s2 ? "1" : "0") );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100010" + (s2 ? "1" : "0") );
   oReq.send();
 }
 
@@ -165,8 +160,7 @@ function swi1_click(event) {
   s1 = !s1;
   if(s1) swi1.src = "components/switchOn.png";
   else   swi1.src = "components/switchOff.png"; 
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100001" + (s1 ? "1" : "0") );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100001" + (s1 ? "1" : "0") );
   oReq.send();
 }
 
@@ -174,20 +168,17 @@ function swi0_click(event) {
   s0 = !s0;
   if(s0) swi0.src = "components/switchOn.png";
   else   swi0.src = "components/switchOff.png"; 
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=0100000" + (s0 ? "1" : "0") );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=0100000" + (s0 ? "1" : "0") );
   oReq.send();
 }
 
 function update() {
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=00100000" );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=00100000" );
   oReq.send();
 }
 
 function exit_fpga(event) {
-  oReq.open("get", "http://lad.dsc.ufcg.edu.br/hdl/client.php?name="
-	           + name + "&fpga=" + fpga + "&data=exit" );
+  oReq.open("get", "client.php?name=" + name + "&fpga=" + fpga + "&data=exit" );
   oReq.send();
   clearInterval(si);
   swi0.src = "components/switchNada.png";
