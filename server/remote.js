@@ -53,6 +53,21 @@ function sse_listener(event) {
             risc2.innerHTML = "SrcA &nbsp; &nbsp; SrcB &nbsp; ALUResult " +
                               "Result ReadData MemtoReg RegWrite";
             x0.innerHTML = "x0&nbsp; zero: ";
+            x4.innerHTML = "x4&nbsp; tp &nbsp;: ";
+            x8.innerHTML = "x8&nbsp; s0 &nbsp;: ";
+            xc.innerHTML = "x12 a2 &nbsp;: ";
+            x1.innerHTML = " &nbsp;ra : ";                
+            x2.innerHTML = " &nbsp;sp : ";                
+            x3.innerHTML = " &nbsp;gp : ";                
+            x5.innerHTML = " &nbsp;t0 : ";                
+            x6.innerHTML = " &nbsp;t1 : ";                
+            x7.innerHTML = " &nbsp;t2 : ";                
+            x9.innerHTML = " &nbsp;s1 : ";                
+            xa.innerHTML = " &nbsp;a0 : ";                
+            xb.innerHTML = " &nbsp;a1 : ";                
+            xd.innerHTML = " &nbsp;a3 : ";                
+            xe.innerHTML = " &nbsp;a4 : ";                
+            xf.innerHTML = " &nbsp;a5 : ";                
          }
          eSource.removeEventListener("message", sse_listener);
       }
@@ -75,6 +90,21 @@ function riscRegReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   var r = this.responseText.toUpperCase();
   r0.innerHTML = r.substr(0,2);
+  r1.innerHTML = r.substr(2,2);
+  r2.innerHTML = r.substr(4,2);
+  r3.innerHTML = r.substr(6,2);
+  r4.innerHTML = r.substr(8,2);
+  r5.innerHTML = r.substr(10,2);
+  r6.innerHTML = r.substr(12,2);
+  r7.innerHTML = r.substr(14,2);
+  r8.innerHTML = r.substr(16,2);
+  r9.innerHTML = r.substr(18,2);
+  ra.innerHTML = r.substr(20,2);
+  rb.innerHTML = r.substr(22,2);
+  rc.innerHTML = r.substr(24,2);
+  rd.innerHTML = r.substr(26,2);
+  re.innerHTML = r.substr(28,2);
+  rf.innerHTML = r.substr(30,2);
  }
 }
 riscRegReq.onload = riscRegReqListener;
@@ -109,6 +139,7 @@ var lcdReq = new XMLHttpRequest();
 function lcdReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   var r = this.responseText.toUpperCase();
+  //                 lcd_a                    lcd_b
   LCD.innerHTML = r.slice(-16) + "<br>" + r.slice(0,16);
  }
 }
@@ -274,5 +305,37 @@ function exit_fpga(event) {
   LCD.innerHTML = "";
   risc1.innerHTML = "";
   risc2.innerHTML = "";
+  x0.innerHTML = "";
+  x4.innerHTML = "";
+  x8.innerHTML = "";
+  xc.innerHTML = "";
+  x1.innerHTML = "";                
+  x2.innerHTML = "";                
+  x3.innerHTML = "";                
+  x5.innerHTML = "";                
+  x6.innerHTML = "";                
+  x7.innerHTML = "";                
+  x9.innerHTML = "";                
+  xa.innerHTML = "";                
+  xb.innerHTML = "";                
+  xd.innerHTML = "";                
+  xe.innerHTML = "";                
+  xf.innerHTML = "";                
+  r0.innerHTML = "";
+  r4.innerHTML = "";
+  r8.innerHTML = "";
+  rc.innerHTML = "";
+  r1.innerHTML = "";                
+  r2.innerHTML = "";                
+  r3.innerHTML = "";                
+  r5.innerHTML = "";                
+  r6.innerHTML = "";                
+  r7.innerHTML = "";                
+  r9.innerHTML = "";                
+  ra.innerHTML = "";                
+  rb.innerHTML = "";                
+  rd.innerHTML = "";                
+  re.innerHTML = "";                
+  rf.innerHTML = "";                
 }
 

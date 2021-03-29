@@ -32,7 +32,7 @@
     // send string to server
     socket_write($socket, $message, strlen($message)) or die("Sending data failed\n");
     // get server response
-    if( substr_compare($message,"0011",0,4) == 0 ) {
+    if( substr_compare($message,"0011",0,4) == 0 || substr_compare( $message,"0000",0,4) == 0 ) {
        $nr = 32;
     } else if( substr_compare( $message,"00100011",0,8) == 0 ) {
        $nr = 24;
