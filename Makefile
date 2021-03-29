@@ -59,7 +59,7 @@ remote.bin: remote.cpp gui.o
 	$(CXX) $(CFLTK) remote.cpp gui.o -o remote.bin $(BOOST) $(LFLTK)
 
 sim_socket.o: sim_socket.cpp
-	$(CXX) -c sim_socket.cpp
+	$(CXX) -std=c++11 -c sim_socket.cpp
 
 gui.o: gui.cpp gui.h
 	$(CXX) $(CFLTK) -c gui.cpp
