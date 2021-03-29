@@ -12,11 +12,9 @@
 #include <string>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/process.hpp>
 
 using namespace boost::asio;
 using ip::tcp;
-using boost::process::spawn;
 using boost::system::error_code;
 using ip::host_name;
 using std::string;
@@ -138,8 +136,8 @@ int main(int argc, char** argv, char** env) {
 #ifdef LAD
     cout << "<h4>Agora digite: ./remote "
          << host_name() << " " << fpga << " </h4>" << endl;
-#else
-    spawn("remote.bin", to_string(port));
+#else 
+    if (fork()==0) execl("./remote.bin", "remote.bin", to_string(port).c_str(), NULL);
 #endif
 
     // Enter timer IO loop and never return.
