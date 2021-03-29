@@ -48,12 +48,11 @@ function sse_listener(event) {
          led6.src = "components/ledOff.png";
          led7.src = "components/ledOff.png";
          if (display == "RISC") { 
-            risc1.innerHTML = 
-                  "&nbsp; pc &nbsp; &nbsp; &nbsp; &nbsp; instruction " +
-                  "&nbsp; &nbsp; &nbsp;&nbsp; WriteData MemWrite Branch";
-            risc2.innerHTML =
-                  "SrcA &nbsp; &nbsp; SrcB &nbsp; ALUResult " +
-                  "Result ReadData MemtoReg RegWrite";
+            risc1.innerHTML = "&nbsp; pc &nbsp; &nbsp; &nbsp; &nbsp; instruction " +
+                              "&nbsp; &nbsp; &nbsp;&nbsp; WriteData MemWrite Branch";
+            risc2.innerHTML = "SrcA &nbsp; &nbsp; SrcB &nbsp; ALUResult " +
+                              "Result ReadData MemtoReg RegWrite";
+            x0.innerHTML = "x0&nbsp; zero: ";
          }
          eSource.removeEventListener("message", sse_listener);
       }
@@ -68,6 +67,17 @@ if(typeof(EventSource)!=="undefined") {
 	eSource.onmessage = sse_listener;
 } else serverData.innerHTML= "Whoops! Your browser does not receive server-sent events.";
 
+
+// JTAG client request for RISC-V registers
+var riscRegReq = new XMLHttpRequest();
+
+function riscRegReqListener() {
+ if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
+  var r = this.responseText.toUpperCase();
+  r0.innerHTML = r.substr(0,2);
+ }
+}
+riscRegReq.onload = riscRegReqListener;
 
 // JTAG client request for RISC-V LCD
 var riscLcdReq = new XMLHttpRequest();
@@ -87,6 +97,8 @@ function riscLcdReqListener() {
      r.substr(16,2) + " " + r.substr(20,2) + 
      //       Memto Reg         RegWrite
      ( f&0x04 ? "*" : "_" ) + ( f&0x08 ? "*" : "_" );
+  riscRegReq.open("get", name + fpga + "&data=00000000" );
+  riscRegReq.send();
  }
 }
 riscLcdReq.onload = riscLcdReqListener;
