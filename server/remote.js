@@ -8,10 +8,10 @@ function sse_listener(event) {
       var r = event.data.indexOf("<h4>Agora digite: ./remote ");
       if( r == -1 ) { // if the "Agora..." string was not found, we are still synthesizing 
          //write the received data to the page
-         document.getElementById("serverData").innerHTML = event.data;
+         serverData.innerHTML = event.data;
       } else { // string found, FPGA is configured and JTAG server was started
          //write the received data to the page, but without "Agora..." string
-         document.getElementById("serverData").innerHTML = event.data.substring(0,r) + "<br>\n";
+         serverData.innerHTML = event.data.substring(0,r) + "<br>\n";
          // extract computer name and FPGA number
          var name_fpga = event.data.substr(r+27).split(" ");
          name = "client.php?name=" + name_fpga[0];
@@ -66,8 +66,7 @@ if(typeof(EventSource)!=="undefined") {
         //create an object, passing it the name and location of the server side script
         eSource = new EventSource("send_sse.php?dir=" + path);
 	eSource.onmessage = sse_listener;
-} else document.getElementById("serverData").innerHTML=
-          "Whoops! Your browser does not receive server-sent events.";
+} else serverData.innerHTML= "Whoops! Your browser does not receive server-sent events.";
 
 
 // JTAG client request for RISC-V LCD
