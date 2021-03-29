@@ -26,8 +26,8 @@ using std::setfill;
 using std::setw;
 using std::hex;
 using std::endl;
-using std::__cxx11::stoi;
-using std::__cxx11::to_string;
+using std::stoi;
+using std::to_string;
 
 extern void tick_v();
 extern void swi(unsigned short cmd);
