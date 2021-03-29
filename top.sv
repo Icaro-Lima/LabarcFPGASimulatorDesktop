@@ -29,7 +29,9 @@ module top(input  logic clk_2,
     lcd_Branch <= SWI[1];
     lcd_MemtoReg <= SWI[2];
     lcd_RegWrite <= SWI[3];
-    for(int i=0; i<NREGS_TOP; i++) lcd_registrador[i] <= i+i*16;
+    for(int i=0; i<NREGS_TOP; i++)
+       if(i != NREGS_TOP/2-1) lcd_registrador[i] <= i+i*16;
+       else                   lcd_registrador[i] <= ~SWI;
     lcd_a <= {56'h1234567890ABCD, SWI};
     lcd_b <= {SWI, 56'hFEDCBA09876543};
   end
