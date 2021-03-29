@@ -77,7 +77,7 @@ function riscLcdReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   var r = this.responseText.toUpperCase();
   let f = Number("0x" + r.substr(22,2));         
-  document.getElementById("LCD").innerHTML =
+  LCD.innerHTML =
      //       PC               instruction           WriteData
      r.substr( 0,2) + " " + r.substr( 2,8) + " " + r.substr(18,2) + 
      //      MemWrite           Branch
@@ -98,7 +98,7 @@ var lcdReq = new XMLHttpRequest();
 function lcdReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   var r = this.responseText.toUpperCase();
-  document.getElementById("LCD").innerHTML = r.slice(-16) + "<br>" + r.slice(0,16);
+  LCD.innerHTML = r.slice(-16) + "<br>" + r.slice(0,16);
  }
 }
 lcdReq.onload = lcdReqListener;
@@ -260,7 +260,7 @@ function exit_fpga(event) {
   led5.src = "components/ledNada.png";
   led6.src = "components/ledNada.png";
   led7.src = "components/ledNada.png";
-  document.getElementById("LCD").innerHTML = "";
+  LCD.innerHTML = "";
   risc1.innerHTML = "";
   risc2.innerHTML = "";
 }
