@@ -6,7 +6,7 @@ mkdir -p syn/tmp.0
 
 while : ; do # infinite loop
   # get a directory to work on
-  while ! d=$(curl -s lad:2525); do sleep 1; done
+  while ! d=$(curl -s lad:2525); do sleep 5; done
   if [[ $d = *[![:space:]]* ]]; then
     echo "sintesizing " $d
     cd $d
@@ -16,6 +16,6 @@ while : ; do # infinite loop
     echo "___________________pronto____________________" >> qq.log
     cd
   else
-    sleep 1
+    sleep 5
   fi
 done
