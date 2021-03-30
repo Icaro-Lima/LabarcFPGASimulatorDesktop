@@ -26,6 +26,7 @@ ifeq ($(findstring MINGW,$(shell uname)),MINGW)
 else
   LFLTK=-lfltk_images -lpng -lz -lfltk
   FLTK=-LDFLAGS "$(LFLTK)"
+  VBOOST=-CFLAGS "-std=c++11" -LDFLAGS "-lboost_system -lpthread"
 endif
 
 UTIL=/labarc/util
@@ -54,7 +55,7 @@ default:
 
 sim: # inst.objdump
 	mkdir -p $(TMP)/obj
-	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv -y $(UTIL)/sim $(HDL_SIM) $(UTIL)/veri.cpp $(UTIL)/sim_socket.o
+	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv -y $(UTIL)/sim $(HDL_SIM) $(UTIL)/veri.cpp $(UTIL)/sim_socket.o $(VBOOST)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
 	$(TMP)/obj/Vtop
 
