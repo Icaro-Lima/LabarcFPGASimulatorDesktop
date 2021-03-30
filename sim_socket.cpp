@@ -87,6 +87,7 @@ void read_handle(const error_code& err, size_t bytes_transferred)  {
          // Destroy Verilog model
          vdelete();
 
+         cerr << "___________________pronto____________________" << endl;
          // Fin
          exit(0);
     }

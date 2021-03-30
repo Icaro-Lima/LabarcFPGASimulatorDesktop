@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# make sure there is at least one tmp directory so ls will not fail
+mkdir -p sim/tmp.0
+
+while : ; do # infinite loop
+  # get a directory to work on
+  for i in {1..10}; do
+   # set d to the i-th last tmp directory
+   d=$(ls -1dt sim/tmp.* | head -$i | tail -1)
+   # is there exactly one file in it ?
+   if [ "`ls -1 $d | wc -w`" == "1" ]; then
+      (cd $d; make sim > qq.log ) &
+   fi
+  done
+  sleep 5
+done
