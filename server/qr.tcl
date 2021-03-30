@@ -88,10 +88,14 @@ proc ConnAccept {sock addr port} {
    fileevent $sock readable [list IncomingData $sock]
 }
 
+set cmd_count 0
+set swi_count 0
 
 proc IncomingData {sock} {
    global conn
    global upload_ip
+   global cmd_count
+   global swi_count
 
 # Check end of file or abnormal connection drop,
 # then write the data to the vJTAG
@@ -103,6 +107,7 @@ proc IncomingData {sock} {
       unset conn(addr,$sock)
       if { ! $end_of_file } {
          catch {close_device}
+         puts stderr "$cmd_count total commands, $swi_count switch commands"
          exit 0
       }
    } else {
@@ -112,6 +117,13 @@ proc IncomingData {sock} {
          lassign $cmd_ip cmd ip
          if { $upload_ip != $ip } then {
             puts stderr "IP mismatch upload=$upload_ip command=$ip $cmd"
+         }
+         incr cmd_count
+         if { [string range $cmd 0 1] == "01" } then {
+            incr swi_count
+         }
+         if { [expr $cmd_count % 10] == 0 } then {
+            puts stderr "$cmd_count total commands, $swi_count switch commands"
          }
          device_lock -timeout 10000
 
