@@ -25,7 +25,7 @@ double sc_time_stamp () {       // Called by $time in Verilog
      return main_time;          // converts to double, to match what SystemC does
 }
 
-void tick_v() {
+void vtick() {
     main_time++;            // Verilator simulation time passes...
 
     top->clk_2 = !top->clk_2;       // Toggle clock
@@ -33,17 +33,16 @@ void tick_v() {
     top->eval();  // Evaluate Verilated SystemVerilog model
 }
 
-void swi(unsigned short cmd) {
-    unsigned short p = 1<<((cmd & 0xE)>>1); // bit position
-    if( cmd&1 ) top->SWI |= p;  // set bit at position
-    else        top->SWI &= ~p; // clear bit at position
-    top->eval();  // Evaluate Verilated SystemVerilog model
-}
-
 // macro for SystemVerilog top module output
 #define s(top_port)  setw(2) << (unsigned short)top->top_port
 
-void riscv(unsigned short cmd, ostream& sout) {
+void vcmd(unsigned short cmd, ostream& sout) {
+         if ( (cmd & 0xF0) == 0x40) { // cmd = 0100xxxx - set/reset SWI
+            unsigned short p = 1<<((cmd & 0xE)>>1); // bit position
+            if( cmd&1 ) top->SWI |= p;  // set bit at position
+            else        top->SWI &= ~p; // clear bit at position
+            top->eval();  // Evaluate Verilated SystemVerilog model
+         }
 //  $cmd    # of bytes
 //          returned       description
 // -------------------------------------------------------------------

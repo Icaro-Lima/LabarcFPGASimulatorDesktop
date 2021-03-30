@@ -29,11 +29,10 @@ using std::endl;
 using std::stoi;
 using std::to_string;
 
-extern void tick_v();
-extern void swi(unsigned short cmd);
-extern void riscv(unsigned short cmd, ostream& sout);
-extern void vinit(int argc, char** argv);
-extern void vdelete();
+extern void vinit(int argc, char** argv); // initializer Verilator
+extern void vtick(); // Verilator timer action
+extern void vcmd(unsigned short cmd, ostream& sout); // perform command and get response
+extern void vdelete(); // Verilator destructor
 
 // service for timer and socket
 io_service io;
@@ -42,7 +41,7 @@ boost::posix_time::seconds interval(1);  // 1 second
 deadline_timer timer(io, interval); // timer for the clock signal
 
 void tick(const error_code& ) {
-    tick_v();
+    vtick();
     // Reschedule the timer for 1 second in the future:
     timer.expires_at(timer.expires_at() + interval);
     // Posts the timer event
@@ -68,13 +67,12 @@ void read_handle(const error_code& err, size_t bytes_transferred)  {
          char eol;
          is >> eol;
 	 unsigned short cmd = stoi(cmd_str, 0, 2); // convert binary command string
-	 // decode command
-         if ( (cmd & 0xF0) == 0x40) swi(cmd); // cmd = 0100xxxx - set/reset SWI
-         // assemble output string
+         // prepare output string
          streambuf bout;
          ostream sout(&bout);
          sout << setfill('0') << hex;
-         riscv(cmd,sout);
+	 // decode command
+         vcmd(cmd,sout);
 	 sout << '\r' << endl;  // needed for compatibility with JTAG server
          //write operation
          async_write(sock, bout, write_handle);
