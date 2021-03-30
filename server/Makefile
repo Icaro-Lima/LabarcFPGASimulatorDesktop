@@ -29,7 +29,7 @@ else
 endif
 
 UTIL=/labarc/util
-HDL_SIM=top.sv $(UTIL)/inst_sim.sv $(UTIL)/memo_sim.sv
+HDL_SIM=top.sv # $(UTIL)/inst_sim.sv $(UTIL)/memo_sim.sv
 WARN=-Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-COMBDLY
 TMP=/tmp${subst $(HOME),,${PWD}}
 CUR=${PWD}
@@ -52,9 +52,9 @@ endif
 default:
 	@sintetize $(TMP) $(CABLE)
 
-sim: inst.objdump
+sim: # inst.objdump
 	mkdir -p $(TMP)/obj
-	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv -y $(UTIL)/sim $(HDL_SIM) $(UTIL)/sim_main.cpp $(UTIL)/gui.o $(FLTK)
+	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv -y $(UTIL)/sim $(HDL_SIM) $(UTIL)/veri.cpp $(UTIL)/sim_socket.o
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
 	$(TMP)/obj/Vtop
 

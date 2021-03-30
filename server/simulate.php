@@ -5,15 +5,11 @@
       @font-face { font-family: LCD; src: url('led_counter-7.ttf'); }
       .label { font-family: Courier New; color:red; font-weight: bold; }
     </style>
-  <title>LABARC- uso remoto</title>
+  <title>LABARC- simulação remota</title>
 </head>
 <body>
-  <form enctype="multipart/form-data" action="remote.php" method="POST">
-    <p>Primeiro simule, depois faça upload do seu arquivo top.sv</p>
-    <p>Para ganhar centavos, você precisa colocar seu nome na primeira linha do top.sv<br>
-       No início da linha, você precisa marcar a mesma como comentário.</p>
-    <p>Na segunda linha, em comentário, deve constar o nome do exercício ou do circuito.<br>
-      Se quiser, pode colocar sua matrícula na segunda linha, mas não na primeira linha.</p>
+  <form enctype="multipart/form-data" action="simulate.php" method="POST">
+    <p>Simular não vale centavos.</p>
     <input type="file" name="uploaded_file" id=browse></input>
     <input type="radio" name="display" value="LCD"> LCD
     <input type="radio" name="display" value="RISC"> RISC-V
@@ -45,7 +41,7 @@
      !empty($_FILES['uploaded_file']['name']) &&
      !empty($_FILES['uploaded_file']['tmp_name']) )
   {
-    $path = trim(shell_exec("mktemp -d -p /home/labarc01/syn 2>&1"));
+    $path = trim(shell_exec("mktemp -d -p /home/labarc01/sim 2>&1"));
     $file = $path . "/" . basename( $_FILES['uploaded_file']['name']);
     exec("chmod g+rwx ". $path, $o, $chp);
     if( $chp != 0 ) {
@@ -63,7 +59,7 @@
              file_put_contents($file, "\n//           " . get_client_ip() . "\n", FILE_APPEND);
 	     echo "<div id=\"serverData\">The file "
 		  . basename( $_FILES['uploaded_file']['name']) .
-                  " has been uploaded.<br>\n<h4>Solicitando síntese</h4></div>\n";
+                  " has been uploaded.<br>\n<h4>Solicitando simulação</h4></div>\n";
              echo file_get_contents("fpga.html");
 	     echo "<script type=\"text/javascript\">\n";
 	     echo "let path = \"". $path ."\";";

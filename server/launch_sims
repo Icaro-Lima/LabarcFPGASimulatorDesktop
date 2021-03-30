@@ -10,6 +10,7 @@ while : ; do # infinite loop
    d=$(ls -1dt sim/tmp.* | head -$i | tail -1)
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
+      cp /labarc/TOP/Makefile $d
       (cd $d; make sim > qq.log ) &
    fi
   done
