@@ -113,20 +113,13 @@ void accept_handler(const error_code& error) {
 
 int main(int argc, char** argv, char** env) {
 
-    if (argc < 2)
-    {
-      cerr << "Usage: " << argv[0] << " <fpga>\n";
-      return 1;
-    }
-    int fpga = atoi(argv[1]);  // FPGA number, starts from 0
-    int port = fpga +2540;     // socket port number
-
     vinit(argc, argv);
 
-    //listener for new connection
-    tcp::acceptor acceptor_(io, tcp::endpoint(tcp::v4(), port ));
+    //listener for new connection, let OS choose port number
+    tcp::acceptor acceptor_(io, tcp::endpoint(tcp::v4(), 0));
     //waiting for connection
     acceptor_.async_accept(sock, accept_handler);
+    int port = acceptor_.local_endpoint().port();
 
     // Schedule the timer for the first time:
     timer.async_wait(tick);
