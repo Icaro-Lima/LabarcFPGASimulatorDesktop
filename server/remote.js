@@ -1,5 +1,5 @@
 let name = "";  // computer name string for GET request to JTAG client
-let fpga = "";  // FPGA number string for GET request to JTAG client
+let port = "";  // port number string for GET request to JTAG client
 var si;  // periodic interval timer for GUI refresh
 var eSource;  // event dsource for synthesizer output update
 
@@ -13,9 +13,9 @@ function sse_listener(event) {
          //write the received data to the page, but without "Agora..." string
          serverData.innerHTML = event.data.substring(0,r) + "<br>\n";
          // extract computer name and FPGA number
-         var name_fpga = event.data.substr(r+27).split(" ");
-         name = "client.php?name=" + name_fpga[0];
-         fpga = "&fpga=" + name_fpga[1];
+         var name_port = event.data.substr(r+27).split(" ");
+         name = "client.php?name=" + name_port[0];
+         port = "&port=" + name_port[1];
          // register GUI event handlers
          swi7.onpointerdown = swi7_click;
          swi6.onpointerdown = swi6_click;
@@ -26,9 +26,9 @@ function sse_listener(event) {
          swi1.onpointerdown = swi1_click;
          swi0.onpointerdown = swi0_click;
          si = setInterval(update, 1000);
-         window.onbeforeunload = exit_fpga;
-         browse.onclick = exit_fpga;
-         upload.onclick = exit_fpga;
+         window.onbeforeunload = exit_jtag;
+         browse.onclick = exit_jtag;
+         upload.onclick = exit_jtag;
          // make GUI appear on page
          swi0.src = "components/switchOff.png";
          swi1.src = "components/switchOff.png";
@@ -127,7 +127,7 @@ function riscLcdReqListener() {
      r.substr(16,2) + " " + r.substr(20,2) + 
      //       Memto Reg         RegWrite
      ( f&0x04 ? "*" : "_" ) + ( f&0x08 ? "*" : "_" );
-  riscRegReq.open("get", name + fpga + "&data=00000000" );
+  riscRegReq.open("get", name + port + "&data=00000000" );
   riscRegReq.send();
  }
 }
@@ -184,10 +184,10 @@ function ledSegReqListener() {
   if(r&0x8000) seg7.src = "components/seg7.png";
   else         seg7.src = "components/segNada.png";
   if(display == "LCD") {
-      lcdReq.open("get", name + fpga + "&data=00110000" );
+      lcdReq.open("get", name + port + "&data=00110000" );
       lcdReq.send();
   } else if (display == "RISC") {
-      riscLcdReq.open("get", name + fpga + "&data=00100011" );
+      riscLcdReq.open("get", name + port + "&data=00100011" );
       riscLcdReq.send();
   }
  }
@@ -207,7 +207,7 @@ function swi7_click(event) {
   s7 = !s7;
   if(s7) swi7.src = "components/switchOn.png";
   else   swi7.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + fpga + "&data=0100111" + (s7 ? "1" : "0") );
+  ledSegReq.open("get", name + port + "&data=0100111" + (s7 ? "1" : "0") );
   ledSegReq.send();
 }
 
@@ -215,7 +215,7 @@ function swi6_click(event) {
   s6 = !s6;
   if(s6) swi6.src = "components/switchOn.png";
   else   swi6.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + fpga + "&data=0100110" + (s6 ? "1" : "0") );
+  ledSegReq.open("get", name + port + "&data=0100110" + (s6 ? "1" : "0") );
   ledSegReq.send();
 }
 
@@ -223,7 +223,7 @@ function swi5_click(event) {
   s5 = !s5;
   if(s5) swi5.src = "components/switchOn.png";
   else   swi5.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + fpga + "&data=0100101" + (s5 ? "1" : "0") );
+  ledSegReq.open("get", name + port + "&data=0100101" + (s5 ? "1" : "0") );
   ledSegReq.send();
 }
 
@@ -231,7 +231,7 @@ function swi4_click(event) {
   s4 = !s4;
   if(s4) swi4.src = "components/switchOn.png";
   else   swi4.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + fpga + "&data=0100100" + (s4 ? "1" : "0") );
+  ledSegReq.open("get", name + port + "&data=0100100" + (s4 ? "1" : "0") );
   ledSegReq.send();
 }
 
@@ -239,7 +239,7 @@ function swi3_click(event) {
   s3 = !s3;
   if(s3) swi3.src = "components/switchOn.png";
   else   swi3.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + fpga + "&data=0100011" + (s3 ? "1" : "0") );
+  ledSegReq.open("get", name + port + "&data=0100011" + (s3 ? "1" : "0") );
   ledSegReq.send();
 }
 
@@ -247,7 +247,7 @@ function swi2_click(event) {
   s2 = !s2;
   if(s2) swi2.src = "components/switchOn.png";
   else   swi2.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + fpga + "&data=0100010" + (s2 ? "1" : "0") );
+  ledSegReq.open("get", name + port + "&data=0100010" + (s2 ? "1" : "0") );
   ledSegReq.send();
 }
 
@@ -255,7 +255,7 @@ function swi1_click(event) {
   s1 = !s1;
   if(s1) swi1.src = "components/switchOn.png";
   else   swi1.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + fpga + "&data=0100001" + (s1 ? "1" : "0") );
+  ledSegReq.open("get", name + port + "&data=0100001" + (s1 ? "1" : "0") );
   ledSegReq.send();
 }
 
@@ -263,17 +263,17 @@ function swi0_click(event) {
   s0 = !s0;
   if(s0) swi0.src = "components/switchOn.png";
   else   swi0.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + fpga + "&data=0100000" + (s0 ? "1" : "0") );
+  ledSegReq.open("get", name + port + "&data=0100000" + (s0 ? "1" : "0") );
   ledSegReq.send();
 }
 
 function update() {
-  ledSegReq.open("get", name + fpga + "&data=00100000" );
+  ledSegReq.open("get", name + port + "&data=00100000" );
   ledSegReq.send();
 }
 
-function exit_fpga(event) {
-  ledSegReq.open("get", name + fpga + "&data=exit" );
+function exit_jtag(event) {
+  ledSegReq.open("get", name + port + "&data=exit" );
   ledSegReq.send();
   clearInterval(si);
   // make GUI disappear from page

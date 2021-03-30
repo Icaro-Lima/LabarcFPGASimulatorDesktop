@@ -19,10 +19,10 @@
     return $ipaddress;
   }
 
-  if( isset($_GET["name"]) && isset($_GET["fpga"]) && isset($_GET["data"]) &&
+  if( isset($_GET["name"]) && isset($_GET["port"]) && isset($_GET["data"]) &&
       !empty($_GET["name"]) && !empty($_GET["data"]) ) {
     $host    = $_GET["name"];
-    $port    = $_GET["fpga"] + 2540;
+    $port    = $_GET["port"];
     $message = substr($_GET["data"],0,8) . " " . get_client_ip() . "\n";
     // Error messages must start with letter 'S'
     // create socket
