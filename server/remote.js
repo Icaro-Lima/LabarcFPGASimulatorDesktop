@@ -319,6 +319,7 @@ function exit_jtag(event) {
   led5.src = "components/ledNada.png";
   led6.src = "components/ledNada.png";
   led7.src = "components/ledNada.png";
+  serverData.innerHTML = "";
   LCD.innerHTML = "";
   risc1.innerHTML = "";
   risc2.innerHTML = "";

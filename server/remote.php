@@ -61,9 +61,9 @@
              // Put enough space befire the IP so that even one-digit IPs
              // can be read grabbing the last 18 characters of the file. 
              file_put_contents($file, "\n//           " . get_client_ip() . "\n", FILE_APPEND);
-             echo "The file ". basename( $_FILES['uploaded_file']['name'])
-                  ." has been uploaded.<br>\n";
-             echo "<div id=\"serverData\"><h4>Solicitando síntese</h4></div>\n";
+	     echo "<div id=\"serverData\">The file "
+		  . basename( $_FILES['uploaded_file']['name']) .
+                  " has been uploaded.<br>\n<h4>Solicitando síntese</h4></div>\n";
              echo file_get_contents("fpga.html");
 	     echo "<script type=\"text/javascript\">\n";
 	     echo "let path = \"". $path ."\";";
