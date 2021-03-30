@@ -23,7 +23,7 @@
       !empty($_GET["name"]) && !empty($_GET["data"]) ) {
     $host    = $_GET["name"];
     $port    = $_GET["fpga"] + 2540;
-    $message = $_GET["data"] . " " . get_client_ip() . "\n";
+    $message = substr($_GET["data"],0,8) . " " . get_client_ip() . "\n";
     // Error messages must start with letter 'S'
     // create socket
     $socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Socket creation failed\n");
