@@ -272,7 +272,24 @@ function update() {
   ledSegReq.send();
 }
 
+function nada() { }
+function nada_e(event) { }
+
 function exit_jtag(event) {
+  swi7.onpointerdown = nada_e;
+  swi6.onpointerdown = nada_e;
+  swi5.onpointerdown = nada_e;
+  swi4.onpointerdown = nada_e;
+  swi3.onpointerdown = nada_e;
+  swi2.onpointerdown = nada_e;
+  swi1.onpointerdown = nada_e;
+  swi0.onpointerdown = nada_e;
+  browse.onclick = nada_e;
+  upload.onclick = nada_e;
+  lcdReq.onload = nada;
+  riscLcdReq.onload = nada;
+  riscRegReq.onload = nada;
+  ledSegReq.onload = nada;
   ledSegReq.open("get", name + port + "&data=exit" );
   ledSegReq.send();
   clearInterval(si);
