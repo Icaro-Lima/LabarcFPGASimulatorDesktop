@@ -14,5 +14,5 @@ while : ; do # infinite loop
       (cd $d; make sim > qq.log 2>&1) &
    fi
   done
-  sleep 5
+  sleep 2
 done

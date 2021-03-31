@@ -9,7 +9,7 @@
 </head>
 <body>
   <form enctype="multipart/form-data" action="simulate.php" method="POST">
-    <p>Simular não vale centavos.</p>
+    <p>Simular não vale centavos, mas é bem mais rápido.</p>
     <input type="file" name="uploaded_file" id=browse></input>
     <input type="radio" name="display" value="LCD"> LCD
     <input type="radio" name="display" value="RISC"> RISC-V

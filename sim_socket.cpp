@@ -74,22 +74,23 @@ void read_handler(const error_code& err, size_t bytes_transferred)  {
     if (!err) {
          // get command from input stream
          istream is(&binp);
-         char cmd_str[bytes_transferred]; // be sure we allocate enough memory
-         is >> cmd_str;
+         char cmd_str[bytes_transferred], // be sure we allocate enough memory
+	      ip_str[bytes_transferred];
+         is >> cmd_str >> ip_str;
          // read end-of-line character to clean up for next read
          char eol;
          is >> eol;
-	 if (cmd_str[0] == 'e') {
+	 if (cmd_str[0] == 'e') { // if command is "exit"
              sock.close();
              exit_all();
          }
+	 cmd_str[8] = 0;  // cut off IP, if there is
 	 unsigned short cmd = stoi(cmd_str, 0, 2); // convert binary command string
          // prepare output string
          streambuf bout;
          ostream sout(&bout);
          sout << setfill('0') << hex;
-	 // decode command
-         vcmd(cmd,sout);
+         vcmd(cmd,sout);  // pass command to Verilator and get response
 	 sout << '\r' << endl;  // needed for compatibility with JTAG server
          //write operation
          async_write(sock, bout, write_handler);
@@ -100,8 +101,12 @@ void read_handler(const error_code& err, size_t bytes_transferred)  {
          // EOF, socket connection was terminated
 
          sock.close();
-
+#ifdef LAD
+	 // accept new connection
+         acceptor_ptr->async_accept(sock, accept_handler);
+#else
          exit_all();
+#endif
     }
 }
 
@@ -118,7 +123,6 @@ void write_handler(const error_code& err, size_t bytes_transferred) {
 void accept_handler(const error_code& error) {
   if (!error)
   {
-    cout << "Connection accepted" << endl;
     // read operation
     async_read_until(sock, binp, '\n', read_handler);
   }
@@ -130,9 +134,10 @@ int main(int argc, char** argv, char** env) {
 
     //listener for new connection, let OS choose port number
     acceptor_ptr = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), 0));
+    int port = acceptor_ptr->local_endpoint().port();
+
     //waiting for connection
     acceptor_ptr->async_accept(sock, accept_handler);
-    int port = acceptor_ptr->local_endpoint().port();
 
     // Schedule the timer for the first time:
     timer.async_wait(tick);
