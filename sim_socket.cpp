@@ -95,18 +95,18 @@ void read_handler(const error_code& err, size_t bytes_transferred)  {
          //write operation
          async_write(sock, bout, write_handler);
     } else {
-         if (err != error::eof) {
+         if (err == error::eof) {  // running in localhost - exit server normally
+            sock.close();
+            exit_all();
+         } else if ( err == error::connection_reset) { // running in LAD
+            sock.close();
+            // accept new connection
+            acceptor_ptr->async_accept(sock, accept_handler);
+         } else {
              cerr << "read error: " << err.message() << endl;
+             sock.close();
+             exit_all();
          }
-         // EOF, socket connection was terminated
-
-         sock.close();
-#ifdef LAD
-	 // accept new connection
-         acceptor_ptr->async_accept(sock, accept_handler);
-#else
-         exit_all();
-#endif
     }
 }
 

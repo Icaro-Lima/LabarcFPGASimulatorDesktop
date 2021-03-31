@@ -78,7 +78,7 @@ function sse_listener(event) {
 //check for browser support
 if(typeof(EventSource)!=="undefined") {
         //create an object, passing it the name and location of the server side script
-        eSource = new EventSource("send_sse.php?dir=" + path);
+        eSource = new EventSource("send_sse.php?dir=" + path + "&proc=" + process);
 	eSource.onmessage = sse_listener;
 } else serverData.innerHTML= "Whoops! Your browser does not receive server-sent events.";
 
