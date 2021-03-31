@@ -10,7 +10,7 @@ while : ; do # infinite loop
   if [[ $d = *[![:space:]]* ]]; then
     echo "sintesizing " $d
     cd $d
-    if CABLE=$(expr $1 + 1) make > qq.log ; then
+    if CABLE=$(expr $1 + 1) make > qq.log 2>&1 ; then
         timeout 300 quartus_stp -t /labarc/util/qr.tcl $1 > /dev/null 2>> qq.log
     fi
     echo "___________________pronto____________________" >> qq.log

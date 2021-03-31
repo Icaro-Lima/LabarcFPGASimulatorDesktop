@@ -21,7 +21,8 @@
 
   if( isset($_GET["name"]) && isset($_GET["port"]) && isset($_GET["data"]) &&
       !empty($_GET["name"]) && !empty($_GET["data"]) &&
-      !preg_match('/[^01]/', $_GET["data"]) ) {  // data must contain only 0 and 1
+      ( !preg_match('/[^01]/', $_GET["data"]) || !strcmp($_GET["data"], "exit") ) ) {
+        // data must contain only 0 and 1  or "exit"
     $host    = $_GET["name"];
     $port    = $_GET["port"];
     $message = substr($_GET["data"],0,8) . " " . get_client_ip() . "\n";

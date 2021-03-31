@@ -54,10 +54,23 @@ void tick(const error_code& ) {
 tcp::socket sock(io);
 // buffer for string received by socket
 streambuf binp;
+// acceptor for socket opening
+tcp::acceptor *acceptor_ptr;
 
-void write_handle(const error_code&, size_t); // prototype to be used in read_handle
+// prototypes to be used in read_handle
+void accept_handler(const error_code& error);
+void write_handler(const error_code&, size_t);
 
-void read_handle(const error_code& err, size_t bytes_transferred)  {
+void exit_all() {
+         // Destroy Verilog model
+         vdelete();
+
+         cerr << "___________________pronto____________________" << endl;
+         // Fin
+         exit(0);
+}
+
+void read_handler(const error_code& err, size_t bytes_transferred)  {
     if (!err) {
          // get command from input stream
          istream is(&binp);
@@ -66,6 +79,10 @@ void read_handle(const error_code& err, size_t bytes_transferred)  {
          // read end-of-line character to clean up for next read
          char eol;
          is >> eol;
+	 if (cmd_str[0] == 'e') {
+             sock.close();
+             exit_all();
+         }
 	 unsigned short cmd = stoi(cmd_str, 0, 2); // convert binary command string
          // prepare output string
          streambuf bout;
@@ -75,7 +92,7 @@ void read_handle(const error_code& err, size_t bytes_transferred)  {
          vcmd(cmd,sout);
 	 sout << '\r' << endl;  // needed for compatibility with JTAG server
          //write operation
-         async_write(sock, bout, write_handle);
+         async_write(sock, bout, write_handler);
     } else {
          if (err != error::eof) {
              cerr << "read error: " << err.message() << endl;
@@ -84,19 +101,14 @@ void read_handle(const error_code& err, size_t bytes_transferred)  {
 
          sock.close();
 
-         // Destroy Verilog model
-         vdelete();
-
-         cerr << "___________________pronto____________________" << endl;
-         // Fin
-         exit(0);
+         exit_all();
     }
 }
 
-void write_handle(const error_code& err, size_t bytes_transferred) {
+void write_handler(const error_code& err, size_t bytes_transferred) {
     if (!err) {
        // next read operation
-       async_read_until(sock, binp, '\n', read_handle);
+       async_read_until(sock, binp, '\n', read_handler);
     } else {
        cerr << "write error: " << err.message() << endl;
        sock.close();
@@ -108,7 +120,7 @@ void accept_handler(const error_code& error) {
   {
     cout << "Connection accepted" << endl;
     // read operation
-    async_read_until(sock, binp, '\n', read_handle);
+    async_read_until(sock, binp, '\n', read_handler);
   }
 }
 
@@ -117,17 +129,18 @@ int main(int argc, char** argv, char** env) {
     vinit(argc, argv);
 
     //listener for new connection, let OS choose port number
-    tcp::acceptor acceptor_(io, tcp::endpoint(tcp::v4(), 0));
+    acceptor_ptr = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), 0));
     //waiting for connection
-    acceptor_.async_accept(sock, accept_handler);
-    int port = acceptor_.local_endpoint().port();
+    acceptor_ptr->async_accept(sock, accept_handler);
+    int port = acceptor_ptr->local_endpoint().port();
 
     // Schedule the timer for the first time:
     timer.async_wait(tick);
 
 #ifdef LAD
+    string name = host_name();
     cout << "<h4>Agora digite: ./remote "
-         << host_name() << " " << fpga << " </h4>" << endl;
+         << name.substr(0,name.find('.')) << " " << port << " </h4>" << endl;
 #else 
     if (fork()==0) execl("./remote.bin", "remote.bin", to_string(port).c_str(), NULL);
 #endif
