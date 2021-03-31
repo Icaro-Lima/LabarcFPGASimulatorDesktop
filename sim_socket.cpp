@@ -62,6 +62,8 @@ void accept_handler(const error_code& error);
 void write_handler(const error_code&, size_t);
 
 void exit_all() {
+         sock.close();
+
          // Destroy Verilog model
          vdelete();
 
@@ -80,11 +82,7 @@ void read_handler(const error_code& err, size_t bytes_transferred)  {
          // read end-of-line character to clean up for next read
          char eol;
          is >> eol;
-	 if (cmd_str[0] == 'e') { // if command is "exit"
-             sock.close();
-             exit_all();
-         }
-	 cmd_str[8] = 0;  // cut off IP, if there is
+	 if (cmd_str[0] == 'e') exit_all(); // if command is "exit"
 	 unsigned short cmd = stoi(cmd_str, 0, 2); // convert binary command string
          // prepare output string
          streambuf bout;
@@ -96,7 +94,6 @@ void read_handler(const error_code& err, size_t bytes_transferred)  {
          async_write(sock, bout, write_handler);
     } else {
          if (err == error::eof) {  // running in localhost - exit server normally
-            sock.close();
             exit_all();
          } else if ( err == error::connection_reset) { // running in LAD
             sock.close();
@@ -104,7 +101,6 @@ void read_handler(const error_code& err, size_t bytes_transferred)  {
             acceptor_ptr->async_accept(sock, accept_handler);
          } else {
              cerr << "read error: " << err.message() << endl;
-             sock.close();
              exit_all();
          }
     }
@@ -144,8 +140,9 @@ int main(int argc, char** argv, char** env) {
 
 #ifdef LAD
     string name = host_name();
-    cout << "<h4>Agora digite: ./remote "
+    cerr << "<h4>Agora digite: ./remote "
          << name.substr(0,name.find('.')) << " " << port << " </h4>" << endl;
+    // need to use cerr because only stderr is directed to log file
 #else 
     if (fork()==0) execl("./remote.bin", "remote.bin", to_string(port).c_str(), NULL);
 #endif
