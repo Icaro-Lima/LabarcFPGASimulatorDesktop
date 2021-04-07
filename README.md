@@ -31,7 +31,7 @@ cd LabarcFPGASimulatorDesktop
 #### Vídeo mostrando o passo a passo
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
 
-### Ubuntu 120.10
+### Ubuntu 20.10
 
 (ainda em análise)
 ```
