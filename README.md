@@ -164,6 +164,4 @@ Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-l
 
 #### Vídeo mostrando o passo a passo
 
-Este vídeo está desatualizado.
-
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
