@@ -11,6 +11,7 @@
 #include <iostream>
 #include <iomanip>
 #include <string>
+#include <thread>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
