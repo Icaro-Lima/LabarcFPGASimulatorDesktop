@@ -52,6 +52,8 @@ cd LabarcFPGASimulatorDesktop
 
 ### Windows 10
 
+Follow steps 1. to 8. in https://www.msys2.org
+
 (start Msys2)
 pacman -Syu
 (terminal window closes)
@@ -62,9 +64,9 @@ pacman -S --needed base-devel mingw-w64-x86_64-toolchain
 at prompt, answer 1-19 instead of "all"
 (close terminal window)
 (start mingw64)
-pacman -S git mingw-w64-x86_64-verilator mingw-w64-x86_64-fltk mingw-w64-x86_64-boost
 
 ```
+pacman -S git mingw-w64-x86_64-verilator mingw-w64-x86_64-fltk mingw-w64-x86_64-boost
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```

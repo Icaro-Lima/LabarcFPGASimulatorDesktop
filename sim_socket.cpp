@@ -127,13 +127,15 @@ void accept_handler(const error_code& error) {
 
 int port;
 
-#ifdef MINGW
 void independentThread() { 
-    string cmd = "remote.bin " + to_string(port);
-    cout << cmd << endl;
-    std:system(cmd.c_str());
-}
+    string cmd = 
+#ifndef MINGW
+                 "./"
 #endif
+                    "remote.bin " + to_string(port);
+    std:system(cmd.c_str());
+    exit(0);
+}
 
 int main(int argc, char** argv, char** env) {
 
@@ -155,12 +157,8 @@ int main(int argc, char** argv, char** env) {
          << name.substr(0,name.find('.')) << " " << port << " </h4>" << endl;
     // need to use cerr because only stderr is directed to log file
 #else
-#ifdef MINGW
     std::thread t(independentThread);
     t.detach();
-#else
-    if (fork()==0) execl("./remote.bin", "remote.bin", to_string(port).c_str(), NULL);
-#endif
 #endif
 
     // Enter timer IO loop and never return.
