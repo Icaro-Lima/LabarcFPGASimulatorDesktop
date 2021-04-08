@@ -30,6 +30,7 @@ using std::hex;
 using std::endl;
 using std::stoi;
 using std::to_string;
+using std::thread;
 
 extern void vinit(int argc, char** argv); // initializer Verilator
 extern void vtick(); // Verilator timer action
@@ -159,7 +160,7 @@ int main(int argc, char** argv, char** env) {
          << name.substr(0,name.find('.')) << " " << port << " </h4>" << endl;
     // need to use cerr because only stderr is directed to log file
 #else
-    std::thread t(independentThread);
+    thread t(independentThread);
     t.detach();
 #endif
 
