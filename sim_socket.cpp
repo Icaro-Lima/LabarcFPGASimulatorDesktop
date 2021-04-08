@@ -64,6 +64,7 @@ void write_handler(const error_code&, size_t);
 
 void exit_all() {
          sock.close();
+	 timer.cancel();
 
          // Destroy Verilog model
          vdelete();
@@ -164,4 +165,5 @@ int main(int argc, char** argv, char** env) {
     // Enter timer IO loop and never return.
     // The timer will fire for the first time 1 second from now.
     io.run();
+    t.join();
 }
