@@ -8,14 +8,14 @@
 // This program is based in part on the work of the FLTK project (http://www.fltk.org) and
 // https://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/example/cpp03/echo/blocking_tcp_echo_client.cpp
 
-// Include graphic user interface
-#include "gui.h"
-
 #include <bitset>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
 #include <boost/asio.hpp>
+// Include graphic user interface
+#include "gui.h"
+
 
 // declare inputs and outputs of module top as struct,
 // similar to what Verilator does automatically

@@ -20,8 +20,8 @@ ifneq ($(words $(CURDIR)),1)
 endif
 
 ifeq ($(findstring MINGW,$(shell uname)),MINGW)
-  CFLTK=-I/usr/local/include
-  LFLTK=-L/usr/local/lib -mwindows -lfltk_images -lfltk_png -lfltk_z -lfltk -lole32 -luuid -lcomctl32 -lws2_32
+  CFLTK=-I/mingw64/include
+  LFLTK=-L/mingw64/lib -mwindows -lfltk_images -lfltk -lole32 -luuid -lcomctl32 -lws2_32
   FLTK=-CFLAGS "$(CFLTK)" -LDFLAGS "$(LFLTK)"
 else
   LFLTK=-lfltk_images -lpng -lz -lfltk

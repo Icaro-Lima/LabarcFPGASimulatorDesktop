@@ -7,6 +7,7 @@
 // Version 2.1.
 // Icaro Dantas de Araujo Lima and Elmar Melcher at UFCG, 2021
 
+#define BOOST_BIND_GLOBAL_PLACEHOLDERS
 #include <iostream>
 #include <iomanip>
 #include <string>
