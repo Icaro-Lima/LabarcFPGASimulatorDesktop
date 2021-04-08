@@ -54,14 +54,17 @@ cd LabarcFPGASimulatorDesktop
 
 Follow steps 1. to 8. in https://www.msys2.org
 
-(start Msys2)
-pacman -Syu
-(terminal window closes)
-(start Msys2)
+
+At step 6, first execute
+```
 pacman -Sy
+```
+before
+```
 pacman -Su
-pacman -S --needed base-devel mingw-w64-x86_64-toolchain
-at prompt, answer 1-19 instead of "all"
+```
+
+At step 7, when asked to choose, answer "1-19" instead of "all"
 
 Abre uma janela de terminal MinGW (não MSys2) e execute o seguinte:
 ```
