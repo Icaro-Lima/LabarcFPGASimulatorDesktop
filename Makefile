@@ -23,6 +23,8 @@ ifeq ($(findstring MINGW,$(shell uname)),MINGW)
   CFLTK=-I/mingw64/include
   LFLTK=-L/mingw64/lib -mwindows -lfltk_images -lfltk -lole32 -luuid -lcomctl32 -lws2_32
   FLTK=-CFLAGS "$(CFLTK)" -LDFLAGS "$(LFLTK)"
+  CSOCK=-DMINGW
+  VBOOST=-LDFLAGS "-L/mingw64/lib -lboost_system-mt -lws2_32 -lwsock32"
 else
   LFLTK=-lfltk_images -lpng -lz -lfltk
   FLTK=-LDFLAGS "$(LFLTK)"
@@ -59,7 +61,7 @@ remote.bin: remote.cpp gui.o
 	$(CXX) $(CFLTK) remote.cpp gui.o -o remote.bin $(BOOST) $(LFLTK)
 
 sim_socket.o: sim_socket.cpp
-	$(CXX) -std=c++11 -c sim_socket.cpp
+	$(CXX) -std=c++11 $(CSOCK) -c sim_socket.cpp
 
 gui.o: gui.cpp gui.h
 	$(CXX) $(CFLTK) -c gui.cpp

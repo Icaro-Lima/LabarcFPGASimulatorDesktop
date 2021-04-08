@@ -125,13 +125,23 @@ void accept_handler(const error_code& error) {
   }
 }
 
+int port;
+
+#ifdef MINGW
+void independentThread() { 
+    string cmd = "remote.bin " + to_string(port);
+    cout << cmd << endl;
+    std:system(cmd.c_str());
+}
+#endif
+
 int main(int argc, char** argv, char** env) {
 
     vinit(argc, argv);
 
     //listener for new connection, let OS choose port number
     acceptor_ptr = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), 0));
-    int port = acceptor_ptr->local_endpoint().port();
+    port = acceptor_ptr->local_endpoint().port();
 
     //waiting for connection
     acceptor_ptr->async_accept(sock, accept_handler);
@@ -144,8 +154,13 @@ int main(int argc, char** argv, char** env) {
     cerr << "<h4>Agora digite: ./remote "
          << name.substr(0,name.find('.')) << " " << port << " </h4>" << endl;
     // need to use cerr because only stderr is directed to log file
-#else 
+#else
+#ifdef MINGW
+    std::thread t(independentThread);
+    t.detach();
+#else
     if (fork()==0) execl("./remote.bin", "remote.bin", to_string(port).c_str(), NULL);
+#endif
 #endif
 
     // Enter timer IO loop and never return.
