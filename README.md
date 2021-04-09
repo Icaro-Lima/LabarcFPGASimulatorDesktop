@@ -52,10 +52,6 @@ cd LabarcFPGASimulatorDesktop
 
 ### Windows 10
 
-Follow steps 1. to 8. in https://www.msys2.org
-
-### Windows 10
-
 Baixe o MSYS2 através do link: https://www.msys2.org/
 
 Após concluir a instalação, abra o terminal MSYS2 e execute os seguintes comandos:
