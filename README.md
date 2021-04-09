@@ -3,7 +3,7 @@
 
 Work inspired from https://fpga-vision-lab.h-brs.de/weblab/login
 
-## Instalação
+## Instalação do simulador no desktop
 
 ### Para todos os sistemas operacionais
 
@@ -104,25 +104,27 @@ Existe uma issue na biblioteca fltk no macOS Mojave, em que o simulador fica com
 
 OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote disponível no Homebrew com o fix dessa issue.
 
-## Utilização
+## Utilização do simulador no desktop
 
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar `make`.
 
 No caso do RISC-V, o caractere mais a direita na primeira linha do LCD visualiza o valor do sinal `Branch`,
 sendo que `_` significa `0` e `*` significa `1`. O caractere imediatamente a esquerda visualiza o sinal `MemWrite`. O caractere mais a direita na segunda  linha visualiza o sinal `RegWrite` e o caractere imediatamente a esquerda deste visualiza o sinal `MemtoReg`. Somente os primeiros 16 registradores aparecem na GUI. Os demais registradores podem ser usados normalmente, mas não são visualizados na GUI.
 
-## Usar o simulador remotamente
+## Utilização do simulador remotamente
 
 Navegue para http://lad.ufcg.edu.br/hdl/simulate.php
 e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na janela do browser.
 
-## Usar uma placa FPGA remotamente
+## Utilização de uma FPGA remotamente
 
 Navegue para http://lad.ufcg.edu.br/hdl/remote.php
 e faça upload do arquivo `top.sv`. No final da síntese, a GUI aparece na janela do browser.
 
 Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-la para outro usuário. Caso não fizer isso, depois de alguns minutos a placa FPGA será liberada assim mesmo.
 
-#### Vídeo mostrando o passo a passo
+### Vídeo mostrando o passo a passo
+
+O vídeo mostra a utilização do simulador no desktop seguido de utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação utilização de FPGA remota. 
 
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
