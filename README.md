@@ -54,21 +54,24 @@ cd LabarcFPGASimulatorDesktop
 
 Follow steps 1. to 8. in https://www.msys2.org
 
+### Windows 10
 
-At step 6, first execute
+Baixe o MSYS2 através do link: https://www.msys2.org/
+
+Após concluir a instalação, abra o terminal MSYS2 e execute os seguintes comandos:
 ```
+pacman -Syu
 pacman -Sy
-```
-before
-```
 pacman -Su
+pacman -S --needed base-devel mingw-w64-x86_64-toolchain
 ```
 
-At step 7, when asked to choose, answer "1-19" instead of "all"
+No passo anterior, quando questionado quais pacotes do MinGW deseja instalar, digite: "1-19", ao invés de "all".
 
-Abre uma janela de terminal MinGW (não MSys2) e execute o seguinte:
+Após concluído, feche o terminal e abra um novo, agora do MinGW, e execute os seguintes comandos:
+#### Nota: perceba que o terminal não é o mesmo em que você executou os últimos comandos, o MSYS2.
 ```
-pacman -S git mingw-w64-x86_64-verilator mingw-w64-x86_64-fltk mingw-w64-x86_64-boost
+pacman -S git make mingw-w64-x86_64-verilator mingw-w64-x86_64-fltk mingw-w64-x86_64-boost
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
