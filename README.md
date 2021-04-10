@@ -118,7 +118,7 @@ e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na j
 
 ## Utilização de uma placa FPGA remotamente
 
-Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:
+Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:  
 <img src="http://lad.ufcg.edu.br/loac/uploads/OAC/nano.jpg" width="400">
 
 Navegue para http://lad.ufcg.edu.br/hdl/remote.php
