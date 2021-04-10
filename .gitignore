@@ -9,6 +9,7 @@
 !*.h
 !Makefile
 !*.png
+!*.jpg
 !.gitignore
 !README.md
 
