@@ -127,6 +127,6 @@ Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-l
 
 ### Vídeo mostrando o passo a passo
 
-O vídeo mostra a utilização do simulador no desktop seguido de utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação utilização de FPGA remota. 
+O vídeo mostra a utilização do simulador no desktop seguida da utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação e utilização de FPGA remota. 
 
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
