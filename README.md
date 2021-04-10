@@ -1,5 +1,5 @@
 # Labarc FPGA Simulator and Remote LAB
-![Alt text](MainWindow.png?raw=true "Main Window")
+<img src="http://lad.ufcg.edu.br/loac/uploads/OAC/MainWindow.png">
 
 Work inspired from https://fpga-vision-lab.h-brs.de/weblab/login
 
