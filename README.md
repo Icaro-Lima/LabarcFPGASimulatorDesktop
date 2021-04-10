@@ -10,7 +10,7 @@ Work inspired from https://fpga-vision-lab.h-brs.de/weblab/login
 Recomenda-se a instalação desta fonte tipográfica:
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
 
-### Ubuntu 18.04 até 20.04
+### Ubuntu 18.04 até 19.10
 
 Execute o seguinte, no terminal:
 
@@ -31,9 +31,8 @@ cd LabarcFPGASimulatorDesktop
 #### Vídeo mostrando o passo a passo
 http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
 
-### Ubuntu 20.10
+### Ubuntu 20.04 e acima
 
-(ainda em análise)
 ```
 sudo apt-get update
 sudo apt-get install verilator libfltk1.3-dev make g++ libpng-dev zlib1g-dev git flex bison libfl-dev libboost-all-dev
