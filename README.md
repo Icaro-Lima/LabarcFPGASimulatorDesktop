@@ -116,8 +116,9 @@ sendo que `_` significa `0` e `*` significa `1`. O caractere imediatamente a esq
 Navegue para http://lad.ufcg.edu.br/hdl/simulate.php
 e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na janela do browser.
 
-## Utilização de uma FPGA remotamente
+## Utilização de uma placa FPGA remotamente
 
+Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:
 <img src="http://lad.ufcg.edu.br/loac/uploads/OAC/nano.jpg" width="400">
 
 Navegue para http://lad.ufcg.edu.br/hdl/remote.php
