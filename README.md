@@ -118,7 +118,7 @@ e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na j
 
 ## Utilização de uma FPGA remotamente
 
-[[nano.jpg|width=100px]]
+<img src="http://lad.ufcg.edu.br/loac/uploads/OAC/nano.jpg" width="400">
 
 Navegue para http://lad.ufcg.edu.br/hdl/remote.php
 e faça upload do arquivo `top.sv`. No final da síntese, a GUI aparece na janela do browser.
