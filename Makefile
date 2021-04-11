@@ -32,6 +32,7 @@ else
   VBOOST=-CFLAGS "-std=c++11" -LDFLAGS "-lboost_system -lpthread"
 endif
 
+HDL_SIM=$(wildcard *.sv)
 WARN=-Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-COMBDLY
 
 ######################################################################
@@ -47,7 +48,7 @@ export VERILATOR_ROOT
 VERILATOR = $(VERILATOR_ROOT)/bin/verilator
 endif
 
-default: sim_socket.o remote.bin
+default: $(HDL_SIM) sim_socket.o remote.bin
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv veri.cpp ../sim_socket.o $(VBOOST)
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
 	obj_dir/Vtop
@@ -66,9 +67,20 @@ sim_socket.o: sim_socket.cpp
 gui.o: gui.cpp gui.h
 	$(CXX) $(CFLTK) -c gui.cpp
 
+# from assembly to object dump
+%.objdump : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
+	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -Tlink.ld $^
+	riscv32-unknown-elf-objdump -s -j .text | egrep " [0-9a-f]{4} [0-9a-f]{8}" | cut -b7-41 > $@
+
+# from C to assembly
+%.s : %.c
+	riscv32-unknown-elf-gcc -O1 -S $<
+
+
+
 ######################################################################
 
 maintainer-copy::
 clean mostlyclean distclean maintainer-clean::
-	-rm -rf obj_dir *.h.gch *.o *.bin *.log *.dmp *.vpd core
+	-rm -rf obj_dir *.h.gch *.o *.bin *.log *.dmp *.vpd core *.objdir
 
