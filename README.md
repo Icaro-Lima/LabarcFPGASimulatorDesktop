@@ -8,7 +8,7 @@ Work inspired from https://fpga-vision-lab.h-brs.de/weblab/login
 ### Para todos os sistemas operacionais
 
 Recomenda-se a instalação desta fonte tipográfica:
-http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
+http://lad.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
 
 ### Ubuntu 18.04 até 19.10
 
@@ -29,7 +29,7 @@ cd LabarcFPGASimulatorDesktop
 ```
 
 #### Vídeo mostrando o passo a passo
-http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
+http://lad.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
 
 ### Ubuntu 20.04 e acima
 
