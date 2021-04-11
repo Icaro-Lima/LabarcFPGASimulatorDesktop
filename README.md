@@ -107,6 +107,8 @@ OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote 
 
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar `make`.
 
+### Sinais de controle do RISC-V
+
 No caso do RISC-V, o caractere mais a direita na primeira linha do LCD visualiza o valor do sinal `Branch`,
 sendo que `_` significa `0` e `*` significa `1`. O caractere imediatamente a esquerda visualiza o sinal `MemWrite`. O caractere mais a direita na segunda  linha visualiza o sinal `RegWrite` e o caractere imediatamente a esquerda deste visualiza o sinal `MemtoReg`. Somente os primeiros 16 registradores aparecem na GUI. Os demais registradores podem ser usados normalmente, mas não são visualizados na GUI.
 
@@ -115,6 +117,8 @@ sendo que `_` significa `0` e `*` significa `1`. O caractere imediatamente a esq
 Navegue para http://lad.ufcg.edu.br/hdl/simulate.php
 e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na janela do browser.
 
+Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
+
 ## Utilização de uma placa FPGA remotamente
 
 Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:  
@@ -122,6 +126,8 @@ Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:
 
 Navegue para http://lad.ufcg.edu.br/hdl/remote.php
 e faça upload do arquivo `top.sv`. No final da síntese, a GUI aparece na janela do browser.
+
+Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
 
 Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-la para outro usuário. Caso não fizer isso, depois de alguns minutos a placa FPGA será liberada assim mesmo.
 
