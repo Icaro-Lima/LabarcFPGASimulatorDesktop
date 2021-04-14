@@ -28,6 +28,7 @@ using std::cerr;
 using std::setfill;
 using std::setw;
 using std::hex;
+using std::setprecision;
 using std::endl;
 using std::stoi;
 using std::to_string;
@@ -143,8 +144,32 @@ void independentThread() {
 
 int main(int argc, char** argv, char** env) {
 
-    interval_ptr = new milliseconds(vinit(argc, argv));
+    unsigned int divide_by, interval;
+
+    if (argc>1) { 
+       divide_by = atoi(argv[1]);
+       // consume argv[1];
+       argv[1] = argv[0];
+       argc--;
+       argv++;
+    }
+    else divide_by = 100000000;
+
+    if (divide_by > 500000000) {
+       cerr << "Error: Clock frequency below 0.1 Hz" << endl;
+       exit(1);
+    } else if (divide_by >= 500000 ) {
+         interval = divide_by / 100000;
+         cerr << setprecision(3) << 500. / (float)interval << " Hz" << endl;
+    }  else {
+       cerr << "Error: Clock frequency higher than 100 Hz" << endl;
+       exit(1);
+    }        
+
+    interval_ptr = new milliseconds(interval);
     timer_ptr = new deadline_timer(io, *interval_ptr);
+
+    vinit(argc, argv);
 
     //listener for new connection, let OS choose port number
     acceptor_ptr = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), 0));

@@ -49,13 +49,11 @@ VERILATOR = $(VERILATOR_ROOT)/bin/verilator
 endif
 
 DIVIDE_BY=$(shell grep parameter top.sv | grep divide_by | grep -oP '(?<!\d)\d*(?!\d)' )
-# calculate half clock period in ms
-INTERVAL=$(shell expr $(DIVIDE_BY) / 100000)
 
 default: $(HDL_SIM) sim_socket.o remote.bin
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv veri.cpp ../sim_socket.o $(VBOOST)
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
-	obj_dir/Vtop $(INTERVAL)
+	obj_dir/Vtop $(DIVIDE_BY)
 
 call: gui.o
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv sim_main.cpp ../gui.o $(FLTK)
@@ -73,7 +71,7 @@ gui.o: gui.cpp gui.h
 
 # from assembly to object dump
 %.objdump : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
-	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -Tlink.ld $^
+	riscv32-unknown-elf-gcc -nostartfiles -T$$RISCV/link.ld $^
 	riscv32-unknown-elf-objdump -s -j .text | egrep " [0-9a-f]{4} [0-9a-f]{8}" | cut -b7-41 > $@
 
 # from C to assembly

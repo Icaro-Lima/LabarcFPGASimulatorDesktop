@@ -66,7 +66,7 @@ void vcmd(unsigned short cmd, ostream& sout) {
          }
 }
 
-int vinit(int argc, char** argv) { // return half clock period in ms
+void vinit(int argc, char** argv) { // return half clock period in ms
     // Construct the Verilated model, from Vtop.h generated from Verilating "top.sv"
     top = new Vtop;
 
@@ -74,9 +74,6 @@ int vinit(int argc, char** argv) { // return half clock period in ms
     top->clk_2 = 0;
 
     Verilated::commandArgs(argc, argv);   // Remember args
-
-    if (argc>1) return atoi(argv[1]);
-    else        return 1000;
 }
 
 extern void vdelete() {
