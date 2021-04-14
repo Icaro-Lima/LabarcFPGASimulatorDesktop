@@ -48,10 +48,14 @@ export VERILATOR_ROOT
 VERILATOR = $(VERILATOR_ROOT)/bin/verilator
 endif
 
+DIVIDE_BY=$(shell grep parameter top.sv | grep divide_by | grep -oP '(?<!\d)\d*(?!\d)' )
+# calculate half clock period in ms
+INTERVAL=$(shell expr $(DIVIDE_BY) / 100000)
+
 default: $(HDL_SIM) sim_socket.o remote.bin
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv veri.cpp ../sim_socket.o $(VBOOST)
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
-	obj_dir/Vtop 1000
+	obj_dir/Vtop $(INTERVAL)
 
 call: gui.o
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv sim_main.cpp ../gui.o $(FLTK)
