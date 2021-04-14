@@ -42,32 +42,37 @@
      !empty($_FILES['uploaded_file']['name']) &&
      !empty($_FILES['uploaded_file']['tmp_name']) )
   {
-    $path = trim(shell_exec("mktemp -d -p /home/labarc01/sim 2>&1"));
-    $file = $path . "/" . basename( $_FILES['uploaded_file']['name']);
-    exec("chmod g+rwx ". $path, $o, $chp);
-    if( $chp != 0 ) {
-           echo "Error changing the directory permissions in ". $path;
+    if( $_FILES['uploaded_file']['size'] > 30000 ) {
+            echo "Error: file size ". $_FILES['uploaded_file']['size']
+                 ." bytes above limit of 30000 bytes";
     } else {
-       if(!move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $file)) {
-          echo "There was an error uploading the file to ". $path .", please try again!";
+       $path = trim(shell_exec("mktemp -d -p /home/labarc01/sim 2>&1"));
+       $file = $path . "/" . basename( $_FILES['uploaded_file']['name']);
+       exec("chmod g+rwx ". $path, $o, $chp);
+       if( $chp != 0 ) {
+           echo "Error changing the directory permissions in ". $path;
        } else {
-          exec("chmod g+r ". $file, $o, $chf);
-          if( $chp != 0 || $chf != 0 ) {
-              echo "Error changing the file permissions in ". $file;
-	  } else {
-             // Put enough space characters in front of the IP so that even one-digit IPs
-             // can be read grabbing the last 18 characters of the file. 
-             file_put_contents($file, "\n//           " . get_client_ip() . "\n", FILE_APPEND);
-	     echo "<div style=\"font-size:75%\" id=\"serverData\">The file "
-		  . basename( $_FILES['uploaded_file']['name']) .
-                  " has been uploaded.<br>\n<h4>Solicitando simulação</h4></div>\n";
-             echo file_get_contents("fpga.html");
-	     echo "<script type=\"text/javascript\">\n";
-	     echo "let path = \"". $path ."\";";
-	     echo "let process = \"compilação\";";
-	     echo "let display = \"". $_POST["display"] ."\";";
-             echo file_get_contents("remote.js");
-	     echo "</script>\n";
+          if(!move_uploaded_file($_FILES['uploaded_file']['tmp_name'], $file)) {
+             echo "There was an error uploading the file to ". $path .", please try again!";
+          } else {
+             exec("chmod g+r ". $file, $o, $chf);
+             if( $chp != 0 || $chf != 0 ) {
+                 echo "Error changing the file permissions in ". $file;
+             } else {
+                 // Put enough space characters in front of the IP so that even one-digit IPs
+                 // can be read grabbing the last 18 characters of the file. 
+                 file_put_contents($file, "\n//           " . get_client_ip() . "\n", FILE_APPEND);
+                 echo "<div style=\"font-size:75%\" id=\"serverData\">The file "
+                      . basename( $_FILES['uploaded_file']['name']) .
+                      " has been uploaded.<br>\n<h4>Solicitando simulação</h4></div>\n";
+                 echo file_get_contents("fpga.html");
+                 echo "<script type=\"text/javascript\">\n";
+                 echo "let path = \"". $path ."\";";
+                 echo "let process = \"compilação\";";
+                 echo "let display = \"". $_POST["display"] ."\";";
+                 echo file_get_contents("remote.js");
+                 echo "</script>\n";
+             }
           }
        }
     }
