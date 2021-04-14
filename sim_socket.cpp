@@ -42,14 +42,14 @@ extern void vdelete(); // Verilator destructor
 io_service io;
 
 milliseconds interval(1000);
-deadline_timer timer(io, interval); // timer for the clock signal
+deadline_timer *timer_ptr; // timer for the clock signal
 
 void tick(const error_code& ) {
     vtick();
     // Reschedule the timer for 1 second in the future:
-    timer.expires_at(timer.expires_at() + interval);
+    timer_ptr->expires_at(timer_ptr->expires_at() + interval);
     // Posts the timer event
-    timer.async_wait(tick);
+    timer_ptr->async_wait(tick);
 }
 
 // https://www.codeproject.com/Articles/1264257/Socket-Programming-in-Cplusplus-using-boost-asio-T
@@ -67,7 +67,7 @@ void write_handler(const error_code&, size_t);
 
 void exit_all() {
          sock.close();
-	 timer.cancel();
+	 timer_ptr->cancel();
 
          // Destroy Verilog model
          vdelete();
@@ -145,6 +145,8 @@ int main(int argc, char** argv, char** env) {
 
     int period_ms = vinit(argc, argv);
 
+    timer_ptr = new deadline_timer(io, interval);
+
     //listener for new connection, let OS choose port number
     acceptor_ptr = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), 0));
     port = acceptor_ptr->local_endpoint().port();
@@ -153,7 +155,7 @@ int main(int argc, char** argv, char** env) {
     acceptor_ptr->async_accept(sock, accept_handler);
 
     // Schedule the timer for the first time:
-    timer.async_wait(tick);
+    timer_ptr->async_wait(tick);
 
 #ifdef LAD
     string name = host_name();
