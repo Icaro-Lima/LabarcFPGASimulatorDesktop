@@ -11,7 +11,7 @@ while : ; do # infinite loop
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
       if test -f $d/*.zip; then
-         (cd $d; unzip *.zip)
+         (cd $d; unzip *.zip; tail -1 top.zip >>top.sv)
       fi	   
       cp /labarc/TOP/Makefile $d
       (cd $d; make sim 1>/dev/null 2>qq.log) &
