@@ -22,8 +22,6 @@
     <input type="submit" value="Upload" id=upload></input>
   </form>
 <?PHP
-  include 'client_ip.php';
-
   $subdir = "syn";
   include 'uploaded.php';
 
