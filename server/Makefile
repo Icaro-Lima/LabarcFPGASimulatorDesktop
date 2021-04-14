@@ -53,12 +53,6 @@ sim: $(HDL_SIM)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
 	$(TMP)/obj/Vtop 0
 
-top.sv : top.zip
-	unzip -u top.zip
-
-top.zip : top.sv
-	zip top top.sv
-
 # from assembly to object dump
 %.objdump : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -Tlink.ld $^

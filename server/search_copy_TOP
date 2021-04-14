@@ -6,10 +6,13 @@ for i in {1..10}; do
    d=$(ls -1dt syn/tmp.* | head -$i | tail -1)
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
-     cp /labarc/TOP/* $d
-     # there is no file named top.sv in lad:/labarc/TOP
-     r=1  # result "found"
-     break
+      if test -f $d/*.zip; then
+         (cd $d; unzip *.zip &>/dev/null )
+      fi	   
+      cp /labarc/TOP/* $d
+      # there is no file named top.sv in lad:/labarc/TOP
+      r=1  # result "found"
+      break
    fi
 done
 echo -e "HTTP/1.1 200 OK\n"

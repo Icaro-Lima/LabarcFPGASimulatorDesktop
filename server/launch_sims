@@ -10,6 +10,9 @@ while : ; do # infinite loop
    d=$(ls -1dt sim/tmp.* | head -$i | tail -1)
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
+      if test -f $d/*.zip; then
+         (cd $d; unzip *.zip)
+      fi	   
       cp /labarc/TOP/Makefile $d
       (cd $d; make sim 1>/dev/null 2>qq.log) &
    fi
