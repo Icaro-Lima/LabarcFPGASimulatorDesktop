@@ -8,7 +8,7 @@ Work inspired from https://fpga-vision-lab.h-brs.de/weblab/login
 ### Para todos os sistemas operacionais
 
 Recomenda-se a instalação desta fonte tipográfica:
-http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
+http://lad.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
 
 ### Ubuntu 18.04 até 19.10
 
@@ -29,7 +29,7 @@ cd LabarcFPGASimulatorDesktop
 ```
 
 #### Vídeo mostrando o passo a passo
-http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
+http://lad.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
 
 ### Ubuntu 20.04 e acima
 
@@ -107,6 +107,8 @@ OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote 
 
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar `make`.
 
+### Sinais de controle do RISC-V
+
 No caso do RISC-V, o caractere mais a direita na primeira linha do LCD visualiza o valor do sinal `Branch`,
 sendo que `_` significa `0` e `*` significa `1`. O caractere imediatamente a esquerda visualiza o sinal `MemWrite`. O caractere mais a direita na segunda  linha visualiza o sinal `RegWrite` e o caractere imediatamente a esquerda deste visualiza o sinal `MemtoReg`. Somente os primeiros 16 registradores aparecem na GUI. Os demais registradores podem ser usados normalmente, mas não são visualizados na GUI.
 
@@ -114,6 +116,8 @@ sendo que `_` significa `0` e `*` significa `1`. O caractere imediatamente a esq
 
 Navegue para http://lad.ufcg.edu.br/hdl/simulate.php
 e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na janela do browser.
+
+Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
 
 ## Utilização de uma placa FPGA remotamente
 
@@ -123,10 +127,12 @@ Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:
 Navegue para http://lad.ufcg.edu.br/hdl/remote.php
 e faça upload do arquivo `top.sv`. No final da síntese, a GUI aparece na janela do browser.
 
+Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
+
 Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-la para outro usuário. Caso não fizer isso, depois de alguns minutos a placa FPGA será liberada assim mesmo.
 
 ### Vídeo mostrando o passo a passo
 
-O vídeo mostra a utilização do simulador no desktop seguido de utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação utilização de FPGA remota. 
+O vídeo mostra a utilização do simulador no desktop seguida da utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação e utilização de FPGA remota. 
 
-http://lad.dsc.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
+http://lad.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
