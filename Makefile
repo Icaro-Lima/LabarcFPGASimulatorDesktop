@@ -51,7 +51,7 @@ endif
 default: $(HDL_SIM) sim_socket.o remote.bin
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv veri.cpp ../sim_socket.o $(VBOOST)
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
-	obj_dir/Vtop
+	obj_dir/Vtop 1000
 
 call: gui.o
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv sim_main.cpp ../gui.o $(FLTK)

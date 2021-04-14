@@ -41,13 +41,13 @@ extern void vdelete(); // Verilator destructor
 // service for timer and socket
 io_service io;
 
-milliseconds interval(1000);
+milliseconds *interval_ptr;
 deadline_timer *timer_ptr; // timer for the clock signal
 
 void tick(const error_code& ) {
     vtick();
     // Reschedule the timer for 1 second in the future:
-    timer_ptr->expires_at(timer_ptr->expires_at() + interval);
+    timer_ptr->expires_at(timer_ptr->expires_at() + *interval_ptr);
     // Posts the timer event
     timer_ptr->async_wait(tick);
 }
@@ -143,9 +143,8 @@ void independentThread() {
 
 int main(int argc, char** argv, char** env) {
 
-    int period_ms = vinit(argc, argv);
-
-    timer_ptr = new deadline_timer(io, interval);
+    interval_ptr = new milliseconds(vinit(argc, argv));
+    timer_ptr = new deadline_timer(io, *interval_ptr);
 
     //listener for new connection, let OS choose port number
     acceptor_ptr = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), 0));
