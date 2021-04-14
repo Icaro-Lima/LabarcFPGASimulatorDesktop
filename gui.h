@@ -129,6 +129,7 @@ public:
         SegmentsDisplay *segments; // seven LED segment display 
 };
 
+// not used
 class Clock : public Fl_Spinner {
 public:
 	Clock(int x, int y);
@@ -141,7 +142,6 @@ public:
         float lcd_char_width;
 	LCD_check *lcd_check;
 	RISCV_check *riscv_check;
-        Clock *clk;
 
 	FPGA(int x, int y);
 	virtual void draw();

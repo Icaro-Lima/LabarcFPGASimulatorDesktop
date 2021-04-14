@@ -1,7 +1,7 @@
 // DESCRIPTION: Verilator: Systemverilog example module
 // with interface to switch buttons, LEDs, LCD and register display
 
-parameter divide_by=250000000;  // divisor do clock de referência
+parameter divide_by=100000000;  // divisor do clock de referência
 // A frequencia do clock de referencia é 50 MHz.
 // A frequencia de clk_2 será de  50 MHz / divide_by
 

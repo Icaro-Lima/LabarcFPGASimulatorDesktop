@@ -107,6 +107,10 @@ OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote 
 
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar `make`.
 
+### Frequencia de atualização do display
+
+A GUI se atualiza a cada segundo, independentemente da frequência do sinal `clk_2`. Só se a frequencia do sinal `clk_2` for igual ou menor a 0.5&nbsp;Hz, este sinal pode ser observado corretamente na GUI. Se a frequencia do sinal `clk_2` for maior do que 1&nbsp;Hz, a visualização da GUI pode estar pulando mudanças rápidas que eventualmente poderiam ser vistas no display da placa física.
+
 ### Sinais de controle do RISC-V
 
 No caso do RISC-V, o caractere mais a direita na primeira linha do LCD visualiza o valor do sinal `Branch`,
