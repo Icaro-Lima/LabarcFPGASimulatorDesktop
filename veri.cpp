@@ -66,7 +66,7 @@ void vcmd(unsigned short cmd, ostream& sout) {
          }
 }
 
-void vinit(int argc, char** argv) {
+int vinit(int argc, char** argv) {
     // Construct the Verilated model, from Vtop.h generated from Verilating "top.v"
     top = new Vtop;
 
@@ -74,6 +74,8 @@ void vinit(int argc, char** argv) {
     top->clk_2 = 0;
 
     Verilated::commandArgs(argc, argv);   // Remember args
+
+    return 1000;
 }
 
 extern void vdelete() {

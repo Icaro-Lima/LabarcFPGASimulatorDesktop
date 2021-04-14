@@ -18,6 +18,7 @@
 using namespace boost::asio;
 using ip::tcp;
 using boost::system::error_code;
+using boost::posix_time::milliseconds;
 using ip::host_name;
 using std::string;
 using std::istream;
@@ -32,7 +33,7 @@ using std::stoi;
 using std::to_string;
 using std::thread;
 
-extern void vinit(int argc, char** argv); // initializer Verilator
+extern int vinit(int argc, char** argv); // initialize Verilator, returns clock period
 extern void vtick(); // Verilator timer action
 extern void vcmd(unsigned short cmd, ostream& sout); // perform command and get response
 extern void vdelete(); // Verilator destructor
@@ -40,7 +41,7 @@ extern void vdelete(); // Verilator destructor
 // service for timer and socket
 io_service io;
 
-boost::posix_time::seconds interval(1);  // 1 second
+milliseconds interval(1000);
 deadline_timer timer(io, interval); // timer for the clock signal
 
 void tick(const error_code& ) {
@@ -142,7 +143,7 @@ void independentThread() {
 
 int main(int argc, char** argv, char** env) {
 
-    vinit(argc, argv);
+    int period_ms = vinit(argc, argv);
 
     //listener for new connection, let OS choose port number
     acceptor_ptr = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), 0));
