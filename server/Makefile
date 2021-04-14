@@ -12,6 +12,8 @@
 #
 # Modifications by Icaro Dantas de Araujo Lima and Elmar Melcher at UFCG, 2018
 #
+# This Makefile is specialized to be used by the simulation and remote lab server.
+#
 ######################################################################
 
 # Check for sanity to avoid later confusion
@@ -19,18 +21,10 @@ ifneq ($(words $(CURDIR)),1)
  $(error Unsupported: GNU Make cannot build in directories containing spaces, build elsewhere: '$(CURDIR)')
 endif
 
-ifeq ($(findstring MINGW,$(shell uname)),MINGW)
-  CFLTK=-I/usr/local/include
-  LFLTK=-L/usr/local/lib -mwindows -lfltk_images -lfltk_png -lfltk_z -lfltk -lole32 -luuid -lcomctl32 -lws2_32
-  FLTK=-CFLAGS "$(CFLTK)" -LDFLAGS "$(LFLTK)"
-else
-  LFLTK=-lfltk_images -lpng -lz -lfltk
-  FLTK=-LDFLAGS "$(LFLTK)"
-  VBOOST=-CFLAGS "-std=c++11" -LDFLAGS "-lboost_system -lpthread"
-endif
+LFLTK=-lfltk_images -lpng -lz -lfltk
+FLTK=-LDFLAGS "$(LFLTK)"
 
-UTIL=/labarc/util
-HDL_SIM=top.sv # $(UTIL)/inst_sim.sv $(UTIL)/memo_sim.sv
+HDL_SIM=top.sv
 WARN=-Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-COMBDLY
 TMP=/tmp${subst $(HOME),,${PWD}}
 CUR=${PWD}
@@ -50,24 +44,30 @@ export VERILATOR_ROOT
 VERILATOR = $(VERILATOR_ROOT)/bin/verilator
 endif
 
-default:
+default: $(HDL_SIM)
 	@sintetize $(TMP) $(CABLE)
 
-sim: # inst.objdump
+sim: $(HDL_SIM)
 	mkdir -p $(TMP)/obj
-	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv -y $(UTIL)/sim $(HDL_SIM) $(UTIL)/veri.cpp $(UTIL)/sim_socket.o $(VBOOST)
+	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv $(HDL_SIM) /labarc/util/veri.cpp /labarc/util/sim_socket.o $(FLTK)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
-	$(TMP)/obj/Vtop
+	$(TMP)/obj/Vtop 0
+
+top.sv : top.zip
+	unzip -u top.zip
+
+top.zip : top.sv
+	zip top top.sv
 
 # from assembly to object dump
-.s.objdump :
-	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -T$(UTIL)/link.ld $< && \
+%.objdump : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
+	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -Tlink.ld $^
 	riscv32-unknown-elf-objdump -s -j .text | egrep " [0-9a-f]{4} [0-9a-f]{8}" | cut -b7-41 > $@
 
 # from C to assembly
-.c.s :
+%.s : %.c
 	riscv32-unknown-elf-gcc -O1 -S $<
 
 maintainer-copy::
 clean mostlyclean distclean maintainer-clean::
-	-rm -rf obj_dir *.s *.o *.log *.dmp *.vpd core a.out *.objdump *.sof *.fit.summary
+	-rm -rf obj_dir *.s *.o *.log *.dmp *.vpd core a.out *.objdump *.sof *.fit.summary *.objdir

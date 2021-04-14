@@ -9,7 +9,8 @@
 </head>
 <body>
   <form enctype="multipart/form-data" action="simulate.php" method="POST">
-    <p>Simular não vale centavos, mas é bem mais rápido.</p>
+    <p>Simular não vale centavos, mas compilação para simulação é bem mais rápida do que a síntese do circuito real.</p>
+    <p>Por favor, faça upload do seu arquivo top.sv ou top.zip</p>
     <input type="file" name="uploaded_file" id=browse></input>
     <input type="radio" name="display" value="LCD"> LCD
     <input type="radio" name="display" value="RISC"> RISC-V

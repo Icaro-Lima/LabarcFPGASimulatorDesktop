@@ -9,11 +9,12 @@
 </head>
 <body>
   <form enctype="multipart/form-data" action="remote.php" method="POST">
-    <p>Primeiro simule, depois faça upload do seu arquivo top.sv</p>
+    <p>Primeiro simule, depois faça upload do seu arquivo top.sv ou top.zip</p>
     <p>Para ganhar centavos, você precisa colocar seu nome na primeira linha do top.sv<br>
        No início da linha, você precisa marcar a mesma como comentário.</p>
-    <p>Na segunda linha, em comentário, deve constar o nome do exercício ou do circuito.<br>
-      Se quiser, pode colocar sua matrícula na segunda linha, mas não na primeira linha.</p>
+    <p>Na segunda linha, em comentário, deve constar o nome do exercício ou do circuito.</p>
+    <p>Se quiser, pode colocar sua matrícula na terceira linha,
+        mas não a coloque nem na primeira nem na segunda linha.</p>
     <input type="file" name="uploaded_file" id=browse></input>
     <input type="radio" name="display" value="LCD"> LCD
     <input type="radio" name="display" value="RISC"> RISC-V
