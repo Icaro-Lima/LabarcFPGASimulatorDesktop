@@ -27,11 +27,7 @@
         // data must contain only 0 and 1  or "exit"
     $host    = $_GET["name"];
     $port    = $_GET["port"];
-    if(isset($_GET["m"])) {
-       $message = $_GET["data"] . "\n";
-    } else {
-       $message = substr($_GET["data"],0,8) . " " . get_client_ip() . "\n";
-    }
+    $message = $_GET["data"] . " " . get_client_ip() . "\n";
     // Error messages must start with letter 'S'
     // create socket
     $socket = socket_create(AF_INET, SOCK_STREAM, 0) or die("Socket creation failed\n");
@@ -39,9 +35,13 @@
     $result = socket_connect($socket, $host, $port) or die("Server connection failed\n");
     // send string to server
     socket_write($socket, $message, strlen($message)) or die("Sending data failed\n");
-    // get server response
-    $result = socket_read ($socket, 100, PHP_NORMAL_READ) or die("Server response failed\n");
-    echo $result;
+    // get server response - accept multiple lines if m is set, exactly one line else
+    if($result = socket_read ($socket, 80, PHP_NORMAL_READ)) {
+       echo $result;
+    } else {
+       isset($_GET["m"]) or die("Server response failed\n");
+       echo "\n"; // if m is set, allow for no response
+    }
     while(isset($_GET["m"]) && ($result = socket_read ($socket, 80, PHP_NORMAL_READ))) {
        echo "\n<br>" . preg_replace('/>/', '&#62', preg_replace('/</', '&#60', $result));
     }
