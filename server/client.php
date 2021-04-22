@@ -35,13 +35,13 @@
     $result = socket_connect($socket, $host, $port) or die("Server connection failed\n");
     // send string to server
     socket_write($socket, $message, strlen($message)) or die("Sending data failed\n");
-    // get server response - accept multiple lines if m is set, exactly one line else
+    // get server response
     if($result = socket_read ($socket, 80, PHP_NORMAL_READ)) {
        echo $result;
     } else {
-       isset($_GET["m"]) or die("Server response failed\n");
-       echo "\n"; // if m is set, allow for no response
+       echo "\n"; // allow for no response from socket
     }
+    // accept more lines if m is set - else remote simulation exits (why?)
     while(isset($_GET["m"]) && ($result = socket_read ($socket, 80, PHP_NORMAL_READ))) {
        echo "\n<br>" . preg_replace('/>/', '&#62', preg_replace('/</', '&#60', $result));
     }
