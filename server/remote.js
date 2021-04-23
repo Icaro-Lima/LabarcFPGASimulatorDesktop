@@ -140,7 +140,7 @@ function lcdReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   var r = this.responseText.toUpperCase();
   //                 lcd_a                    lcd_b
-  LCD.innerHTML = r.slice(-16) + "<br>" + r.slice(0,16);
+  LCD.innerHTML = r.slice(16,32) + "<br>" + r.slice(0,16);
  }
 }
 lcdReq.onload = lcdReqListener;

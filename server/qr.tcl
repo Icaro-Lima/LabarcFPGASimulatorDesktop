@@ -129,7 +129,7 @@ proc IncomingData {sock} {
 
 # $cmd may be a command to change SWI or a command to read LED
 # however, a command to change SWI also reads LED
-         get_data $cmd
+         get_data [string range $cmd 0 7]
 # the data returned are always for the command of the previous call
 
 #  $cmd    # of bytes
