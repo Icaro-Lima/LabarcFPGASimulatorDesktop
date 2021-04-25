@@ -184,7 +184,7 @@ function ledSegReqListener() {
   if(r&0x8000) seg7.src = "components/seg7.png";
   else         seg7.src = "components/segNada.png";
   if(display == "LCD") {
-      lcdReq.open("get", name + port + "&data=00110000" );
+      lcdReq.open("get", name + port + "&data=00111111" );
       lcdReq.send();
   } else if (display == "RISC") {
       riscLcdReq.open("get", name + port + "&data=00100011" );

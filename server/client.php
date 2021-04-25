@@ -20,7 +20,7 @@
   }
 
   if( isset($_GET["name"]) && isset($_GET["port"]) && isset($_GET["data"]) &&
-      !empty($_GET["name"]) && isset($_GET["data"]) &&
+      !empty($_GET["name"]) && $_GET["port"] > 1000 &&
       ( !preg_match('/[^01]/', $_GET["data"]) || !strcmp($_GET["data"], "exit") 
         || !preg_match('/[^fhmpqrsuvw]/', $_GET["data"][0]) 
       ) ) {

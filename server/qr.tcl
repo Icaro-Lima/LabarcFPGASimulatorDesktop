@@ -140,9 +140,10 @@ proc IncomingData {sock} {
 # 0011xxxx     16      LCD 1st and 2nd line
 # all others    2      LED and SEG
 
-#        if lcd_a and lcd_b are requested
+#        if RISC-V registers are requested
 	 if { [string range $cmd 0 3] == "0000"} then {           
             puts $sock "[get_data "00000001"][get_data "00000010"][get_data "00000011"][get_data "00000100"][get_data "00000101"][get_data "00000110"][get_data "00000111"][get_data "00001000"][get_data "00001001"][get_data "00001010"][get_data "00001011"][get_data "00001100"][get_data "00001101"][get_data "00001110"][get_data "00001111"][get_data "00000000"]"
+#        if lcd_a and lcd_b are requested
          } elseif { [string range $cmd 0 3] == "0011"} then {
             puts $sock "[get_data "00111110"][get_data "00111101"][get_data "00111100"][get_data "00111011"][get_data "00111010"][get_data "00111001"][get_data "00111000"][get_data "00110111"][get_data "00110110"][get_data "00110101"][get_data "00110100"][get_data "00110011"][get_data "00110010"][get_data "00110001"][get_data "00110000"][get_data "00000000"]"
 #              if pc is requested, get also instruction up to flags
