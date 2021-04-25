@@ -98,13 +98,14 @@ void read_handler(const error_code& err, size_t bytes_transferred)  {
 	 sout << '\r' << endl;  // needed for compatibility with JTAG server
          //write operation
          async_write(sock, bout, write_handler);
+#ifdef LAD
+         sock.close();
+         // accept new connection
+         acceptor_ptr->async_accept(sock, accept_handler);
+#endif
     } else {
          if (err == error::eof) {  // running in localhost - exit server normally
             exit_all();
-         } else if ( err == error::connection_reset) { // running in LAD
-            sock.close();
-            // accept new connection
-            acceptor_ptr->async_accept(sock, accept_handler);
          } else {
              cerr << "read error: " << err.message() << endl;
              exit_all();
