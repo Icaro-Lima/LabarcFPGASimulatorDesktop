@@ -192,8 +192,10 @@ int main(int argc, char** argv, char** env) {
     t.detach();
 #endif
 
-    // Enter timer IO loop and never return.
+    // Enter timer IO loop and only return when timer is calcelled.
     // The timer will fire for the first time 1 second from now.
     io.run();
+#ifndef LAD
     t.join();
+#endif
 }
