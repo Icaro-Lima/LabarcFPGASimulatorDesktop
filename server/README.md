@@ -36,15 +36,15 @@ These files are stored here only for reference.
 ```
 ### How it works
 
-HTTP server, NFS server, MUTEX server, and SSH server are running on the same computer.
+HTTP server, NFS server, and MUTEX server are running on the same computer.
 The `/home` directory is shared via NFS.
 The MUTEX server process `search_copy_TOP_server` is running
 from the `labarc01` account.
-The HTTP server has write access to /home/labarc01/sim and /home/labarc01/syn.
+The HTTP server has write access to both, `/home/labarc01/sim` and `/home/labarc01/syn`.
 
 When the user clicks `Upload` in `remote.php` or `simulate.php`,
 the HTTP server creates a new directory in `/home/labarc01/syn` or `/home/labarc01/sim`, respectively,
-and puts the uploaded Systemverilog file `top.sv` into it.
+and puts the uploaded Systemverilog file `top.sv` or `top.zip`into it.
 The HTTP server has no FPGA board connected to it nor does it run simulations.
 
 The simulations are run by one specific computer. One process of `launch_sims`
@@ -61,7 +61,8 @@ Periodically, the `launch` command tries to connect to the MUTEX server.
 The MUTEX server allows only one connection at a time.
 The MUTEX server executes the comamnd `search_copy_TOP`, which looks for a
 directory in `/home/labarc01/syn` which has exactly one file in it.
-If it finds such a directory, it copies files from `/labarc/TOP` into it
+If it finds such a directory, and if the one file is a `.zip` it unzips it.
+It copies files from `/labarc/TOP` into the directory
 and then returns the directory name to the `launch` command.
 
 When a `launch` command obtains a diretory name, it performs synthesis,
