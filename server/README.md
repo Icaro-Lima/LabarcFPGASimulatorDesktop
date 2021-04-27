@@ -1,9 +1,9 @@
-These are the server files that allow using FPGA boards remotely
-and also do simulation remotely using a web browser.
+These are the server files that allow using FPGA boards remotely,
+and also do simulation remotely, using a web browser.
 
 These files are stored here only for reference.
 
-#### HTTP+NFS+MUTEX server
+#### Web server: HTTP+NFS+MUTEX server
 ```
 /var/www/html/hdl
    simulate.php
@@ -18,7 +18,7 @@ These files are stored here only for reference.
    DE0_SOC.sv     and also .qpf .qsf .sdc, /home/labarc01/syn only
    Makefile    /home/labarc01/syn and /home/labarc01/sim
 ```
-#### NFS clients and JTAG servers where FPGA boards are connected
+#### EDA workstations: NFS clients and JTAG servers where FPGA boards are connected
 ```
 /labarc/util
    sim_socket.o (compiled from sim_socket.cpp with -DLAD)
@@ -26,7 +26,7 @@ These files are stored here only for reference.
    vJTAG_interface.sv
    qr.tcl
 ```
-#### NFS mounted /home/labarc01 in server and clients
+#### NFS mounted /home/labarc01 in Web server and EDA workstations
 ```
    launch_sims
    launch.sh
