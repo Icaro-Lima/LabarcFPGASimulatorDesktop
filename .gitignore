@@ -10,6 +10,7 @@
 !Makefile
 !*.png
 !*.jpg
+!*.svg
 !.gitignore
 !README.md
 
