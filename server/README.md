@@ -21,7 +21,7 @@ These files are stored here only for reference.
 #### NFS clients and JTAG servers where FPGA boards are connected
 ```
 /labarc/util
-   sim_socket.o (compiled from sim_socket.cpp)
+   sim_socket.o (compiled from sim_socket.cpp with -DLAD)
    veri.cpp
    vJTAG_interface.sv
    qr.tcl
@@ -43,11 +43,11 @@ from the `labarc01` account.
 The HTTP server has write access to /home/labarc01/sim and /home/labarc01/syn.
 
 When the user clicks `Upload` in `remote.php` or `simulate.php`,
-the HTTP server creates a new directory in `/home/labarc01/syn` or `/home/labarc01/sum`, respectively,
+the HTTP server creates a new directory in `/home/labarc01/syn` or `/home/labarc01/sim`, respectively,
 and puts the uploaded Systemverilog file `top.sv` into it.
 The HTTP server has no FPGA board connected to it nor does it run simulations.
 
-The simulation is run by one specific computer. One process of `launch_sims`
+The simulations are run by one specific computer. One process of `launch_sims`
 is running on account `labarc01` on this computer. This process looks for a
 directory in `/home/labarc01/sim` which has exactly one file in it.
 If it finds such a directory, it copies `Makefile` from `/labarc/TOP` into it
@@ -79,6 +79,7 @@ of the GUI in `fpga.html`.
 
 Closing the browser tab of window os clicking on the `Browse...` or `Upload` button
 sends an exit message to the socket server. This makes the FPGA available for
-another run or ends the simulation process.
-If no such exit message is received, the JTAG server is killed after 5 minutes.
+another run or ends the simulation process, respectively.
+If no such exit message is received, the JTAG server is killed after 5 minutes
+and the simulation is killed after 1 hour.
 
