@@ -3,7 +3,7 @@ and also do simulation remotely using a web browser.
 
 These files are stored here only for reference.
 
-#### HTTP+NFS+MUTEX![arch](arch.svg) server
+#### HTTP+NFS+MUTEX server
 ```
 /var/www/html/hdl
    simulate.php
@@ -83,5 +83,4 @@ another run or ends the simulation process, respectively.
 If no such exit message is received, the JTAG server is killed after 5 minutes
 and the simulation is killed after 1 hour.
 
-![Alt text](./arch.svg)
-<img src="./arch.svg">
+![arch](arch.svg)
