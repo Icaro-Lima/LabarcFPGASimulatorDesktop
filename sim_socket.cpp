@@ -154,17 +154,16 @@ int main(int argc, char** argv, char** env) {
        argv++;
     }
     else divide_by = 100000000;
+    interval = divide_by / 100000; // timer interval in seconds
+    float f = 500. / interval; // frequency in Hz
 
     if (divide_by > 500000000) {
-       cerr << "Error: Clock frequency " << 500. / ((float)divide_by / 100000.)
-	    << " Hz is below the allowed 0.1 Hz" << endl;
+       cerr << "Error: Clock frequency " << f << " Hz is below the allowed 0.1 Hz" << endl;
        exit(1);
     } else if (divide_by >= 500000 ) {
-         interval = divide_by / 100000;
-         cerr << setprecision(3) << 500. / (float)interval << " Hz" << endl;
+         cerr << setprecision(3) << f << " Hz" << endl;
     }  else {
-       cerr << "Error: Clock frequency " << 500. / ((float)divide_by / 100000.)
-	    << " Hz is higher than the allowed 100 Hz" << endl;
+       cerr << "Error: Clock frequency " << f << " Hz is higher than the allowed 100 Hz" << endl;
        exit(1);
     }        
 
