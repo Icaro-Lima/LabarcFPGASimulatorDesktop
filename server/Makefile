@@ -23,12 +23,14 @@ endif
 
 LFLTK=-lfltk_images -lpng -lz -lfltk
 FLTK=-LDFLAGS "$(LFLTK)"
+VBOOST=-CFLAGS "-std=c++11" -LDFLAGS "-lboost_system -lpthread"
 
 HDL_SIM=top.sv
 WARN=-Wno-CASEINCOMPLETE -Wno-WIDTH -Wno-COMBDLY
 TMP=/tmp${subst $(HOME),,${PWD}}
 CUR=${PWD}
 CABLE?=1
+DIVIDE_BY?=0
 
 ######################################################################
 
@@ -49,14 +51,20 @@ default: $(HDL_SIM)
 
 sim: $(HDL_SIM)
 	mkdir -p $(TMP)/obj
-	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv $(HDL_SIM) /labarc/util/veri.cpp /labarc/util/sim_socket.o $(FLTK)
+	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv $(HDL_SIM) /labarc/util/veri.cpp /labarc/util/sim_socket.o $(FLTK) $(VBOOST)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
-	$(TMP)/obj/Vtop 0
+	$(TMP)/obj/Vtop $(DIVIDE_BY)
 
-# from assembly to object dump
-%.objdump : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
-	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -Tlink.ld $^
+# from binary to object dump
+%.objdump : a.out
 	riscv32-unknown-elf-objdump -s -j .text | egrep " [0-9a-f]{4} [0-9a-f]{8}" | cut -b7-41 > $@
+
+isa: a.out
+	spike -d a.out
+
+# from assembly to binary
+a.out: $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
+	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -Tlink.ld $^
 
 # from C to assembly
 %.s : %.c

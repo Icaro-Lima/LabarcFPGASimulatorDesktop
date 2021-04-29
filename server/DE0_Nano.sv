@@ -76,7 +76,7 @@ always_comb {GPIO_0[27],GPIO_0[ 3],GPIO_0[ 1],GPIO_0[ 0],
 	     GPIO_0[ 2],GPIO_0[25],GPIO_0[31],GPIO_0[33]} <= SEG;
 
 // clock lento 
-parameter divide_by=100000000;  // divisor de clock, igual ao arquivo .sdc
+// O parameter divide_by esta no top.sv e no .sdc
 // obs.: divide_by=1 nao funciona,
 //       neste caso use CLOCK_50 diretamente no lugar de CLOCK_DIV
 //       e verifique o setup slack no arquivo DE0_Nano.sta.summary

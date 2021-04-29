@@ -99,7 +99,7 @@ always_comb { GPIO_0[23], GPIO_0[11], GPIO_0[13], GPIO_0[15],
               GPIO_0[17], GPIO_0[19], GPIO_0[27], GPIO_0[25] } <= ~SEG;
 
 // clock lento //
-parameter divide_by=100000000;  // divisor de clock, igual ao arquivo .sdc
+// O parameter divide_by esta no top.sv e no .sdc
 // obs.: divide_by=1 nao funciona,
 //       neste caso use FPGA_CLK1_50 diretamente no lugar de CLOCK_DIV
 //       e verifique o setup slack no arquivo DE0_SOC.sta.summary
