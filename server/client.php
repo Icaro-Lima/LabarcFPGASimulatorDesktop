@@ -19,6 +19,8 @@
     return $ipaddress;
   }
 
+  define("MAX_LINE_LENGTH", 100);
+
   if( isset($_GET["name"]) && isset($_GET["port"]) && isset($_GET["data"]) &&
       !empty($_GET["name"]) && $_GET["port"] > 1000 &&
       ( !preg_match('/[^01]/', $_GET["data"]) || !strcmp($_GET["data"], "exit") 
@@ -36,14 +38,16 @@
     // send string to server
     socket_write($socket, $message, strlen($message)) or die("Sending data failed\n");
     // get server response
-    if($result = socket_read ($socket, 80, PHP_NORMAL_READ)) {
+    if($result = socket_read ($socket, MAX_LINE_LENGTH, PHP_NORMAL_READ)) {
        echo $result;
     } else {
        echo "\n"; // allow for no response from socket
     }
     // accept more lines if m is set - else remote simulation exits (why?)
-    while(isset($_GET["m"]) && ($result = socket_read ($socket, 80, PHP_NORMAL_READ))) {
-       echo "\n<br>" . preg_replace('/>/', '&#62', preg_replace('/</', '&#60', $result));
+    while(isset($_GET["m"]) && ($result = socket_read ($socket, MAX_LINE_LENGTH, PHP_NORMAL_READ))) {
+       echo "\n<br>" . preg_replace('/ /', '&nbsp;',
+                       preg_replace('/>/', '&#62',
+                       preg_replace('/</', '&#60', $result)));
     }
     // close socket
     socket_close($socket);

@@ -60,11 +60,11 @@ sim: $(HDL_SIM)
 	riscv32-unknown-elf-objdump -s -j .text | egrep " [0-9a-f]{4} [0-9a-f]{8}" | cut -b7-41 > $@
 
 isa: a.out
-	spike -d a.out
+	spike -d -s a.out
 
 # from assembly to binary
 a.out: $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
-	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -Tlink.ld $^
+	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -T/usr/local/riscv/link.ld $^
 
 # from C to assembly
 %.s : %.c
