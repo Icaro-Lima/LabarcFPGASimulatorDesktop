@@ -10,20 +10,23 @@ function sse_listener(event) {
          //write the received data to the page
          serverData.innerHTML = event.data;
       } else { // string found, compilation done
-         //write the received data to the page, but without "Listening..." string
          // extract computer name and port number
          var name_port = event.data.substr(s+32).split(" ");
          name = "client.php?name=" + name_port[0];
          port = "&port=" + name_port[2] + "&m";
-         serverData.innerHTML = event.data.substring(0,s) + "<h4>Listening:</h4>\n";
+         //write the received data to the page, but without "Listening..." string
+         serverData.innerHTML = event.data.substring(0,s) + "<h4>Ready for command input:</h4>\n";
          // register GUI event handlers
          cmd.addEventListener("keyup", command);
          window.onbeforeunload = exit_spike;
          browse.onclick = exit_spike;
          upload.onclick = exit_spike;
          // make GUI appear on page
-         eSource.removeEventListener("message", sse_listener);
       }
+   } else {
+       if (port == "") serverData.innerHTML = "";  // connection was terminated
+       else serverData.innerHTML = event.data.replace(/Listening for debug commands on [^.]+./,
+                                                      "<h4>Ready for command input:</h4>");
    }
 }
 
@@ -51,11 +54,13 @@ function command(event) {
 }
 
 function exit_spike() {
+    eSource.removeEventListener("message", sse_listener);
     spikeReq.open("get", name + port + "&data=q");
     spikeReq.send();
-    serverData.innerHTML = "";
+    port = "";  // mark connection as terminated
     sout.innerHTML = "";
     cmd.style.border = "transparent";
     cmd.value = "";
+    serverData.innerHTML = "";
 }
 

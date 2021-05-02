@@ -39,7 +39,7 @@
     socket_write($socket, $message, strlen($message)) or die("Sending data failed\n");
     // get server response
     if($result = socket_read ($socket, MAX_LINE_LENGTH, PHP_NORMAL_READ)) {
-       echo $result;
+       echo preg_replace('/ /', '&nbsp;', $result);
     } else {
        echo "\n"; // allow for no response from socket
     }

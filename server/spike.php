@@ -9,7 +9,7 @@
 </head>
 <body>
   <form enctype="multipart/form-data" action="spike.php" method="POST">
-    <p>Por favor, faça upload do seu arquivo assembly ou C ou comprimido .zip</p>
+    <p>Upload Your assembly file .s or C file .c, or compressed file .zip</p>
     <input type="file" name="uploaded_file" id=browse></input>
     <br style="line-height:180%">
     <input type="submit" value="Upload" id=upload></input>
