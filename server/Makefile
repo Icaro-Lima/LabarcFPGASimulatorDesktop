@@ -31,6 +31,7 @@ TMP=/tmp${subst $(HOME),,${PWD}}
 CUR=${PWD}
 CABLE?=1
 DIVIDE_BY?=0
+include Make_pk
 
 ######################################################################
 
@@ -60,15 +61,18 @@ sim: $(HDL_SIM)
 	riscv32-unknown-elf-objdump -s -j .text | egrep " [0-9a-f]{4} [0-9a-f]{8}" | cut -b7-41 > $@
 
 isa: a.out
-	spike -d -s a.out
+	echo -n "until pc 0 " >a.cmd
+	riscv32-unknown-elf-objdump -j .text -t a.out | grep " main" | cut -d' ' -f1 >>a.cmd
+	spike -d -s --cmd=a.cmd $(PK) a.out $(PROG_ARGS); echo $$?
 
 # from assembly to binary
 a.out: $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
-	riscv32-unknown-elf-gcc -nostdlib -nostartfiles -T/usr/local/riscv/link.ld $^
+	riscv32-unknown-elf-gcc $(RVLDFL) $^
 
 # from C to assembly
 %.s : %.c
 	riscv32-unknown-elf-gcc -O1 -S $<
+	cat $@
 
 maintainer-copy::
 clean mostlyclean distclean maintainer-clean::

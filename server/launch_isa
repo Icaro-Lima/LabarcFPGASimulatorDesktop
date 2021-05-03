@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# make sure there is at least one tmp directory so ls will not fail
+mkdir -p isa/tmp.0
+
+while : ; do # infinite loop
+  # get a directory to work on
+  for i in {1..10}; do
+   # set d to the i-th last tmp directory
+   d=$(ls -1dt isa/tmp.* | head -$i | tail -1)
+   # is there exactly one file in it ?
+   if [ "`ls -1 $d | wc -w`" == "1" ]; then
+      if test -f $d/*.zip; then
+         (cd $d; unzip *.zip)
+      fi
+      f=$(ls $d)
+      cp /labarc/TOP/Makefile $d
+      if tail -1 $d/$f | grep pk >/dev/null; then
+        echo "PK=pk"  > $d/Make_pk
+        echo -n "PROG_ARGS=" >> $d/Make_pk
+        tail -1 $d/$f | cut -d\| -f2 >> $d/Make_pk
+        echo >> $d/Make_pk 
+      else
+        echo "RVLDFL=-nostartfiles -T/usr/local/riscv/link.ld" > $d/Make_pk
+      fi
+      (cd $d; timeout 3600 make isa >qq.log 2>&1 ) &
+   fi
+  done
+  sleep 2
+done
