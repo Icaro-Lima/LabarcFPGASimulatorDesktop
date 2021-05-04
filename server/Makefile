@@ -63,7 +63,7 @@ sim: $(HDL_SIM)
 isa: a.out
 	echo -n "until pc 0 " >a.cmd
 	riscv32-unknown-elf-objdump -j .text -t a.out | grep " main" | cut -d' ' -f1 >>a.cmd
-	spike -d -s --cmd=a.cmd $(PK) a.out $(PROG_ARGS); echo $$?
+	prlimit --cpu=5 spike -d -s --cmd=a.cmd $(PK) a.out $(PROG_ARGS); echo $$?
 
 # from assembly to binary
 a.out: $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
@@ -72,7 +72,7 @@ a.out: $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 # from C to assembly
 %.s : %.c
 	riscv32-unknown-elf-gcc -O1 -S $<
-	cat $@
+	echo \<pre\>\<code\>; grep -v "^[[:space:]]\." $@ | sed 's/^\t/\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'; echo \</code\>\</pre\>
 
 maintainer-copy::
 clean mostlyclean distclean maintainer-clean::

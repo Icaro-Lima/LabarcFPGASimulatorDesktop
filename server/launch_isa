@@ -14,14 +14,13 @@ while : ; do # infinite loop
          (cd $d; unzip *.zip)
       fi
       f=$(ls $d)
+      p=$(tail -1 $d/$f | cut -d\| -f2)
       cp /labarc/TOP/Makefile $d
-      if tail -1 $d/$f | grep pk >/dev/null; then
-        echo "PK=pk"  > $d/Make_pk
-        echo -n "PROG_ARGS=" >> $d/Make_pk
-        tail -1 $d/$f | cut -d\| -f2 >> $d/Make_pk
-        echo >> $d/Make_pk 
-      else
+      if [ -z "$p" ]; then
         echo "RVLDFL=-nostartfiles -T/usr/local/riscv/link.ld" > $d/Make_pk
+      else
+        echo "PK=pk"  > $d/Make_pk
+        echo "PROG_ARGS="$p >> $d/Make_pk
       fi
       (cd $d; timeout 3600 make isa >qq.log 2>&1 ) &
    fi
