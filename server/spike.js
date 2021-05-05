@@ -19,12 +19,14 @@ function sse_listener(event) {
          browse.onclick = exit_spike;
          upload.onclick = exit_spike;
          server_HTML_replace(event);
-         regReq.open("get", name + port + "&data=reg 0");
-         regReq.send();
       }
    } else {
        if (port == "") serverData.innerHTML = "";  // connection was terminated
-       else server_HTML_replace(event);
+       else {
+          regReq.open("get", name + port + "&data=reg 0");
+          regReq.send();
+          server_HTML_replace(event);
+       }
    }
 }
 
