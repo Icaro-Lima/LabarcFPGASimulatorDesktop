@@ -39,8 +39,8 @@ if(typeof(EventSource)!=="undefined") {
 
 //write the received data to the page, but without "Listening..." string
 function server_HTML_replace(event) {
-   serverData.innerHTML = event.data.replace(/Listening for debug commands on [^.]+./,
-                                       "<h4>Pronto para receber comandos na caixa azul:</h4>");
+   serverData.innerHTML = event.data.replace(/Listening for debug commands on [^.]+.<br>/,
+            "<h4 style=\"font-family:serif\">pronto para receber comandos na caixa azul:</h4>");
 }
 
 // request for register display

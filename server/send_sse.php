@@ -5,9 +5,9 @@ if( isset($_GET["dir"]) )
 {
    $path = strtr($_GET['dir'],"<>?","___");
    $log = $path . "/qq.log";
-   $a = "data: <h3>espere a " . $_GET['proc'] . " iniciar</h3>\n";
+   $a = "data: <h4 style=\"font-family:serif\">espere a " . $_GET['proc'] . " iniciar</h4>\n";
    if(file_exists($log) && ($handle = fopen("$log", "r")) ) {
-         $a = "data: <h3>" . $_GET['proc'] . " iniciada, espere resultado:</h3>\n";
+         $a = "data: <h4 style=\"font-family:serif\">" . $_GET['proc'] . " iniciada, espere resultado:</h4>\n";
          while($line = fgets($handle)) {
             $a = $a . "data: ". trim($line) ."<br>\n";
          }
