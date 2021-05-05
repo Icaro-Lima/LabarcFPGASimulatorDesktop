@@ -1,6 +1,5 @@
 let name = "";  // computer name string for GET request to JTAG client
 let port = "";  // port number string for GET request to JTAG client
-var si;  // periodic interval timer for GUI refresh
 var eSource;  // event dsource for synthesizer output update
 
 function sse_listener(event) {
@@ -14,19 +13,18 @@ function sse_listener(event) {
          var name_port = event.data.substr(s+32).split(" ");
          name = "client.php?name=" + name_port[0];
          port = "&port=" + name_port[2] + "&m";
-         //write the received data to the page, but without "Listening..." string
-         serverData.innerHTML = event.data.substring(0,s) + "<h4>Ready for command input:</h4>\n";
          // register GUI event handlers
-         cmd.addEventListener("keyup", command);
+         cmd.addEventListener("keyup", command);	      
          window.onbeforeunload = exit_spike;
          browse.onclick = exit_spike;
          upload.onclick = exit_spike;
-         // make GUI appear on page
+         server_HTML_replace(event);
+         regReq.open("get", name + port + "&data=reg 0");
+         regReq.send();
       }
    } else {
        if (port == "") serverData.innerHTML = "";  // connection was terminated
-       else serverData.innerHTML = event.data.replace(/Listening for debug commands on [^.]+./,
-                                                      "<h4>Ready for command input:</h4>");
+       else server_HTML_replace(event);
    }
 }
 
@@ -37,12 +35,27 @@ if(typeof(EventSource)!=="undefined") {
 	eSource.onmessage = sse_listener;
 } else serverData.innerHTML= "Whoops! Your browser does not receive server-sent events.";
 
+//write the received data to the page, but without "Listening..." string
+function server_HTML_replace(event) {
+   serverData.innerHTML = event.data.replace(/Listening for debug commands on [^.]+./,
+                                       "<h4>Pronto para receber comandos na caixa azul:</h4>");
+}
 
-// JTAG client request for spike debug
+// request for register display
+var regReq = new XMLHttpRequest();
+
+function regReqListener() {
+  reg.innerHTML = this.responseText;            
+}
+regReq.onload = regReqListener;
+
+// request for spike debug command from user
 var spikeReq = new XMLHttpRequest();
 
 function spikeReqListener() {
-  sout.innerHTML = this.responseText;                
+  sout.innerHTML = this.responseText;
+  regReq.open("get", name + port + "&data=reg 0");
+  regReq.send();
 }
 spikeReq.onload = spikeReqListener;
 
@@ -53,14 +66,25 @@ function command(event) {
     }
 }
 
+function nada() { }
+function nada_e(event) { }
+
 function exit_spike() {
     eSource.removeEventListener("message", sse_listener);
     spikeReq.open("get", name + port + "&data=q");
     spikeReq.send();
+    spikeReq.onload = nada;
+    regReq.onload = nada;
+    cmd.addEventListener("keyup", nada_e);
+    browse.onclick = nada_e;
     port = "";  // mark connection as terminated
     sout.innerHTML = "";
     cmd.style.border = "transparent";
     cmd.value = "";
+    sout.style.border = "transparent";
+    sout.innerHTML = "";
+    reg.style.border = "transparent";
+    reg.innerHTML = "";
     serverData.innerHTML = "";
 }
 

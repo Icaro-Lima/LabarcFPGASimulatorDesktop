@@ -19,7 +19,6 @@ module top(input  logic clk_2,
            output logic lcd_MemWrite, lcd_Branch, lcd_MemtoReg, lcd_RegWrite);
 
   always_comb begin
-    LED <= SWI | clk_2;
     SEG <= SWI;
     lcd_WriteData <= SWI;
     lcd_pc <= 'h12;
@@ -39,5 +38,14 @@ module top(input  logic clk_2,
     lcd_a <= {56'h1234567890ABCD, SWI};
     lcd_b <= {SWI, 56'hFEDCBA09876543};
   end
+
+  logic [3:0] contador;
+
+  always_ff @(posedge clk_2) begin
+     contador <= contador+1;
+  end
+
+  always_comb LED[0] <= clk_2;  
+  always_comb LED[7:4] <= contador;
 
 endmodule
