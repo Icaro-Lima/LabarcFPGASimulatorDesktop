@@ -14,7 +14,7 @@ function sse_listener(event) {
          name = "client.php?name=" + name_port[0];
          port = "&port=" + name_port[2] + "&m";
          // register GUI event handlers
-         cmd.addEventListener("keyup", command);	      
+         cmd.onkeyup = command;
          window.onbeforeunload = exit_spike;
          browse.onclick = exit_spike;
          upload.onclick = exit_spike;
@@ -23,8 +23,8 @@ function sse_listener(event) {
    } else {
        if (port == "") serverData.innerHTML = "";  // connection was terminated
        else {
-          regReq.open("get", name + port + "&data=reg 0");
-          regReq.send();
+          pcReq.open("get", name + port + "&data=pc 0");
+          pcReq.send();
           server_HTML_replace(event);
        }
    }
@@ -44,10 +44,20 @@ function server_HTML_replace(event) {
 }
 
 // request for register display
+var pcReq = new XMLHttpRequest();
+var pc = "";
+function pcReqListener() {
+  pc = this.responseText;            
+  regReq.open("get", name + port + "&data=reg 0");
+  regReq.send();
+}
+pcReq.onload = pcReqListener;
+
+// request for register display
 var regReq = new XMLHttpRequest();
 
 function regReqListener() {
-  reg.innerHTML = this.responseText;            
+  reg.innerHTML = "&nbsp;  pc: " + pc + "<br>" + this.responseText;            
 }
 regReq.onload = regReqListener;
 
@@ -56,8 +66,8 @@ var spikeReq = new XMLHttpRequest();
 
 function spikeReqListener() {
   sout.innerHTML = this.responseText;
-  regReq.open("get", name + port + "&data=reg 0");
-  regReq.send();
+  pcReq.open("get", name + port + "&data=pc 0");
+  pcReq.send();
 }
 spikeReq.onload = spikeReqListener;
 
@@ -77,7 +87,7 @@ function exit_spike() {
     spikeReq.send();
     spikeReq.onload = nada;
     regReq.onload = nada;
-    cmd.addEventListener("keyup", nada_e);
+    cmd.onkeyup = nada_e;
     browse.onclick = nada_e;
     port = "";  // mark connection as terminated
     sout.innerHTML = "";
