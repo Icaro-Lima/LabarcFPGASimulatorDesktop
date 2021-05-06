@@ -1,6 +1,7 @@
 let name = "";  // computer name string for GET request to JTAG client
 let port = "";  // port number string for GET request to JTAG client
 var eSource;  // event dsource for synthesizer output update
+var initial = true;
 
 function sse_listener(event) {
    if(name == "") {
@@ -23,8 +24,11 @@ function sse_listener(event) {
    } else {
        if (port == "") serverData.innerHTML = "";  // connection was terminated
        else {
-          pcReq.open("get", name + port + "&data=pc 0");
-          pcReq.send();
+	  if(initial) {
+             pcReq.open("get", name + port + "&data=pc 0");
+             pcReq.send();
+             initial = false;
+          }
           server_HTML_replace(event);
        }
    }
@@ -65,7 +69,7 @@ var regReq = new XMLHttpRequest();
 function regReqListener() {
   reg.innerHTML = "&nbsp;  pc: " + pc + "<br>" + this.responseText;
   if (memory.length != 0) {
-     memReq.open("get", name + port + "&data=mem " + memory);
+     memReq.open("get", name + port + "&data=mem " + memory[0]);
      memReq.send();
   }
 }
@@ -73,9 +77,16 @@ regReq.onload = regReqListener;
 
 // request for memory display
 var memReq = new XMLHttpRequest();
-var mempory = "";
+var memory = [];
+var memory_idx = 0;
 function memReqListener() {
-  mem.innerHTML = memory + ": " + this.responseText;            
+   if (memory_idx == 0) mem.innerHTML = "";
+   else mem.innerHTML =  mem.innerHTML + "<br>";
+   mem.innerHTML =  mem.innerHTML + memory[memory_idx++] + ": " + this.responseText;
+   if (memory_idx < memory.length) {
+      memReq.open("get", name + port + "&data=mem " + memory[memory_idx]);
+      memReq.send();
+   } else memory_idx = 0;
 }
 memReq.onload = memReqListener;
 
@@ -91,8 +102,9 @@ spikeReq.onload = spikeReqListener;
 function command(event) {
     if (event.key === "Enter") {
        if (cmd.value.split(" ")[0] == "mem") {
-          memory = cmd.value.split(" ")[1];
-          memReq.open("get", name + port + "&data=" + cmd.value);
+          memory[memory.length] = cmd.value.split(" ")[1];
+          memory_idx = 0;
+          memReq.open("get", name + port + "&data=mem " + memory[0]);
           memReq.send();
        } else {
           spikeReq.open("get", name + port + "&data=" + cmd.value);
@@ -125,5 +137,6 @@ function exit_spike() {
     mem.innerHTML = "";
     help.innerHTML = "";
     serverData.innerHTML = "";
+    initial = true;
 }
 
