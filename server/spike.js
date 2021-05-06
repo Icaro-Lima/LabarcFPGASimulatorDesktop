@@ -43,7 +43,14 @@ function server_HTML_replace(event) {
             "<h4 style=\"font-family:serif\">pronto para receber comandos na caixa azul:</h4>");
 }
 
-// request for register display
+// the requests to spike are sent in the following sequence:
+// user command, pc, reg, mem
+// Each request response triggers the next request in the sequence.
+// The user command request is triggered by user input.
+// The first request is for pc, so the register window is already populated
+// when the user entgers his first command.
+
+// request for pc display (first line of register window)
 var pcReq = new XMLHttpRequest();
 var pc = "";
 function pcReqListener() {
@@ -55,15 +62,25 @@ pcReq.onload = pcReqListener;
 
 // request for register display
 var regReq = new XMLHttpRequest();
-
 function regReqListener() {
-  reg.innerHTML = "&nbsp;  pc: " + pc + "<br>" + this.responseText;            
+  reg.innerHTML = "&nbsp;  pc: " + pc + "<br>" + this.responseText;
+  if (memory.length != 0) {
+     memReq.open("get", name + port + "&data=mem " + memory);
+     memReq.send();
+  }
 }
 regReq.onload = regReqListener;
 
-// request for spike debug command from user
-var spikeReq = new XMLHttpRequest();
+// request for memory display
+var memReq = new XMLHttpRequest();
+var mempory = "";
+function memReqListener() {
+  mem.innerHTML = memory + ": " + this.responseText;            
+}
+memReq.onload = memReqListener;
 
+// request for user command response
+var spikeReq = new XMLHttpRequest();
 function spikeReqListener() {
   sout.innerHTML = this.responseText;
   pcReq.open("get", name + port + "&data=pc 0");
@@ -73,8 +90,14 @@ spikeReq.onload = spikeReqListener;
 
 function command(event) {
     if (event.key === "Enter") {
-       spikeReq.open("get", name + port + "&data=" + cmd.value);
-       spikeReq.send();
+       if (cmd.value.split(" ")[0] == "mem") {
+          memory = cmd.value.split(" ")[1];
+          memReq.open("get", name + port + "&data=" + cmd.value);
+          memReq.send();
+       } else {
+          spikeReq.open("get", name + port + "&data=" + cmd.value);
+          spikeReq.send();
+       }    
     }
 }
 
@@ -87,6 +110,7 @@ function exit_spike() {
     spikeReq.send();
     spikeReq.onload = nada;
     regReq.onload = nada;
+    memReq.onload = nada;
     cmd.onkeyup = nada_e;
     browse.onclick = nada_e;
     port = "";  // mark connection as terminated
@@ -97,6 +121,9 @@ function exit_spike() {
     sout.innerHTML = "";
     reg.style.border = "transparent";
     reg.innerHTML = "";
+    mem.style.border = "transparent";
+    mem.innerHTML = "";
+    help.innerHTML = "";
     serverData.innerHTML = "";
 }
 
