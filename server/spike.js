@@ -58,9 +58,14 @@ function server_HTML_replace(event) {
 var pcReq = new XMLHttpRequest();
 var pc = "";
 function pcReqListener() {
-  pc = this.responseText;            
-  regReq.open("get", name + port + "&data=reg 0");
-  regReq.send();
+   if(this.responseText[0] != 'S') {
+      pc = this.responseText;      
+      regReq.open("get", name + port + "&data=reg 0");
+      regReq.send();
+   } else {
+       reg.innerHTML = "";
+       mem.innerHTML = "";
+   }
 }
 pcReq.onload = pcReqListener;
 

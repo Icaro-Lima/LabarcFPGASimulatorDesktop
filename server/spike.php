@@ -4,6 +4,7 @@
     <style>
       @font-face { font-family: LCD; src: url('led_counter-7.ttf'); }
       .label { font-family: Courier New; color:red; font-weight: bold; }
+      pre { line-height:60%; }
     </style>
   <title>LABARC - simulação ISA remota</title>
 </head>

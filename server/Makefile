@@ -72,7 +72,7 @@ a.out: $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 # from C to assembly
 %.s : %.c
 	riscv32-unknown-elf-gcc -O1 -S $<
-	echo \<pre\>\<code\>; grep -v "^[[:space:]]\." $@ | sed 's/^\t/\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;\&nbsp;/g'; echo \</code\>\</pre\>
+	echo \<pre\>; grep -v "^[[:space:]]\." $@ | sed 's/^\t/\&nbsp;\t/g'; echo \</pre\>
 
 maintainer-copy::
 clean mostlyclean distclean maintainer-clean::
