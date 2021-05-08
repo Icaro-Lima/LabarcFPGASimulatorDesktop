@@ -84,14 +84,18 @@ regReq.onload = regReqListener;
 var memReq = new XMLHttpRequest();
 var memory = [];
 var memory_idx = 0;
+var memHTML = "";
 function memReqListener() {
-   if (memory_idx == 0) mem.innerHTML = "";
-   else mem.innerHTML =  mem.innerHTML + "<br>";
-   mem.innerHTML =  mem.innerHTML + memory[memory_idx++] + ": " + this.responseText;
+   if (memory_idx > 0) memHTML = memHTML + "<br>";
+   memHTML =  memHTML + memory[memory_idx++] + ": " + this.responseText;
    if (memory_idx < memory.length) {
       memReq.open("get", name + port + "&data=mem " + memory[memory_idx]);
       memReq.send();
-   } else memory_idx = 0;
+   } else {
+      mem.innerHTML = memHTML;
+      memory_idx = 0;
+      memHTML = "";   
+   }
 }
 memReq.onload = memReqListener;
 
