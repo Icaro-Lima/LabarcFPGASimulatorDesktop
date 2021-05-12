@@ -72,7 +72,7 @@ gui.o: gui.cpp gui.h
 # from assembly to object dump
 %.objdump : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	riscv32-unknown-elf-gcc -nostartfiles -T$$RISCV/link.ld $^
-	riscv32-unknown-elf-objdump -s -j .text | egrep " [0-9a-f]{4} [0-9a-f]{8}" | cut -b7-41 > $@
+	riscv32-unknown-elf-objdump -s -j .text | egrep "( [0-9a-f]{8}){5}" | cut -b11-45 > $@
 
 # from C to assembly
 %.s : %.c
