@@ -13,8 +13,17 @@ while : ; do # infinite loop
       if test -f $d/*.zip; then
          (cd $d; unzip *.zip; tail -1 top.zip >>top.sv)
       fi
-      cp /labarc/TOP/Makefile $d
-      (cd $d; timeout 3600 make sim 1>/dev/null 2>qq.log) &
+      cp /labarc/TOP/Make* $d
+      if test -f $d/*.sv; then
+         c=$(grep -h parameter $d/*.sv | grep divide_by | head -1 | grep -oP '(?<!\d)\d*(?!\d)' )
+         (cd $d; DIVIDE_BY=$c timeout 3600 make sim 1>/dev/null 2>qq.log) &
+      else
+         if test -f $d/*.101; then
+            (cd $d; timeout 3600 /labarc/util/RISCV_sim 2>qq.log 1>&2) &
+         else
+            (cd $d; make inst.objdump; timeout 3600 /labarc/util/RISCV_sim 2>qq.log 1>&2) &
+         fi
+      fi
    fi
   done
   sleep 2
