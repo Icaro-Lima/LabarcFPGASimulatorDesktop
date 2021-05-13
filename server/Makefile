@@ -54,11 +54,11 @@ sim: $(HDL_SIM)
 	mkdir -p $(TMP)/obj
 	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv $(HDL_SIM) /labarc/util/veri.cpp /labarc/util/sim_socket.o $(FLTK) $(VBOOST)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
-	$(TMP)/obj/Vtop $(DIVIDE_BY)
+	$(TMP)/obj/Vtop $(DIVIDE_BY) 1>&2
 
 # from binary to object dump
 %.objdump : a.out
-	riscv32-unknown-elf-objdump -s -j .text | egrep " [0-9a-f]{4} [0-9a-f]{8}" | cut -b7-41 > $@
+	riscv32-unknown-elf-objdump -s -j .text | egrep "( [0-9a-f]{8}){5}" | cut -b11-45 > $@
 
 isa: a.out
 	echo -n "until pc 0 " >a.cmd

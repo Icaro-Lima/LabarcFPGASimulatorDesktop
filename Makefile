@@ -55,11 +55,6 @@ default: $(HDL_SIM) sim_socket.o remote.bin
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
 	obj_dir/Vtop $(DIVIDE_BY)
 
-call: gui.o
-	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv sim_main.cpp ../gui.o $(FLTK)
-	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
-	obj_dir/Vtop
-
 remote.bin: remote.cpp gui.o
 	$(CXX) $(CFLTK) remote.cpp gui.o -o remote.bin $(BOOST) $(LFLTK)
 
@@ -69,15 +64,18 @@ sim_socket.o: sim_socket.cpp
 gui.o: gui.cpp gui.h
 	$(CXX) $(CFLTK) -c gui.cpp
 
-# from assembly to object dump
-%.objdump : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
-	riscv32-unknown-elf-gcc -nostartfiles -T$$RISCV/link.ld $^
+# from binary to object dump
+%.objdump : a.out
 	riscv32-unknown-elf-objdump -s -j .text | egrep "( [0-9a-f]{8}){5}" | cut -b11-45 > $@
+
+# from assembly to binary
+a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
+	riscv32-unknown-elf-gcc -nostartfiles -T$$RISCV/link.ld $^
 
 # from C to assembly
 %.s : %.c
 	riscv32-unknown-elf-gcc -O1 -S $<
-
+	grep -v "^[[:space:]]\." $@
 
 
 ######################################################################
