@@ -68,6 +68,7 @@ isa: a.out
 # from assembly to binary
 a.out: $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	riscv32-unknown-elf-gcc $(RVLDFL) $^
+	echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | egrep "^[0-9a-f]{8}" | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
 
 # from C to assembly
 %.s : %.c

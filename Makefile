@@ -71,6 +71,7 @@ gui.o: gui.cpp gui.h
 # from assembly to binary
 a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	riscv32-unknown-elf-gcc -nostartfiles -T$$RISCV/link.ld $^
+	riscv32-unknown-elf-objdump -d -j .text | egrep "^[0-9a-f]{8}"
 
 # from C to assembly
 %.s : %.c
