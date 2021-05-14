@@ -85,3 +85,6 @@ If no such exit message is received, the JTAG server is killed after 5 minutes
 and the simulation is killed after 1 hour.
 
 ![arch](arch.svg)
+
+![files](files.svg)
+
