@@ -41,10 +41,10 @@
      id="namedview9461"
      showgrid="false"
      inkscape:zoom="2"
-     inkscape:cx="290.66667"
+     inkscape:cx="187.16667"
      inkscape:cy="137.50501"
      inkscape:window-x="-3"
-     inkscape:window-y="101"
+     inkscape:window-y="-16"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg9459" />
   <defs
@@ -4557,4 +4557,14 @@
          y="213.14" />
     </g>
   </g>
+  <path
+     inkscape:connector-curvature="0"
+     id="path2797"
+     d="m 237.91704,250.32838 -13.9679,18.77944"
+     style="fill:none;stroke:#000000;stroke-width:2.13342524;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:0.21334253, 0.21334253;stroke-opacity:1" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path2799"
+     d="m 220.11865,275.66146 0.67169,-11.25226 3.1588,4.69862 5.71381,0.33091 z m 0,0"
+     style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2.03180361;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1" />
 </svg>
