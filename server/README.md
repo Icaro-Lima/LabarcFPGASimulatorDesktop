@@ -45,6 +45,15 @@ The HTTP server has write access to both, `/home/labarc01/sim` and `/home/labarc
 When the user clicks `Upload` in `remote.php` or `simulate.php`,
 the HTTP server creates a new directory in `/home/labarc01/syn` or `/home/labarc01/sim`, respectively,
 and puts the uploaded Systemverilog file `top.sv` or `top.zip`into it.
+
+Optionally, before clicking `Upload`,
+the user may activate one of two different LCD views:
+a plain hex display for two 64-bit values, or
+a view of internal processor busses and control signals
+which is used when the intended project is the
+implementation of a RISC-V processor.
+A datapath register view is also provided in this case.
+
 The HTTP server has no FPGA board connected to it nor does it run simulations.
 
 The simulations are run by one specific computer. One process of `launch_sims`
@@ -85,6 +94,55 @@ If no such exit message is received, the JTAG server is killed after 5 minutes
 and the simulation is killed after 1 hour.
 
 ![arch](arch.svg)
+
+In order to be able to support two models of FPGA boards available in the lab,
+there are two top level SystemVerilog files:
+`DE0_Nano.sv` for the Terasic DE0-Nano Development and Education Board and
+`DE0_SoC.sv` for the Terasic DE0-Nano-SoC Kit/Atlas-SoC Kit.
+Both files are kept on the lab server and can not be modified by the user.
+The user uploads the file `top.sv` which is instantiated in `DE0_Nano.sv`
+as well as in `DE0_SoC.sv`. By means fo the file `top.sv`, the user does not
+need to be aware in which FPGA board model his circuit will be implemented.
+Depending on FPGA boards and computers available at the time of upload,
+the circuit descibed in `top.sv` may get implemented in any board model.
+
+By means of the parameter `divide_by` defined in `top.sv`, the user can set
+the clock frequency of the clock signal input to `top.sv`.
+The parameter is used in a clock divider circuit in `DE0_Nano.sv` and `DE0_SoC.sv`.
+
+The files `DE0_Nano.sv` and `DE0_SoC.sv` also instatiate the virtual JTAG module
+contained in file `vJTAG_interface.sv` which in turn instatiates
+the `vJTAG` macrofunction
+[(Zeh, 2012)](http://idlelogiclabs.com/2012/04/15/talking-to-the-de0-nano-using-the-virtual-jtag-interface).
+
+Along with the file `top.sv`, the user may provide additional SystemVerilog
+files which contain modules instatiated in top.sv.
+
+In case the Systemverilog description supplied by the user contains a
+ROM megafunction named "INST", the user may also upload assembly and/or C files
+along with the SystemVerilog files.
+This feature is used when a RISC-V processor circuit is to be implemented in the FPGA.
+
+All file processing is governed by a `Makefile` which uses Quartus Design Software
+command line interface to synthesize the circuit from the SystemVerilog files.
+Depending on the FPGA board model connected to the computer to which the job
+has been assigned to by the web server, either a `DE0_nano.sof` or a `DE0_SoC.sof`
+configuration file is created and loaded into the FPGA.
+Assembly files and C files are compiled using the
+[RISC-V toolchain](https://github.com/riscv/riscv-gnu-toolchain)
+and the raw binary data are loaded into the FPGA ROM memory instance called "INST"
+by means of Quartus Design Software command line interface.
+
+The TCL command file `qr.tcl` supplied to the Quartus SignalTap then
+creates a socket server
+[(Zeh, 2012)](http://idlelogiclabs.com/2012/04/15/talking-to-the-de0-nano-using-the-virtual-jtag-interface)
+to which the web server can connect to.
+The web server relays the socket connection via HTTP to the user's browser.
+
+Incoming user actions from the user's GUI are fed to the virtual JTAG interface
+to the inputs of the module in `top.sv` and outputs are sent back
+through the virtual JTAG interface and through the web server to the user's
+browser Javascript GUI.
 
 ![files](files.svg)
 
