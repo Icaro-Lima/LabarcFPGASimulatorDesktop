@@ -10,7 +10,11 @@
 </head>
 <body>
   <form enctype="multipart/form-data" action="spike.php" method="POST">
-    <p>Procure seu arquivo assembly .s ou C .c, ou um arquivo comprimido .zip
+    <p>Procure seu arquivo
+       <a href="inst.s">assembly .s</a>,&nbsp;  
+       <a href="inst.101">código de máquina</a>,&nbsp;
+       <a href="shift.c">C .c</a>,&nbsp; ou
+       um arquivo <a href="lupi-pc.zip">comprimido .zip</a>
        e dê <i>Enter</i> no campo de valores de entrada. </p>
     <input type="file" name="uploaded_file" id=browse></input>
     &nbsp; &nbsp; Valores de entrada:<input type="text" name="args">

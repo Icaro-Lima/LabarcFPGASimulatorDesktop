@@ -23,9 +23,9 @@
      !empty($_FILES['uploaded_file']['name']) &&
      !empty($_FILES['uploaded_file']['tmp_name']) )
   {
-    if( $_FILES['uploaded_file']['size'] > 30000 ) {
+    if( $_FILES['uploaded_file']['size'] > 300000 ) {
        echo "Error: file size ". $_FILES['uploaded_file']['size']
-            ." bytes above limit of 30000 bytes";
+            ." bytes above limit of 300 kbytes";
        $path = false;
     } else {
        $path = trim(shell_exec("mktemp -d -p /home/labarc01/". $subdir ." 2>&1"));

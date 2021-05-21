@@ -4,6 +4,7 @@
     <style>
       @font-face { font-family: LCD; src: url('led_counter-7.ttf'); }
       .label { font-family: Courier New; color:red; font-weight: bold; }
+      pre { font-size:125%; line-height:60%; }
     </style>
   <title>LABARC- uso remoto</title>
 </head>
@@ -28,7 +29,7 @@
   if(!empty($path)) {
      // Put enough space characters in front of the IP so that even one-digit IPs
      // can be read grabbing the last 18 characters of the file. 
-     file_put_contents($file, "\n//           " . get_client_ip() . "\n", FILE_APPEND);
+	  file_put_contents($file, "\n/*           " . get_client_ip() . " */\n", FILE_APPEND);
      echo "<div style=\"font-size:75%\" id=\"serverData\">The file "
           . basename( $_FILES['uploaded_file']['name']) .
           " has been uploaded.<br>\n<h4>solicitando síntese</h4></div>\n";

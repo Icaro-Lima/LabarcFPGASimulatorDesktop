@@ -25,7 +25,7 @@ function sse_listener(event) {
          swi2.onpointerdown = swi2_click;
          swi1.onpointerdown = swi1_click;
          swi0.onpointerdown = swi0_click;
-         si = setInterval(update, 1000);
+         si = setInterval(update, 400);
          window.onbeforeunload = exit_jtag;
          browse.onclick = exit_jtag;
          upload.onclick = exit_jtag;

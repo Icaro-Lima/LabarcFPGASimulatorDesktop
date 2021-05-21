@@ -7,7 +7,10 @@ for i in {1..10}; do
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
       if test -f $d/*.zip; then
-         (cd $d; unzip *.zip &>/dev/null; tail -1 top.zip >>top.sv 2>>/dev/null )
+         (cd $d; unzip *.zip &>/dev/null)
+         if test -f $d/top.sv; then
+             tail -1 d$/top.zip >> d$/top.sv 2>>/dev/null
+         fi
       fi	   
       cp /labarc/TOP/* $d
       # there is no file named top.sv in lad:/labarc/TOP

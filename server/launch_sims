@@ -11,7 +11,10 @@ while : ; do # infinite loop
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
       if test -f $d/*.zip; then
-         (cd $d; unzip *.zip; tail -1 top.zip >>top.sv)
+         (cd $d; unzip *.zip)
+         if test -f $d/top.sv; then
+            tail -1 d$/top.zip >> d$/top.sv
+         fi
       fi
       cp /labarc/TOP/Make* $d
       if test -f $d/*.sv; then
@@ -21,7 +24,7 @@ while : ; do # infinite loop
          if test -f $d/*.101; then
             (cd $d; timeout 3600 /labarc/util/RISCV_sim 2>qq.log 1>&2) &
          else
-            (cd $d; make inst.objdump; timeout 3600 /labarc/util/RISCV_sim 2>qq.log 1>&2) &
+            (cd $d; make inst.objdump >qq.log; timeout 3600 /labarc/util/RISCV_sim 2>>qq.log 1>&2) &
          fi
       fi
    fi
