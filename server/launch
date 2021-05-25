@@ -4,6 +4,14 @@
 # make sure there is at least one tmp directory so ls will not fail
 mkdir -p syn/tmp.0
 
+function qr () {
+   timeout 300 quartus_stp -t /labarc/util/qr.tcl $1 > /dev/null 2>> qq.log
+}
+
+function qinst () {
+   quartus_stp -t /labarc/util/inst.tcl $2 $1 | egrep --line-buffered "(Error|Running|successful)" >> qq.log
+}
+
 while : ; do # infinite loop
   # get a directory to work on
   while ! d=$(curl -s lad:2525); do sleep 5; done
@@ -12,7 +20,18 @@ while : ; do # infinite loop
     if test -f top.sv; then
        echo "sintesizing " $d
        if CABLE=$(expr $1 + 1) make > qq.log ; then
-           timeout 300 quartus_stp -t /labarc/util/qr.tcl $1 > /dev/null 2>> qq.log
+           if test -f *.101; then
+              b=$(ls -1t *.101 | head -1)  # consider only first .101 file
+              if qinst $1 $b ; then
+                 qr $1
+              fi		   
+           elif test -f *.[cs]; then
+              if make inst.objdump >> qq.log && qint $1 inst.objdump ; then
+                 qr $1
+              fi		   
+           else
+              qr $1
+           fi
        fi
     else
        echo "configuring in " $d
@@ -23,22 +42,24 @@ while : ; do # infinite loop
          p=RISCV
        fi
        if quartus_pgm -c$(expr $1 + 1) /labarc/RISCV/$p.cdf | egrep --line-buffered "(Error|Running|successful)" > qq.log ; then
+           # top.sv does not exist, but create it only to put uploaded IP into it
+           if test -f *.zip; then
+              tail -1 $(ls -1t *.zip | head -1) > top.sv 2>>/dev/null
+           elif test -f *.c; then
+              tail -1 $(ls -1t *.c   | head -1) > top.sv 2>>/dev/null
+           elif test -f *.s; then
+              tail -1 $(ls -1t *.s   | head -1) > top.sv 2>>/dev/null
+           elif test -f *.101; then
+              tail -1 $(ls -1t *.101 | head -1) > top.sv 2>>/dev/null
+           fi
            if test -f *.101; then
-              tail -1 inst.101 > top.sv 2>>/dev/null
-              if quartus_stp -t /labarc/util/inst.tcl *.101 $1 | egrep --line-buffered "(Error|Running|successful)" >> qq.log ; then
-                timeout 300 quartus_stp -t /labarc/util/qr.tcl $1 > /dev/null 2>> qq.log
+              b=$(ls -1t *.101 | head -1)  # consider only first .101 file
+              if qinst $1 $b ; then
+                 qr $1
               fi		   
 	   else
-              # top.sv does not exist, but create it only to put uploaded IP into it
-              if test -f *.zip; then
-                 tail -1 *.zip > top.sv 2>>/dev/null
-	      elif test -f *.s; then
-                 tail -1 *.s > top.sv 2>>/dev/null
-	      elif test -f *.c; then
-                 tail -1 *.c > top.sv 2>>/dev/null
-	      fi
-              if make inst.objdump >> qq.log && quartus_stp -t /labarc/util/inst.tcl inst.objdump $1 | egrep --line-buffered "(Error|Running|successful)" >> qq.log ; then
-                timeout 300 quartus_stp -t /labarc/util/qr.tcl $1 > /dev/null 2>> qq.log
+              if make inst.objdump >> qq.log && qint $1 inst.objdump ; then
+                 qr $1
               fi		   
            fi 
        fi

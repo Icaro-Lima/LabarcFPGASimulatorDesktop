@@ -13,7 +13,7 @@ while : ; do # infinite loop
       if test -f $d/*.zip; then
          (cd $d; unzip *.zip)
          if test -f $d/top.sv; then
-            tail -1 d$/top.zip >> d$/top.sv
+            tail -1 $(ls -1t $d/*.zip | head -1) >> d$/top.sv 2>>/dev/null
          fi
       fi
       cp /labarc/TOP/Make* $d

@@ -9,7 +9,7 @@ for i in {1..10}; do
       if test -f $d/*.zip; then
          (cd $d; unzip *.zip &>/dev/null)
          if test -f $d/top.sv; then
-             tail -1 d$/top.zip >> d$/top.sv 2>>/dev/null
+             tail -1 $(ls -1t $d/*.zip | head -1) >> d$/top.sv 2>>/dev/null
          fi
       fi	   
       cp /labarc/TOP/* $d
