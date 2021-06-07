@@ -48,9 +48,9 @@ proc get_data {send_data} {
 
 
 set svf [open top.sv]
-seek $svf -18 end
-# IP has max 4*(3+1) characters, one for line feed and one for security
-set upload_ip [string trim [read $svf 18]]
+seek $svf -21 end
+# IP has max 4*(3+1) characters, 3 for " */", one for line feed and one for security
+set upload_ip [string trim [read $svf 21] " */\n\r"]
 
 #Code Dervied from Tcl Developer Exchange – http://www.tcl.tk/about/netserver.html
 

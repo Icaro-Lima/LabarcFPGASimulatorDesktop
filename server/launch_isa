@@ -10,11 +10,11 @@ while : ; do # infinite loop
    d=$(ls -1dt isa/tmp.* | head -$i | tail -1)
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
+      f=$(ls $d)
+      p=$(tail -1 $d/$f | cut -d\| -f2)
       if test -f $d/*.zip; then
          (cd $d; unzip *.zip)
       fi
-      f=$(ls $d)
-      p=$(tail -1 $d/$f | cut -d\| -f2)
       cp /labarc/TOP/Makefile $d
       if [ -z "$p" ]; then
         echo "RVLDFL=-nostartfiles -T/usr/local/riscv/link.ld" > $d/Make_pk

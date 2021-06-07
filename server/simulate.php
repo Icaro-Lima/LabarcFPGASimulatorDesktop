@@ -13,11 +13,15 @@
     <p>Simular FPGA não vale centavos, mas compilação para simulação
        é bem mais rápida do que a síntese do circuito real.</p>
     <p>Por favor, faça upload do seu arquivo
-       <a href="top.sv">Systemverilog top.sv</a>,
-       <a href="inst.s">assembly</a>,
-       <a href="shift.c">C</a>,
-       ou comprimido .zip. O arquivo comprimido pode conter somente arquivos
-       .sv, somente arquivos .s, somente arquivos .c e .h,
+       <a href="top.sv">Systemverilog</a>,&nbsp;
+       <a href="inst.101">código de máquina</a>,&nbsp;
+       <a href="inst.s">assembly</a>,&nbsp;
+       <a href="shift.c">C</a>,&nbsp;
+       ou comprimido .zip. O arquivo comprimido pode conter
+       somente arquivos SystemVerilog .sv,
+       somente arquivos de código de máquina .101,
+       somente arquivos .s,
+       somente arquivos .c e .h,
        ou uma mistura de todos estes.</p>
     <input type="file" name="uploaded_file" id=browse></input>
     <input type="radio" name="display" value="LCD"> LCD
