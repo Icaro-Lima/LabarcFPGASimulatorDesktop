@@ -11,18 +11,26 @@ while : ; do # infinite loop
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
       f=$(ls $d)
+      # f is the name of the one file in the directory
+      # p are the command line arguments
+      #   They have been appended to the last line of the uploaded file.
       p=$(tail -1 $d/$f | cut -d\| -f2)
       if test -f $d/*.zip; then
          (cd $d; unzip *.zip)
       fi
       cp /labarc/TOP/Makefile $d
       if [ -z "$p" ]; then
+        # if there are no command line arguments, wo do not need a proxy kernel
         echo "RVLDFL=-nostartfiles -T/usr/local/riscv/link.ld" > $d/Make_pk
       else
+        # if there are program arguments we need the proxy kernel
         echo "PK=pk"  > $d/Make_pk
         echo "PROG_ARGS="$p >> $d/Make_pk
       fi
-      (cd $d; timeout 3600 make isa >qq.log 2>&1 ) &
+      if test -f $d/*.101; then
+         (cd  $d; make binary >qq.log 2>&1 )
+      fi
+      (cd $d; timeout 3600 make isa >>qq.log 2>&1 ) &
    fi
   done
   sleep 2

@@ -58,17 +58,22 @@ sim: $(HDL_SIM)
 
 # from binary to object dump
 %.objdump : a.out
-	riscv32-unknown-elf-objdump -s -j .text | egrep "( [0-9a-f]{8}){5}" | cut -b11-45 > $@
+	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@
 
 isa: a.out
 	echo -n "until pc 0 " >a.cmd
 	riscv32-unknown-elf-objdump -j .text -t a.out | grep " main" | cut -d' ' -f1 >>a.cmd
 	prlimit --cpu=5 spike -d -s --cmd=a.cmd $(PK) a.out $(PROG_ARGS); echo $$?
 
+# from .101 to binary
+binary : $(wildcard *.101)
+	grep ^[01] $< | sed 's/;.*//g' | sed 's/ //g' | binmake 
+	riscv32-unknown-elf-objcopy --update-section .text=a.bin --strip-symbol=_end /labarc/util/riscv.out a.out
+
 # from assembly to binary
-a.out: $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
+a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	riscv32-unknown-elf-gcc $(RVLDFL) $^
-	echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | egrep "^( [0-9a-f]{8}){2}" | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
+	echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | head -n -1 | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
 
 # from C to assembly
 %.s : %.c
