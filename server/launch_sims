@@ -11,13 +11,13 @@ while : ; do # infinite loop
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
       if test -f $d/*.zip; then
-         (cd $d; unzip *.zip)
+         (cd $d; unzip *.zip &>/dev/null)
          if test -f $d/top.sv; then
-            tail -1 $(ls -1t $d/*.zip | head -1) >> d$/top.sv 2>>/dev/null
+            tail -1 $(ls -1t $d/*.zip | head -1) >> $d/top.sv 2>>/dev/null
          fi
       fi
       cp /labarc/TOP/Make* $d
-      if test -f $d/*.sv; then
+      if test -f $(ls -1t $d/*.sv | head -1); then
          c=$(grep -h parameter $d/*.sv | grep divide_by | head -1 | grep -oP '(?<!\d)\d*(?!\d)' )
          (cd $d; DIVIDE_BY=$c timeout 3600 make sim 1>/dev/null 2>qq.log) &
       else

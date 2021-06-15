@@ -2,6 +2,7 @@ let name = "";  // computer name string for GET request to JTAG client
 let port = "";  // port number string for GET request to JTAG client
 var si;  // periodic interval timer for GUI refresh
 var eSource;  // event dsource for synthesizer output update
+var initial = true;
 
 function sse_listener(event) {
    if(name == "") {
@@ -71,6 +72,14 @@ function sse_listener(event) {
          }
          eSource.removeEventListener("message", sse_listener);
       }
+   } else {
+       if (port == "") serverData.innerHTML = "";  // connection was terminated
+       else {
+	  if(initial) {
+             initial = false;
+          }
+          serverData.innerHTML = event.data.replace(/<h4>Agora digite: .\/remote .+ <\/h4>/,"");
+       }
    }
 }
 
