@@ -83,36 +83,10 @@ if(typeof(EventSource)!=="undefined") {
 } else serverData.innerHTML= "Whoops! Your browser does not receive server-sent events.";
 
 
-// JTAG client request for RISC-V registers
-var riscRegReq = new XMLHttpRequest();
-
-function riscRegReqListener() {
- if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
-  var r = this.responseText.toUpperCase();
-  r0.innerHTML = r.substr(0,2);
-  r1.innerHTML = r.substr(2,2);
-  r2.innerHTML = r.substr(4,2);
-  r3.innerHTML = r.substr(6,2);
-  r4.innerHTML = r.substr(8,2);
-  r5.innerHTML = r.substr(10,2);
-  r6.innerHTML = r.substr(12,2);
-  r7.innerHTML = r.substr(14,2);
-  r8.innerHTML = r.substr(16,2);
-  r9.innerHTML = r.substr(18,2);
-  ra.innerHTML = r.substr(20,2);
-  rb.innerHTML = r.substr(22,2);
-  rc.innerHTML = r.substr(24,2);
-  rd.innerHTML = r.substr(26,2);
-  re.innerHTML = r.substr(28,2);
-  rf.innerHTML = r.substr(30,2);
- }
-}
-riscRegReq.onload = riscRegReqListener;
-
 // JTAG client request for RISC-V LCD
-var riscLcdReq = new XMLHttpRequest();
+var riscReq = new XMLHttpRequest();
 
-function riscLcdReqListener() {
+function riscReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   var r = this.responseText.toUpperCase();
   let f = Number("0x" + r.substr(22,2));         
@@ -127,11 +101,25 @@ function riscLcdReqListener() {
      r.substr(16,2) + " " + r.substr(20,2) + 
      //       Memto Reg         RegWrite
      ( f&0x04 ? "*" : "_" ) + ( f&0x08 ? "*" : "_" );
-  riscRegReq.open("get", name + port + "&data=00000000" );
-  riscRegReq.send();
+  r0.innerHTML = r.substr(24,2);
+  r1.innerHTML = r.substr(26,2);
+  r2.innerHTML = r.substr(28,2);
+  r3.innerHTML = r.substr(30,2);
+  r4.innerHTML = r.substr(32,2);
+  r5.innerHTML = r.substr(34,2);
+  r6.innerHTML = r.substr(36,2);
+  r7.innerHTML = r.substr(38,2);
+  r8.innerHTML = r.substr(40,2);
+  r9.innerHTML = r.substr(42,2);
+  ra.innerHTML = r.substr(44,2);
+  rb.innerHTML = r.substr(46,2);
+  rc.innerHTML = r.substr(48,2);
+  rd.innerHTML = r.substr(50,2);
+  re.innerHTML = r.substr(52,2);
+  rf.innerHTML = r.substr(54,2);
  }
 }
-riscLcdReq.onload = riscLcdReqListener;
+riscReq.onload = riscReqListener;
 
 // JTAG client request for LCD
 var lcdReq = new XMLHttpRequest();
@@ -187,8 +175,8 @@ function ledSegReqListener() {
       lcdReq.open("get", name + port + "&data=00111111" );
       lcdReq.send();
   } else if (display == "RISC") {
-      riscLcdReq.open("get", name + port + "&data=00100011" );
-      riscLcdReq.send();
+      riscReq.open("get", name + port + "&data=00100011" );
+      riscReq.send();
   }
  }
 }
@@ -287,8 +275,7 @@ function exit_jtag(event) {
   browse.onclick = nada_e;
   upload.onclick = nada_e;
   lcdReq.onload = nada;
-  riscLcdReq.onload = nada;
-  riscRegReq.onload = nada;
+  riscReq.onload = nada;
   ledSegReq.onload = nada;
   ledSegReq.open("get", name + port + "&data=exit" );
   ledSegReq.send();
