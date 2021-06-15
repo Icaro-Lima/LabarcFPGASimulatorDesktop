@@ -22,9 +22,16 @@ while : ; do # infinite loop
          (cd $d; DIVIDE_BY=$c timeout 3600 make sim 1>/dev/null 2>qq.log) &
       else
          if test -f $d/*.101; then
-            (cd $d; timeout 3600 /labarc/util/RISCV_sim 2>qq.log 1>&2) &
+            (cd $d
+             echo "<span style=color:blue>rodar o simulador com processador completo e pronto já compilado</span>" >>qq.log
+             echo "<span style=color:blue>No início da simulação, o arquivo inst.101 é lido.</span>" >>qq.log
+             timeout 3600 /labarc/util/RISCV_sim 2>>qq.log 1>&2) &
          else
-            (cd $d; make inst.objdump >qq.log; timeout 3600 /labarc/util/RISCV_sim 2>>qq.log 1>&2) &
+            (cd $d
+             make inst.objdump >>qq.log
+             echo "<span style=color:blue>rodar o simulador com processador completo e pronto já compilado</span>" >>qq.log
+             echo "<span style=color:blue>No início da simulação, o arquivo inst.objdump é lido.</span>" >>qq.log
+             timeout 3600 /labarc/util/RISCV_sim 2>>qq.log 1>&2) &
          fi
       fi
    fi

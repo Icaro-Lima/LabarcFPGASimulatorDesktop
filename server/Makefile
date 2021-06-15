@@ -51,6 +51,7 @@ default: $(HDL_SIM)
 	@sintetize $(TMP) $(CABLE)
 
 sim: $(HDL_SIM)
+	@echo "<span style=color:blue>compilar e simular Systemverilog</span>" 1>&2
 	mkdir -p $(TMP)/obj
 	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv $(HDL_SIM) /labarc/util/veri.cpp /labarc/util/sim_socket.o $(FLTK) $(VBOOST)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
