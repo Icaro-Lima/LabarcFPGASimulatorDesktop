@@ -34,7 +34,7 @@ using boost::asio::ip::tcp;
 boost::asio::io_service io_service;
 tcp::socket sock(io_service);
 tcp::resolver resolver(io_service);
-enum { max_length = 40 };
+enum { max_length = 60 };
 
 // send a request string and receive the reply
 char *send_and_rec(string r, int expected_reply_length) {
@@ -74,35 +74,29 @@ void set_lcd_ab(char *reply) {
     top->lcd_b = strtoul(reply, NULL, 16);         // lcd_b are the first 16 characters
 }
 
-void set_pc_etc(char *reply) {
-    unsigned char flags  = strtoul(reply+22, NULL, 16); reply[22] = 0;
-    top->lcd_MemWrite    = (flags & 1)>0;
-    top->lcd_Branch      = (flags & 2)>0;
-    top->lcd_MemtoReg    = (flags & 4)>0;
-    top->lcd_RegWrite    = (flags & 8)>0;
-    top->lcd_ReadData    = strtoul(reply+20, NULL, 16); reply[20] = 0;
-    top->lcd_WriteData   = strtoul(reply+18, NULL, 16); reply[18] = 0;
-    top->lcd_Result      = strtoul(reply+16, NULL, 16); reply[16] = 0;
-    top->lcd_ALUResult   = strtoul(reply+14, NULL, 16); reply[14] = 0;
-    top->lcd_SrcB        = strtoul(reply+12, NULL, 16); reply[12] = 0;
-    top->lcd_SrcA        = strtoul(reply+10, NULL, 16); reply[10] = 0;
-    top->lcd_instruction = strtoul(reply+ 2, NULL, 16); reply[ 2] = 0;
-    top->lcd_pc          = strtoul(reply, NULL, 16);
-}
-
-void set_regs(char *reply) {
+void set_pc_etc_regs(char *reply) {
    for(int i=NREGS-1; i>=0; i--) {
-      top->lcd_registrador[i] = strtoul(reply+2*i, NULL, 16);
-      reply[2*i] = 0;
+      top->lcd_registrador[i] = strtoul(reply+24+2*i, NULL, 16);
+      reply[24+2*i] = 0;
    }
+   unsigned char flags  = strtoul(reply+22, NULL, 16); reply[22] = 0;
+   top->lcd_MemWrite    = (flags & 1)>0;
+   top->lcd_Branch      = (flags & 2)>0;
+   top->lcd_MemtoReg    = (flags & 4)>0;
+   top->lcd_RegWrite    = (flags & 8)>0;
+   top->lcd_ReadData    = strtoul(reply+20, NULL, 16); reply[20] = 0;
+   top->lcd_WriteData   = strtoul(reply+18, NULL, 16); reply[18] = 0;
+   top->lcd_Result      = strtoul(reply+16, NULL, 16); reply[16] = 0;
+   top->lcd_ALUResult   = strtoul(reply+14, NULL, 16); reply[14] = 0;
+   top->lcd_SrcB        = strtoul(reply+12, NULL, 16); reply[12] = 0;
+   top->lcd_SrcA        = strtoul(reply+10, NULL, 16); reply[10] = 0;
+   top->lcd_instruction = strtoul(reply+ 2, NULL, 16); reply[ 2] = 0;
+   top->lcd_pc          = strtoul(reply, NULL, 16);
 }
 
 void rec_set_lcd() {
    if(fpga->lcd_check->value()) set_lcd_ab( send_and_rec("00111111\n", 32) );
-   else if(fpga->riscv_check->value()) {
-         set_pc_etc( send_and_rec("00100011\n", 24) );
-         set_regs( send_and_rec("00000000\n", 32) );
-   }
+   else if(fpga->riscv_check->value()) set_pc_etc_regs( send_and_rec("00100011\n", 24+32) );
 }
 
 // ****** The main action is in this callback ******

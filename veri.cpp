@@ -54,13 +54,12 @@ void vcmd(unsigned short cmd, ostream& sout) {
          } else if ( (cmd & 0xF0) == 0x30) {  // cmd = 0011xxxx - LCD
             sout << setw(16) << (unsigned long)top->lcd_b
                  << setw(16) << (unsigned long)top->lcd_a;
-         } else if (cmd == 0x23) { // cmd = 001000011 - RISC-V pc, ...
+         } else if (cmd == 0x23) { // cmd = 001000011 - RISC-V pc, ..., and regs
             sout << s(lcd_pc) << setw(8) << (unsigned int)top->lcd_instruction
                  << s(lcd_SrcA) << s(lcd_SrcB) << s(lcd_ALUResult) << s(lcd_Result)
                  << s(lcd_WriteData) << s(lcd_ReadData)
                  << setw(2) << ( (top->lcd_RegWrite <<3) | (top->lcd_MemtoReg <<2) 
                                | (top->lcd_Branch   <<1) |  top->lcd_MemWrite     ); 
-         } else if ( (cmd & 0xF0) == 0x00) {  // cmd = 0000xxxx - RISC-V registers
             for (int i=0; i<NREGS; i++) sout << s(lcd_registrador[i]);
          } else { // all other cmd
             sout << s(SEG) << s(LED);
