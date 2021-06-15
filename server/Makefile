@@ -58,6 +58,7 @@ sim: $(HDL_SIM)
 
 # from binary to object dump
 %.objdump : a.out
+	@echo "<span style="color:blue">criar, a partir do arquivo executável a.out, um arquivo chamado $@ só com as instruções em hexadecimal</span>"
 	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@
 
 isa: a.out
@@ -83,7 +84,7 @@ a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	riscv32-unknown-elf-gcc $(RVLDFL) $^
 	@if ! [ -z "$(RVLDFL)" ]; then echo "<span style="color:blue">A opção -nostartfiles serve para excluir do executável arquivos necessários somente para rodar o executável com Linux. A opção -T\$RISCV/link.ld serve para colocar o <i>main</i> no endereço 0x80000000, ao agrado do spike.</span>"; fi
 	@echo "<span style="color:blue">listagem do arquivo executável a.out, em hexadecimal e disassembly:</span>"
-	@echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | head -n -1 | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
+	@echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | sed '/<exit>:/d' | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
 
 # from C to assembly
 %.s : %.c
