@@ -37,21 +37,20 @@ void vtick() {
 #define s(top_port)  setw(2) << (unsigned short)top->top_port
 
 void vcmd(unsigned short cmd, ostream& sout) {
+//  $cmd    # of bytes
+//          returned       description
+// -------------------------------------------------------------------
+// 0000xxxx     16      RISC-V registers 0 to 15
+// 00100000      2      LED and SEG
+// 00100011     12      RISC-V pc, instruction, SrcA, SrcB, ..., flags
+// 0011xxxx     16      LCD 1st and 2nd line
+// 0100xxxx      2      set/clear SWI, return LED and SEG
          if ( (cmd & 0xF0) == 0x40) { // cmd = 0100xxxx - set/reset SWI
             unsigned short p = 1<<((cmd & 0xE)>>1); // bit position
             if( cmd&1 ) top->SWI |= p;  // set bit at position
             else        top->SWI &= ~p; // clear bit at position
             top->eval();  // Evaluate Verilated SystemVerilog model
-         }
-//  $cmd    # of bytes
-//          returned       description
-// -------------------------------------------------------------------
-// 0000xxxx     16      RISC-V registers 0 to 15
-// 00100011     12      RISC-V pc, instruction, SrcA, SrcB, ..., flags
-// 0011xxxx     16      LCD 1st and 2nd line
-// all others    2      LED and SEG
-	 if ( (cmd & 0xF0) == 0x00) {  // cmd = 0000xxxx - RISC-V registers
-            for (int i=0; i<NREGS; i++) sout << s(lcd_registrador[i]);
+            sout << s(SEG) << s(LED);
          } else if ( (cmd & 0xF0) == 0x30) {  // cmd = 0011xxxx - LCD
             sout << setw(16) << (unsigned long)top->lcd_b
                  << setw(16) << (unsigned long)top->lcd_a;
@@ -61,6 +60,8 @@ void vcmd(unsigned short cmd, ostream& sout) {
                  << s(lcd_WriteData) << s(lcd_ReadData)
                  << setw(2) << ( (top->lcd_RegWrite <<3) | (top->lcd_MemtoReg <<2) 
                                | (top->lcd_Branch   <<1) |  top->lcd_MemWrite     ); 
+         } else if ( (cmd & 0xF0) == 0x00) {  // cmd = 0000xxxx - RISC-V registers
+            for (int i=0; i<NREGS; i++) sout << s(lcd_registrador[i]);
          } else { // all other cmd
             sout << s(SEG) << s(LED);
          }
