@@ -1,3 +1,5 @@
+// This files has all the C code that must be recompiled if top.sv changes
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -41,16 +43,15 @@ void vcmd(unsigned short cmd, ostream& sout) {
 //          returned       description
 // -------------------------------------------------------------------
 // 0000xxxx     16      RISC-V registers 0 to 15
-// 00100000      2      LED and SEG
+// 00100000      2      LED and SEG only
 // 00100011     12      RISC-V pc, instruction, SrcA, SrcB, ..., flags
 // 0011xxxx     16      LCD 1st and 2nd line
-// 0100xxxx      2      set/clear SWI, return LED and SEG
+// 0100xxxx      2      set/clear SWI
          if ( (cmd & 0xF0) == 0x40) { // cmd = 0100xxxx - set/reset SWI
             unsigned short p = 1<<((cmd & 0xE)>>1); // bit position
             if( cmd&1 ) top->SWI |= p;  // set bit at position
             else        top->SWI &= ~p; // clear bit at position
             top->eval();  // Evaluate Verilated SystemVerilog model
-            sout << s(SEG) << s(LED);
          } else if ( (cmd & 0xF0) == 0x30) {  // cmd = 0011xxxx - LCD
             sout << setw(16) << (unsigned long)top->lcd_b
                  << setw(16) << (unsigned long)top->lcd_a;
@@ -61,9 +62,8 @@ void vcmd(unsigned short cmd, ostream& sout) {
                  << setw(2) << ( (top->lcd_RegWrite <<3) | (top->lcd_MemtoReg <<2) 
                                | (top->lcd_Branch   <<1) |  top->lcd_MemWrite     ); 
             for (int i=0; i<NREGS; i++) sout << s(lcd_registrador[i]);
-         } else { // all other cmd
-            sout << s(SEG) << s(LED);
          }
+         sout << s(SEG) << s(LED);  // always return SEG and LED
 }
 
 void vinit(int argc, char** argv) { // return half clock period in ms

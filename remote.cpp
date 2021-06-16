@@ -34,7 +34,7 @@ using boost::asio::ip::tcp;
 boost::asio::io_service io_service;
 tcp::socket sock(io_service);
 tcp::resolver resolver(io_service);
-enum { max_length = 60 };
+enum { max_length = 64 };
 
 // send a request string and receive the reply
 char *send_and_rec(string r, int expected_reply_length) {
@@ -69,12 +69,16 @@ void set_led_seg(char *reply) {
 }
 
 void set_lcd_ab(char *reply) {
-    top->lcd_a = strtoul(reply+16, NULL, 16);      // lcd_a are the rightmost 16 characters
-    reply[16] = 0;                                 // cut off lcd_a (reply string gets proposedly damaged)
-    top->lcd_b = strtoul(reply, NULL, 16);         // lcd_b are the first 16 characters
+   top->LED = strtoul(reply+34, NULL, 16); reply[34] = 0;
+   top->SEG = strtoul(reply+32, NULL, 16); reply[32] = 0;
+   top->lcd_a = strtoul(reply+16, NULL, 16);      // lcd_a are the rightmost 16 characters
+   reply[16] = 0;                                 // cut off lcd_a (reply string gets proposedly damaged)
+   top->lcd_b = strtoul(reply, NULL, 16);         // lcd_b are the first 16 characters
 }
 
 void set_pc_etc_regs(char *reply) {
+   top->LED = strtoul(reply+58, NULL, 16); reply[58] = 0;
+   top->SEG = strtoul(reply+56, NULL, 16); reply[56] = 0;
    for(int i=NREGS-1; i>=0; i--) {
       top->lcd_registrador[i] = strtoul(reply+24+2*i, NULL, 16);
       reply[24+2*i] = 0;
@@ -95,16 +99,14 @@ void set_pc_etc_regs(char *reply) {
 }
 
 void rec_set_lcd() {
-   if(fpga->lcd_check->value()) set_lcd_ab( send_and_rec("00111111\n", 32) );
-   else if(fpga->riscv_check->value()) set_pc_etc_regs( send_and_rec("00100011\n", 24+32) );
+   if(fpga->lcd_check->value()) set_lcd_ab( send_and_rec("00111111\n", 32+4) );
+   else if(fpga->riscv_check->value()) set_pc_etc_regs( send_and_rec("00100011\n", 24+32+4) );
+   else set_led_seg( send_and_rec("00100000\n", 4) );  // request LED and SEG state
 }
 
 // ****** The main action is in this callback ******
 void callback(void*) {
 
-  string r;
-
-  set_led_seg( send_and_rec("00100000\n", 4) );  // request LED and SEG state
   rec_set_lcd();
 
   fpga->redraw();
@@ -129,7 +131,7 @@ int SWI::handle(int event) {
 	set_led_seg( send_and_rec("0100" + std::bitset<3>(id).to_string() + (state?"1":"0") + "\n", 4) );
 	// this call also updates LED and SEG
 		
-        rec_set_lcd();
+        if (fpga->lcd_check->value() || fpga->riscv_check->value()) rec_set_lcd();
 
         fpga->redraw();
     }
