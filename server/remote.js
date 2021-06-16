@@ -156,6 +156,7 @@ function swiReqListener() {
   let r = Number("0x" + this.responseText);
   setLedSeg(r);
   if (display == "LCD" || display == "RISC") update();
+  si = setInterval(update, 1000);
  }
 }
 swiReq.onload = swiReqListener;
@@ -205,6 +206,7 @@ let s6 = false;
 let s7 = false;
 
 function swi7_click(event) {
+  clearInterval(si);
   s7 = !s7;
   if(s7) swi7.src = "components/switchOn.png";
   else   swi7.src = "components/switchOff.png"; 
@@ -213,6 +215,7 @@ function swi7_click(event) {
 }
 
 function swi6_click(event) {
+  clearInterval(si);
   s6 = !s6;
   if(s6) swi6.src = "components/switchOn.png";
   else   swi6.src = "components/switchOff.png"; 
@@ -221,6 +224,7 @@ function swi6_click(event) {
 }
 
 function swi5_click(event) {
+  clearInterval(si);
   s5 = !s5;
   if(s5) swi5.src = "components/switchOn.png";
   else   swi5.src = "components/switchOff.png"; 
@@ -229,6 +233,7 @@ function swi5_click(event) {
 }
 
 function swi4_click(event) {
+  clearInterval(si);
   s4 = !s4;
   if(s4) swi4.src = "components/switchOn.png";
   else   swi4.src = "components/switchOff.png"; 
@@ -237,6 +242,7 @@ function swi4_click(event) {
 }
 
 function swi3_click(event) {
+  clearInterval(si);
   s3 = !s3;
   if(s3) swi3.src = "components/switchOn.png";
   else   swi3.src = "components/switchOff.png"; 
@@ -245,6 +251,7 @@ function swi3_click(event) {
 }
 
 function swi2_click(event) {
+  clearInterval(si);
   s2 = !s2;
   if(s2) swi2.src = "components/switchOn.png";
   else   swi2.src = "components/switchOff.png"; 
@@ -253,6 +260,7 @@ function swi2_click(event) {
 }
 
 function swi1_click(event) {
+  clearInterval(si);
   s1 = !s1;
   if(s1) swi1.src = "components/switchOn.png";
   else   swi1.src = "components/switchOff.png"; 
@@ -261,6 +269,7 @@ function swi1_click(event) {
 }
 
 function swi0_click(event) {
+  clearInterval(si);
   s0 = !s0;
   if(s0) swi0.src = "components/switchOn.png";
   else   swi0.src = "components/switchOff.png"; 
