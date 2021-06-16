@@ -16,10 +16,11 @@
        <a href="top.sv">Systemverilog</a>,&nbsp;
        <a href="inst.101">código de máquina</a>,&nbsp;
        <a href="inst.s">assembly</a>,&nbsp;
-       <a href="shift.c">C</a>,&nbsp;
-       ou comprimido .zip. O arquivo comprimido pode conter
+       <a href="shift.c">C</a>, ou &nbsp;
+       <a href="riscv1.zip">comprimido .zip</a>.&nbsp;
+       O arquivo comprimido pode conter
        somente arquivos SystemVerilog .sv,
-       somente arquivos de código de máquina .101,
+       somente um arquivo de código de máquina inst.101,
        somente arquivos .s,
        somente arquivos .c e .h,
        ou uma mistura de todos estes.</p>

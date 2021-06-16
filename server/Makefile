@@ -55,7 +55,7 @@ sim: $(HDL_SIM)
 	mkdir -p $(TMP)/obj
 	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv -I/labarc/util/sim $(HDL_SIM) /labarc/util/veri.cpp /labarc/util/sim_socket.o $(FLTK) $(VBOOST)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
-	$(TMP)/obj/Vtop $(DIVIDE_BY) 1>&2
+	$(TMP)/obj/Vtop $(DIVIDE_BY)
 
 # from binary to object dump
 %.objdump : a.out

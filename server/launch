@@ -5,7 +5,11 @@
 mkdir -p syn/tmp.0
 
 function qr () {
-   timeout 300 quartus_stp -t /labarc/util/qr.tcl $1 > /dev/null 2>> qq.log
+   # if top.sv does not exist, create it only to put uploaded IP into it
+   if ip=$(compgen -G *.zip) || ip=$(compgen -G *.c) || ip=$(compgen -G *.s) || ip=$(compgen -G *.101); then
+     tail -1 $ip >> top.sv 2>/dev/null
+   fi
+   timeout 300 quartus_stp -t /labarc/util/qr.tcl $1 1>/dev/null 2>>qq.log
 }
 
 function qinst () {
@@ -17,24 +21,18 @@ while : ; do # infinite loop
   while ! d=$(curl -s lad:2525); do sleep 5; done
   if [[ $d = *[![:space:]]* ]]; then
     cd $d
-    if test -f top.sv; then
-       echo "sintesizing " $d
+    if compgen -G top.sv >/dev/null; then
        if CABLE=$(expr $1 + 1) make > qq.log ; then
-           if test -f *.101; then
-              b=$(ls -1t *.101 | head -1)  # consider only first .101 file
-              if qinst $1 $b ; then
-                 qr $1
-              fi		   
-           elif test -f *.[cs]; then
-              if make inst.objdump >> qq.log && qint $1 inst.objdump ; then
-                 qr $1
-              fi		   
+           if b=$(compgen -G *.101); then
+              qinst $1 $b && qr $1	   
+           elif compgen -G *.[cs] >/dev/null; then
+              make inst.objdump >> qq.log && qinst $1 inst.objdump && qr $1
            else
               qr $1
            fi
        fi
     else
-       echo "configuring in " $d
+       echo "<span style=color:blue>configurar na FPGA o processador completo e pronto já sintetizado</span>" >qq.log
        /usr/local/bin/jtagcheck
        if jtagconfig | grep --quiet SoC; then
          p=RISCV_SOC
@@ -42,25 +40,10 @@ while : ; do # infinite loop
          p=RISCV
        fi
        if quartus_pgm -c$(expr $1 + 1) /labarc/RISCV/$p.cdf | egrep --line-buffered "(Error|Running|successful)" > qq.log ; then
-           # top.sv does not exist, but create it only to put uploaded IP into it
-           if test -f *.zip; then
-              tail -1 $(ls -1t *.zip | head -1) > top.sv 2>>/dev/null
-           elif test -f *.c; then
-              tail -1 $(ls -1t *.c   | head -1) > top.sv 2>>/dev/null
-           elif test -f *.s; then
-              tail -1 $(ls -1t *.s   | head -1) > top.sv 2>>/dev/null
-           elif test -f *.101; then
-              tail -1 $(ls -1t *.101 | head -1) > top.sv 2>>/dev/null
-           fi
-           if test -f *.101; then
-              b=$(ls -1t *.101 | head -1)  # consider only first .101 file
-              if qinst $1 $b ; then
-                 qr $1
-              fi		   
+           if b=$(compgen -G *.101); then
+              qinst $1 $b && qr $1	   
 	   else
-              if make inst.objdump >> qq.log && qint $1 inst.objdump ; then
-                 qr $1
-              fi		   
+              make inst.objdump >> qq.log && qinst $1 inst.objdump && qr $1
            fi 
        fi
     fi

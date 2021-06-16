@@ -23,6 +23,9 @@ if { [string match "USB-Blaster*" $hardware_name] } {
         exit
 }
 
+global usefile
+# file to write usage statistics
+
 puts "Info: Select JTAG chain connected to $usbblaster_name.";
 
 # List all devices on the chain, and select the first CYCLON device on the chain.
@@ -58,6 +61,9 @@ proc Start_Server {fpga} {
    global usbblaster_name
    global test_device
    open_device -hardware_name $usbblaster_name -device_name $test_device
+
+   global usefile
+   set usefile [open u.log w]
 
    set port [expr 2540 + $fpga]
    puts stderr "Info: Starting JTAG server"
@@ -96,6 +102,7 @@ proc IncomingData {sock} {
    global upload_ip
    global cmd_count
    global swi_count
+   global usefile
 
 # Check end of file or abnormal connection drop,
 # then write the data to the vJTAG
@@ -107,7 +114,8 @@ proc IncomingData {sock} {
       unset conn(addr,$sock)
       if { ! $end_of_file } {
          catch {close_device}
-         puts stderr "$cmd_count total commands, $swi_count switch commands"
+         puts $usefile "$cmd_count total commands, $swi_count switch commands"
+         close $usefile
          exit 0
       }
    } else {
@@ -116,14 +124,16 @@ proc IncomingData {sock} {
          set cmd_ip [split $line]
          lassign $cmd_ip cmd ip
          if { $upload_ip != $ip } then {
-            puts stderr "IP mismatch upload=$upload_ip command=$ip $cmd"
+            puts $usefile "IP mismatch upload=$upload_ip command=$ip $cmd"
+            flush $usefile
          }
          incr cmd_count
          if { [string range $cmd 0 1] == "01" } then {
             incr swi_count
          }
          if { [expr $cmd_count % 10] == 0 } then {
-            puts stderr "$cmd_count total commands, $swi_count switch commands"
+            puts $usefile "$cmd_count total commands, $swi_count switch commands"
+            flush $usefile
          }
          device_lock -timeout 10000
 
@@ -146,7 +156,7 @@ proc IncomingData {sock} {
 #        if lcd_a and lcd_b are requested
          } elseif { [string range $cmd 0 3] == "0011"} then {
             puts $sock "[get_data "00111110"][get_data "00111101"][get_data "00111100"][get_data "00111011"][get_data "00111010"][get_data "00111001"][get_data "00111000"][get_data "00110111"][get_data "00110110"][get_data "00110101"][get_data "00110100"][get_data "00110011"][get_data "00110010"][get_data "00110001"][get_data "00110000"][get_data "00000000"]"
-#              if pc is requested, get also instruction up to flags
+#              if pc is requested, get also instruction up to flags and registers
          } elseif { [string range $cmd 0 7] == "00100011" } then {
             puts $sock "[get_data "00100111"][get_data "00100110"][get_data "00100101"][get_data "00100100"][get_data "00101000"][get_data "00101001"][get_data "00101010"][get_data "00101011"][get_data "00101100"][get_data "00101101"][get_data "00101110"][get_data "00000000"][get_data "00000001"][get_data "00000010"][get_data "00000011"][get_data "00000100"][get_data "00000101"][get_data "00000110"][get_data "00000111"][get_data "00001000"][get_data "00001001"][get_data "00001010"][get_data "00001011"][get_data "00001100"][get_data "00001101"][get_data "00001110"][get_data "00001111"][get_data "00000000"]"
          } else {

@@ -18,16 +18,16 @@
        <a href="riscv1.zip">comprimido .zip</a>.&nbsp;
        O arquivo comprimido pode conter
        somente arquivos SystemVerilog .sv,
-       somente arquivos de código de máquina .101,
+       somente um arquivo de código de máquina inst.101,
        somente arquivos .s,
        somente arquivos .c e .h,
        adicionalmente arquivos .jpeg., .jpg, .pdf,
        ou uma mistura de todos estes, mas somente destes.</p>
     <p>Para ganhar centavos, você precisa colocar seu nome na primeira linha do arquivo principal.<br>
        No início da linha, você precisa marcar a mesma como comentário.</p>
-    <p>Na segunda linha, em comentário, deve constar o nome do exercício ou do circuito.</p>
-    <p>Se quiser, pode colocar sua matrícula na terceira linha,
-        mas não a coloque nem na primeira nem na segunda linha.</p>
+    <p>Na segunda linha, em comentário, deve constar o nome do seu projeto.</p>
+    <p>Não é necessário informar sua matrícula.
+       Não coloque matrícula nem na primeira nem na segunda linha.</p>
     <input type="file" name="uploaded_file" id=browse></input>
     <input type="radio" name="display" value="LCD"> LCD
     <input type="radio" name="display" value="RISC"> RISC-V
