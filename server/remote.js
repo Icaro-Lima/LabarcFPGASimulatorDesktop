@@ -40,14 +40,7 @@ function sse_listener(event) {
          swi6.src = "components/switchOff.png";
          swi7.src = "components/switchOff.png";
          seg.src = "components/segmentsDisplay.png";
-         led0.src = "components/ledOff.png";
-         led1.src = "components/ledOff.png";
-         led2.src = "components/ledOff.png";
-         led3.src = "components/ledOff.png";
-         led4.src = "components/ledOff.png";
-         led5.src = "components/ledOff.png";
-         led6.src = "components/ledOff.png";
-         led7.src = "components/ledOff.png";
+         setLedSeg(0);
          if (display == "RISC") { 
             risc1.innerHTML = "&nbsp; pc &nbsp; &nbsp; &nbsp; &nbsp; instruction " +
                               "&nbsp; &nbsp; &nbsp;&nbsp; WriteData MemWrite Branch";
@@ -126,6 +119,7 @@ function riscReqListener() {
   rd.innerHTML = r.substr(50,2);
   re.innerHTML = r.substr(52,2);
   rf.innerHTML = r.substr(54,2);
+  setLedSeg(Number("0x" + r.substr(56,4)));
  }
 }
 riscReq.onload = riscReqListener;
@@ -138,6 +132,7 @@ function lcdReqListener() {
   var r = this.responseText.toUpperCase();
   //                 lcd_a                    lcd_b
   LCD.innerHTML = r.slice(16,32) + "<br>" + r.slice(0,16);
+  setLedSeg(Number("0x" + r.substr(32,4)));
  }
 }
 lcdReq.onload = lcdReqListener;
@@ -148,6 +143,24 @@ var ledSegReq = new XMLHttpRequest();
 function ledSegReqListener() {
  if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
   let r = Number("0x" + this.responseText);
+  setLedSeg(r);
+ }
+}
+ledSegReq.onload = ledSegReqListener;
+
+// JTAG client request for SWI
+var swiReq = new XMLHttpRequest();
+
+function swiReqListener() {
+ if(this.responseText.charCodeAt(0) != 0x53) { // first character is not S (error)
+  let r = Number("0x" + this.responseText);
+  setLedSeg(r);
+  if (display == "LCD" || display == "RISC") update();
+ }
+}
+swiReq.onload = swiReqListener;
+
+function setLedSeg(r) {
   if(r&0x0001) led0.src = "components/ledOn.png";
   else         led0.src = "components/ledOff.png";
   if(r&0x0002) led1.src = "components/ledOn.png";
@@ -180,16 +193,7 @@ function ledSegReqListener() {
   else         seg6.src = "components/segNada.png";
   if(r&0x8000) seg7.src = "components/seg7.png";
   else         seg7.src = "components/segNada.png";
-  if(display == "LCD") {
-      lcdReq.open("get", name + port + "&data=00111111" );
-      lcdReq.send();
-  } else if (display == "RISC") {
-      riscReq.open("get", name + port + "&data=00100011" );
-      riscReq.send();
-  }
- }
 }
-ledSegReq.onload = ledSegReqListener;
 
 let s0 = false;
 let s1 = false;
@@ -204,69 +208,77 @@ function swi7_click(event) {
   s7 = !s7;
   if(s7) swi7.src = "components/switchOn.png";
   else   swi7.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + port + "&data=0100111" + (s7 ? "1" : "0") );
-  ledSegReq.send();
+  swiReq.open("get", name + port + "&data=0100111" + (s7 ? "1" : "0") );
+  swiReq.send();
 }
 
 function swi6_click(event) {
   s6 = !s6;
   if(s6) swi6.src = "components/switchOn.png";
   else   swi6.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + port + "&data=0100110" + (s6 ? "1" : "0") );
-  ledSegReq.send();
+  swiReq.open("get", name + port + "&data=0100110" + (s6 ? "1" : "0") );
+  swiReq.send();
 }
 
 function swi5_click(event) {
   s5 = !s5;
   if(s5) swi5.src = "components/switchOn.png";
   else   swi5.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + port + "&data=0100101" + (s5 ? "1" : "0") );
-  ledSegReq.send();
+  swiReq.open("get", name + port + "&data=0100101" + (s5 ? "1" : "0") );
+  swiReq.send();
 }
 
 function swi4_click(event) {
   s4 = !s4;
   if(s4) swi4.src = "components/switchOn.png";
   else   swi4.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + port + "&data=0100100" + (s4 ? "1" : "0") );
-  ledSegReq.send();
+  swiReq.open("get", name + port + "&data=0100100" + (s4 ? "1" : "0") );
+  swiReq.send();
 }
 
 function swi3_click(event) {
   s3 = !s3;
   if(s3) swi3.src = "components/switchOn.png";
   else   swi3.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + port + "&data=0100011" + (s3 ? "1" : "0") );
-  ledSegReq.send();
+  swiReq.open("get", name + port + "&data=0100011" + (s3 ? "1" : "0") );
+  swiReq.send();
 }
 
 function swi2_click(event) {
   s2 = !s2;
   if(s2) swi2.src = "components/switchOn.png";
   else   swi2.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + port + "&data=0100010" + (s2 ? "1" : "0") );
-  ledSegReq.send();
+  swiReq.open("get", name + port + "&data=0100010" + (s2 ? "1" : "0") );
+  swiReq.send();
 }
 
 function swi1_click(event) {
   s1 = !s1;
   if(s1) swi1.src = "components/switchOn.png";
   else   swi1.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + port + "&data=0100001" + (s1 ? "1" : "0") );
-  ledSegReq.send();
+  swiReq.open("get", name + port + "&data=0100001" + (s1 ? "1" : "0") );
+  swiReq.send();
 }
 
 function swi0_click(event) {
   s0 = !s0;
   if(s0) swi0.src = "components/switchOn.png";
   else   swi0.src = "components/switchOff.png"; 
-  ledSegReq.open("get", name + port + "&data=0100000" + (s0 ? "1" : "0") );
-  ledSegReq.send();
+  swiReq.open("get", name + port + "&data=0100000" + (s0 ? "1" : "0") );
+  swiReq.send();
 }
 
 function update() {
-  ledSegReq.open("get", name + port + "&data=00100000" );
-  ledSegReq.send();
+  if(display == "LCD") {
+      lcdReq.open("get", name + port + "&data=00111111" );
+      lcdReq.send();
+  } else if (display == "RISC") {
+      riscReq.open("get", name + port + "&data=00100011" );
+      riscReq.send();
+  } else {
+      ledSegReq.open("get", name + port + "&data=00100000" );
+      ledSegReq.send();
+  }
 }
 
 function nada() { }
