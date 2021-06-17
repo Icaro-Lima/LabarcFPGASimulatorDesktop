@@ -3,6 +3,7 @@ let port = "";  // port number string for GET request to JTAG client
 var si;  // periodic interval timer for GUI refresh
 var eSource;  // event dsource for synthesizer output update
 var initial = true;
+var waiting = false;
 
 function sse_listener(event) {
    if(name == "") {
@@ -63,7 +64,6 @@ function sse_listener(event) {
             xe.innerHTML = " &nbsp;a4 : ";                
             xf.innerHTML = " &nbsp;a5 : ";                
          }
-         eSource.removeEventListener("message", sse_listener);
       }
    } else {
        if (port == "") serverData.innerHTML = "";  // connection was terminated
@@ -157,6 +157,7 @@ function swiReqListener() {
   setLedSeg(r);
   if (display == "LCD" || display == "RISC") update();
   si = setInterval(update, 1000);
+  waiting = false;
  }
 }
 swiReq.onload = swiReqListener;
@@ -206,75 +207,99 @@ let s6 = false;
 let s7 = false;
 
 function swi7_click(event) {
-  clearInterval(si);
-  s7 = !s7;
-  if(s7) swi7.src = "components/switchOn.png";
-  else   swi7.src = "components/switchOff.png"; 
-  swiReq.open("get", name + port + "&data=0100111" + (s7 ? "1" : "0") );
-  swiReq.send();
+  if (!waiting) {
+    waiting = true;
+    clearInterval(si);
+    s7 = !s7;
+    if(s7) swi7.src = "components/switchOn.png";
+    else   swi7.src = "components/switchOff.png"; 
+    swiReq.open("get", name + port + "&data=0100111" + (s7 ? "1" : "0") );
+    swiReq.send();
+  }
 }
 
 function swi6_click(event) {
-  clearInterval(si);
-  s6 = !s6;
-  if(s6) swi6.src = "components/switchOn.png";
-  else   swi6.src = "components/switchOff.png"; 
-  swiReq.open("get", name + port + "&data=0100110" + (s6 ? "1" : "0") );
-  swiReq.send();
+  if (!waiting) {
+    waiting = true;
+    clearInterval(si);
+    s6 = !s6;
+    if(s6) swi6.src = "components/switchOn.png";
+    else   swi6.src = "components/switchOff.png"; 
+    swiReq.open("get", name + port + "&data=0100110" + (s6 ? "1" : "0") );
+    swiReq.send();
+  }
 }
 
 function swi5_click(event) {
-  clearInterval(si);
-  s5 = !s5;
-  if(s5) swi5.src = "components/switchOn.png";
-  else   swi5.src = "components/switchOff.png"; 
-  swiReq.open("get", name + port + "&data=0100101" + (s5 ? "1" : "0") );
-  swiReq.send();
+  if (!waiting) {
+    waiting = true;
+    clearInterval(si);
+    s5 = !s5;
+    if(s5) swi5.src = "components/switchOn.png";
+    else   swi5.src = "components/switchOff.png"; 
+    swiReq.open("get", name + port + "&data=0100101" + (s5 ? "1" : "0") );
+    swiReq.send();
+  }
 }
 
 function swi4_click(event) {
-  clearInterval(si);
-  s4 = !s4;
-  if(s4) swi4.src = "components/switchOn.png";
-  else   swi4.src = "components/switchOff.png"; 
-  swiReq.open("get", name + port + "&data=0100100" + (s4 ? "1" : "0") );
-  swiReq.send();
+  if (!waiting) {
+    waiting = true;
+    clearInterval(si);
+    s4 = !s4;
+    if(s4) swi4.src = "components/switchOn.png";
+    else   swi4.src = "components/switchOff.png"; 
+    swiReq.open("get", name + port + "&data=0100100" + (s4 ? "1" : "0") );
+    swiReq.send();
+  }
 }
 
 function swi3_click(event) {
-  clearInterval(si);
-  s3 = !s3;
-  if(s3) swi3.src = "components/switchOn.png";
-  else   swi3.src = "components/switchOff.png"; 
-  swiReq.open("get", name + port + "&data=0100011" + (s3 ? "1" : "0") );
-  swiReq.send();
+  if (!waiting) {
+    waiting = true;
+    clearInterval(si);
+    s3 = !s3;
+    if(s3) swi3.src = "components/switchOn.png";
+    else   swi3.src = "components/switchOff.png"; 
+    swiReq.open("get", name + port + "&data=0100011" + (s3 ? "1" : "0") );
+    swiReq.send();
+  }
 }
 
 function swi2_click(event) {
-  clearInterval(si);
-  s2 = !s2;
-  if(s2) swi2.src = "components/switchOn.png";
-  else   swi2.src = "components/switchOff.png"; 
-  swiReq.open("get", name + port + "&data=0100010" + (s2 ? "1" : "0") );
-  swiReq.send();
+  if (!waiting) {
+    waiting = true;
+    clearInterval(si);
+    s2 = !s2;
+    if(s2) swi2.src = "components/switchOn.png";
+    else   swi2.src = "components/switchOff.png"; 
+    swiReq.open("get", name + port + "&data=0100010" + (s2 ? "1" : "0") );
+    swiReq.send();
+  }
 }
 
 function swi1_click(event) {
-  clearInterval(si);
-  s1 = !s1;
-  if(s1) swi1.src = "components/switchOn.png";
-  else   swi1.src = "components/switchOff.png"; 
-  swiReq.open("get", name + port + "&data=0100001" + (s1 ? "1" : "0") );
-  swiReq.send();
+  if (!waiting) {
+    waiting = true;
+    clearInterval(si);
+    s1 = !s1;
+    if(s1) swi1.src = "components/switchOn.png";
+    else   swi1.src = "components/switchOff.png"; 
+    swiReq.open("get", name + port + "&data=0100001" + (s1 ? "1" : "0") );
+    swiReq.send();
+  }
 }
 
 function swi0_click(event) {
-  clearInterval(si);
-  s0 = !s0;
-  if(s0) swi0.src = "components/switchOn.png";
-  else   swi0.src = "components/switchOff.png"; 
-  swiReq.open("get", name + port + "&data=0100000" + (s0 ? "1" : "0") );
-  swiReq.send();
+  if (!waiting) {
+    waiting = true;
+    clearInterval(si);
+    s0 = !s0;
+    if(s0) swi0.src = "components/switchOn.png";
+    else   swi0.src = "components/switchOff.png"; 
+    swiReq.open("get", name + port + "&data=0100000" + (s0 ? "1" : "0") );
+    swiReq.send();
+  }
 }
 
 function update() {
@@ -294,6 +319,9 @@ function nada() { }
 function nada_e(event) { }
 
 function exit_jtag(event) {
+  waiting = true;
+  clearInterval(si);
+  eSource.removeEventListener("message", sse_listener);
   swi7.onpointerdown = nada_e;
   swi6.onpointerdown = nada_e;
   swi5.onpointerdown = nada_e;
@@ -309,7 +337,6 @@ function exit_jtag(event) {
   ledSegReq.onload = nada;
   ledSegReq.open("get", name + port + "&data=exit" );
   ledSegReq.send();
-  clearInterval(si);
   // make GUI disappear from page
   swi0.src = "components/switchNada.png";
   swi1.src = "components/switchNada.png";
