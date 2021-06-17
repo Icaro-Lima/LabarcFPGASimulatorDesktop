@@ -10,30 +10,27 @@ while : ; do # infinite loop
    d=$(ls -1dt sim/tmp.* | head -$i | tail -1)
    # is there exactly one file in it ?
    if [ "`ls -1 $d | wc -w`" == "1" ]; then
-      if test -f $d/*.zip; then
-         (cd $d; unzip *.zip &>/dev/null)
-         if test -f $d/top.sv; then
-            tail -1 $(ls -1t $d/*.zip | head -1) >> $d/top.sv 2>>/dev/null
-         fi
+      cd $d  
+      z=$(compgen -G *.zip) && unzip $z &>/dev/null
+      t=$(compgen -G top.sv)
+      # if top.sv does not exist, create it only to put uploaded IP into it
+      if ip=$(compgen -G *.zip) || ip=$(compgen -G *.c) || ip=$(compgen -G *.s) || ip=$(compgen -G *.101); then
+        tail -1 $ip >> top.sv 2>/dev/null
       fi
-      cp /labarc/TOP/Make* $d
-      if test -f $(ls -1t $d/*.sv | head -1); then
-         c=$(grep -h parameter $d/*.sv | grep divide_by | head -1 | grep -oP '(?<!\d)\d*(?!\d)' )
-         (cd $d; DIVIDE_BY=$c timeout 3600 make sim 1>/dev/null 2>qq.log) &
-      else
-         if test -f $d/*.101; then
-            (cd $d
-             echo "<span style=color:blue>rodar o simulador com processador completo e pronto já compilado</span>" >>qq.log
-             echo "<span style=color:blue>No início da simulação, o arquivo inst.101 é lido.</span>" >>qq.log
-             timeout 3600 /labarc/util/RISCV_sim 2>>qq.log 1>&2) &
-         else
-            (cd $d
+      cp /labarc/TOP/Make* .
+      if [ -z $t ]; then
+         # top.sv was not provided by user
+	 if ! b=$(compgen -G *.101); then
              make inst.objdump >>qq.log
-             echo "<span style=color:blue>rodar o simulador com processador completo e pronto já compilado</span>" >>qq.log
-             echo "<span style=color:blue>No início da simulação, o arquivo inst.objdump é lido.</span>" >>qq.log
-             timeout 3600 /labarc/util/RISCV_sim 2>>qq.log 1>&2) &
          fi
+         echo "<span style=color:blue>rodar o simulador com processador completo e pronto já compilado</span>" >>qq.log
+         timeout 3600 /labarc/util/RISCV_sim 2>>qq.log 1>&2 &
+      else
+         # top.sv was provided by user
+         c=$(grep -h parameter $d/*.sv | grep divide_by | head -1 | grep -oP '(?<!\d)\d*(?!\d)' )
+         DIVIDE_BY=$c timeout 3600 make sim 1>/dev/null 2>>qq.log &
       fi
+      cd
    fi
   done
   sleep 2
