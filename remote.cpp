@@ -236,7 +236,7 @@ int main(int argc, char** argv, char** env) {
       exit(8); // exit in case of connection error
     }
 
-    init_gui(argc-argc_offset,argv+argc_offset, (char *)"Remote FPGA board"); // dirty argv[0] :-(
+    init_gui(argc-argc_offset,argv+argc_offset, (char *)"Local FPGA board simulation"); // dirty argv[0] :-(
 
     Fl::run();   // run the graphical interface which calls callback()
 
