@@ -114,3 +114,27 @@ A GUI se atualiza a cada segundo, independentemente da frequência do sinal `clk
 No caso do RISC-V, o caractere mais a direita na primeira linha do LCD visualiza o valor do sinal `Branch`,
 sendo que `_` significa `0` e `*` significa `1`. O caractere imediatamente a esquerda visualiza o sinal `MemWrite`. O caractere mais a direita na segunda  linha visualiza o sinal `RegWrite` e o caractere imediatamente a esquerda deste visualiza o sinal `MemtoReg`. Somente os primeiros 16 registradores aparecem na GUI. Os demais registradores podem ser usados normalmente, mas não são visualizados na GUI.
 
+## Utilização do simulador remotamente
+
+Navegue para http://lad.ufcg.edu.br/hdl/simulate.php
+e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na janela do browser.
+
+Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
+
+## Utilização de uma placa FPGA remotamente
+
+Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:  
+<img src="http://lad.ufcg.edu.br/loac/uploads/OAC/nano.jpg" width="400">
+
+Navegue para http://lad.ufcg.edu.br/hdl/remote.php
+e faça upload do arquivo `top.sv`. No final da síntese, a GUI aparece na janela do browser.
+
+Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
+
+Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-la para outro usuário. Caso não fizer isso, depois de alguns minutos a placa FPGA será liberada assim mesmo.
+
+### Vídeo mostrando o passo a passo
+
+O vídeo mostra a utilização do simulador no desktop seguida da utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação e utilização de FPGA remota. 
+
+http://lad.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
