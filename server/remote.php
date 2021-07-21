@@ -6,16 +6,17 @@
       .label { font-family: Courier New; color:red; font-weight: bold; }
       pre { font-size:125%; line-height:60%; }
     </style>
-  <title>LABARC- uso remoto</title>
+  <title>LABARC - FPGA remota</title>
 </head>
 <body>
+  <h1>LOAC - acesso remoto a placas FPGA</h1>
   <form enctype="multipart/form-data" action="remote.php" method="POST">
     <p>Primeiro simule, depois faça upload do seu arquivo
        <a href="top.sv">Systemverilog</a>,&nbsp;
        <a href="inst.101">código de máquina</a>,&nbsp;
        <a href="inst.s">assembly</a>,&nbsp;
-       <a href="shift.c">C</a>,&nbsp;ou&nbsp;
-       <a href="riscv1.zip">comprimido .zip</a>.&nbsp;
+       <a href="shift.c"> &nbsp;C&nbsp;</a>, ou&nbsp;
+       <a href="riscv1.zip">comprimido</a>.&nbsp;
        O arquivo comprimido pode conter
        somente arquivos SystemVerilog .sv,
        somente um arquivo de código de máquina inst.101,
