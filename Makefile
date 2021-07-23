@@ -64,6 +64,9 @@ sim_socket.o: sim_socket.cpp
 gui.o: gui.cpp gui.h
 	$(CXX) $(CFLTK) -c gui.cpp
 
+communicator.o: communicator.cpp communicator.h
+	$(CXX) -std=c++11 -c communicator.cpp
+
 # from binary to object dump
 %.objdump : a.out
 	riscv32-unknown-elf-objdump -s -j .text | egrep "( [0-9a-f]{8}){5}" | cut -b11-45 > $@
