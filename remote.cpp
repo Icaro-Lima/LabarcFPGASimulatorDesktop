@@ -9,13 +9,8 @@
 // https://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/example/cpp03/echo/blocking_tcp_echo_client.cpp
 
 #include <bitset>
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <boost/asio.hpp>
-// Include graphic user interface
+#include "communicator.h"
 #include "gui.h"
-
 
 // declare inputs and outputs of module top as struct,
 // similar to what Verilator does automatically
@@ -28,38 +23,6 @@ struct top_struct
      unsigned long lcd_a, lcd_b; } top_s;
 
 struct top_struct *top = &top_s;
-
-// declare socket and auxiliary elements for remote connection
-using boost::asio::ip::tcp;
-boost::asio::io_service io_service;
-tcp::socket sock(io_service);
-tcp::resolver resolver(io_service);
-enum { max_length = 64 };
-
-// send a request string and receive the reply
-char *send_and_rec(string r, int expected_reply_length) {
-  static char reply[max_length];
-  try
-  {
-    // send request string - typically 8 characters representing a binary number
-    const char *request = r.c_str();
-    size_t request_length = std::strlen(request);
-    boost::asio::write(sock, boost::asio::buffer(request, request_length));
-
-    // reveive a string of characters representing a hex number 
-    size_t reply_length = boost::asio::read(sock, boost::asio::buffer(reply, expected_reply_length));
-    reply[reply_length] = 0; // trim
-    // receive CR and LF (exactly 2 characters) and discard them
-    char crlf[4];
-    reply_length = boost::asio::read(sock, boost::asio::buffer(crlf, 2));
-  }
-  catch (std::exception& e)
-  {
-    std::cerr << "Exception: " << e.what() << "\n";
-    exit(9); // exit in case of connection error
-  }
-  return reply;
-}
 
 // copy information received from remote FPGA to outputs of module top
 void set_led_seg(char *reply) {
@@ -98,10 +61,12 @@ void set_pc_etc_regs(char *reply) {
    top->lcd_pc          = strtoul(reply, NULL, 16);
 }
 
+communicator *sock;
+
 void rec_set_lcd() {
-   if(fpga->lcd_check->value()) set_lcd_ab( send_and_rec("00111111\n", 32+4) );
-   else if(fpga->riscv_check->value()) set_pc_etc_regs( send_and_rec("00100011\n", 24+32+4) );
-   else set_led_seg( send_and_rec("00100000\n", 4) );  // request LED and SEG state
+   if(fpga->lcd_check->value()) set_lcd_ab( sock->send_and_rec("00111111") );
+   else if(fpga->riscv_check->value()) set_pc_etc_regs( sock->send_and_rec("00100011") );
+   else set_led_seg( sock->send_and_rec("00100000") );  // request LED and SEG state
 }
 
 // ****** The main action is in this callback ******
@@ -128,7 +93,7 @@ int SWI::handle(int event) {
 	// the higher nibble is 0100
 	// the lower nibble consists of 3 bits for bit position
 	// and the least significant bit is the value to be assigned to that position
-	set_led_seg( send_and_rec("0100" + std::bitset<3>(id).to_string() + (state?"1":"0") + "\n", 4) );
+	set_led_seg( sock->send_and_rec("0100" + std::bitset<3>(id).to_string() + (state?"1":"0")) );
 	// this call also updates LED and SEG
 		
         if (fpga->lcd_check->value() || fpga->riscv_check->value()) rec_set_lcd();
@@ -226,23 +191,17 @@ int main(int argc, char** argv, char** env) {
        argc_offset = 2;
     }   
 
-    try
-    {
-      boost::asio::connect(sock, resolver.resolve({host, port}));
-    }
-    catch (std::exception& e)
-    {
-      std::cerr << "Exception: " << e.what() << "\n";
-      exit(8); // exit in case of connection error
-    }
+   sock = new communicator(host, port);
 
-    init_gui(argc-argc_offset,argv+argc_offset, (char *)"Local FPGA board simulation"); // dirty argv[0] :-(
+   init_gui(argc-argc_offset,argv+argc_offset, (char *)"Local FPGA board simulation"); // dirty argv[0] :-(
 
-    Fl::run();   // run the graphical interface which calls callback()
+   Fl::run();   // run the graphical interface which calls callback()
 
-    delete_gui();
+   sock->send_and_rec("exit");
 
-    // Fin
-    exit(0);
+   delete_gui();
+
+   // Fin
+   exit(0);
 }
 

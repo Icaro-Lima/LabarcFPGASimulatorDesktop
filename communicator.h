@@ -21,8 +21,9 @@ class communicator {
   tcp::resolver resolver;
   boost::asio::ip::basic_resolver<boost::asio::ip::tcp>::iterator host_port;
   enum { max_length = 2048 };
+  char cs[max_length];
 public:
   communicator(char *host, char *port);
-  const char *send_and_rec(string r); // send a request string and receive the reply
+  char *send_and_rec(string r); // send a request string and receive the reply
 };
 

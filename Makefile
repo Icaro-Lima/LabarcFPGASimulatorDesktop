@@ -55,14 +55,14 @@ default: $(HDL_SIM) sim_socket.o remote.bin
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
 	obj_dir/Vtop $(DIVIDE_BY)
 
-remote.bin: remote.cpp gui.o
-	$(CXX) $(CFLTK) remote.cpp gui.o -o remote.bin $(BOOST) $(LFLTK)
+remote.bin: remote.cpp communicator.o gui.o
+	$(CXX) $(CFLTK) remote.cpp communicator.o gui.o -o remote.bin $(BOOST) $(LFLTK)
 
 sim_socket.o: sim_socket.cpp
-	$(CXX) -std=c++11 $(CTHREAD) -c sim_socket.cpp
+	$(CXX) -std=c++11 $(CTHREAD) -c $<
 
 gui.o: gui.cpp gui.h
-	$(CXX) $(CFLTK) -c gui.cpp
+	$(CXX) $(CFLTK) -c $<
 
 communicator.o: communicator.cpp communicator.h
 	$(CXX) -std=c++11 -c communicator.cpp

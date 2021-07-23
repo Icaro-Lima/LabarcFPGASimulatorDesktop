@@ -62,8 +62,9 @@ streambuf binp;
 // acceptor for socket opening
 tcp::acceptor *acceptor_ptr;
 
-// prototypes to be used in read_handle
+// handle prototypes
 void accept_handler(const error_code& error);
+void read_handler(const error_code&, size_t);
 void write_handler(const error_code&, size_t);
 
 void exit_all() {
@@ -76,6 +77,16 @@ void exit_all() {
          cerr << "___________________pronto____________________" << endl;
          // Fin
          exit(0);
+}
+
+void accept_handler(const error_code& err) {
+    if (!err)  {
+       // read operation
+       async_read_until(sock, binp, '\n', read_handler);
+    } else {
+       cerr << "accept error: " << err.message() << endl;
+       exit_all();
+    }
 }
 
 void read_handler(const error_code& err, size_t bytes_transferred)  {
@@ -99,35 +110,19 @@ void read_handler(const error_code& err, size_t bytes_transferred)  {
          //write operation
          async_write(sock, bout, write_handler);
     } else {
-         if (err == error::eof) {  // running in localhost - exit server normally
-            exit_all();
-         } else if ( err == error::connection_reset) { // running in LAD
-            sock.close();
-            // accept new connection
-            acceptor_ptr->async_accept(sock, accept_handler);
-         } else {
-             cerr << "read error: " << err.message() << endl;
-             exit_all();
-         }
+         cerr << "read error: " << err.message() << endl;
+         exit_all();
     }
 }
 
 void write_handler(const error_code& err, size_t bytes_transferred) {
     if (!err) {
-       // next read operation
-       async_read_until(sock, binp, '\n', read_handler);
+       sock.close();
+       acceptor_ptr->async_accept(sock, accept_handler);  // accept next connection
     } else {
        cerr << "write error: " << err.message() << endl;
-       sock.close();
+       exit_all();
     }
-}
-
-void accept_handler(const error_code& error) {
-  if (!error)
-  {
-    // read operation
-    async_read_until(sock, binp, '\n', read_handler);
-  }
 }
 
 int port;
@@ -176,7 +171,7 @@ int main(int argc, char** argv, char** env) {
     acceptor_ptr = new tcp::acceptor(io, tcp::endpoint(tcp::v4(), 0));
     port = acceptor_ptr->local_endpoint().port();
 
-    //waiting for connection
+    //waiting for first connection
     acceptor_ptr->async_accept(sock, accept_handler);
 
     // Schedule the timer for the first time:

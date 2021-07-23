@@ -14,20 +14,11 @@ communicator::communicator(char *host, char *port) :
    } 
 }
 
-const char *communicator::send_and_rec(string r) {
-  static char cs[max_length];
+char *communicator::send_and_rec(string r) {
   stringstream ss;
   try
   {
     connect(sock, host_port);
-  }
-  catch (exception& e)
-  {
-    cerr << "Exception: " << e.what() << "\n";
-    exit(8); // exit in case of connection error
-  }
-  try
-  {
     // send request string - i.e. a debug command
     string req = r + "\n";
     const char *request = req.c_str();
