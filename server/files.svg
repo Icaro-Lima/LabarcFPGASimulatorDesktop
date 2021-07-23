@@ -36,13 +36,13 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="1649"
+     inkscape:window-width="1919"
      inkscape:window-height="934"
      id="namedview9461"
      showgrid="false"
      inkscape:zoom="2"
      inkscape:cx="289.39119"
-     inkscape:cy="177.50501"
+     inkscape:cy="257.50501"
      inkscape:window-x="-3"
      inkscape:window-y="-16"
      inkscape:window-maximized="0"
@@ -2739,7 +2739,7 @@
   <g
      id="g9428"
      style="fill:#000000;fill-opacity:1"
-     transform="translate(0,-10.5)">
+     transform="translate(0,-7.3)">
     <use
        height="100%"
        width="100%"
@@ -2807,7 +2807,7 @@
   <g
      id="g9450"
      style="fill:#000000;fill-opacity:1"
-     transform="translate(0,-10.5)">
+     transform="translate(0,-7.3)">
     <use
        height="100%"
        width="100%"
@@ -4567,4 +4567,56 @@
      id="path2799"
      d="m 220.11865,275.66146 0.67169,-11.25226 3.1588,4.69862 5.71381,0.33091 z m 0,0"
      style="fill:#808080;fill-opacity:1;fill-rule:evenodd;stroke:#8f8f8f;stroke-width:2.03180361;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path9058-0"
+     d="m 311.31155,178.11253 52.5769,0 0,44.24587 c -10.51538,-7.37541 -15.77307,-7.37541 -26.28845,0 -10.51538,7.37208 -15.77307,7.37208 -26.28845,0 z m 0,0"
+     style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.92310792;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0%;font-family:'Bitstream Vera Sans';-inkscape-font-specification:'Bitstream Vera Sans';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="397.60001"
+     y="198.2"
+     id="text5551"
+     sodipodi:linespacing="0%"><tspan
+       sodipodi:role="line"
+       id="tspan5553"
+       x="397.60001"
+       y="198.2">NFS</tspan></text>
+  <path
+     inkscape:connector-curvature="0"
+     id="path9312-7"
+     d="m 171.91621,184.65609 139.13656,0.36764"
+     style="fill:none;stroke:#000000;stroke-width:1.32916355;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path9314-2"
+     d="m 301.29542,190.20982 10.03906,-4.92186 -9.95702,-5.07814"
+     style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path9380-4"
+     d="m 372.6462,194.44556 14.70778,-0.49114"
+     style="fill:none;stroke:#000000;stroke-width:0.61925161;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path9382-5"
+     d="m 364.33642,194.52811 9.9414,-5.12108 -2.4414,5.03124 2.5586,4.96876 z m 0,0"
+     style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1" />
+  <path
+     inkscape:connector-curvature="0"
+     id="path9384-3"
+     d="m 394.86376,193.87187 -9.9375,5.1211 2.4375,-5.03126 -2.55858,-4.96874 z m 0,0"
+     style="fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-opacity:1" />
+  <text
+     xml:space="preserve"
+     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:0%;font-family:'Bitstream Vera Sans';-inkscape-font-specification:'Bitstream Vera Sans';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     x="316.79996"
+     y="192.20001"
+     id="text5633"
+     sodipodi:linespacing="0%"><tspan
+       sodipodi:role="line"
+       id="tspan5635"
+       x="316.79996"
+       y="192.20001">qq.log</tspan></text>
 </svg>
