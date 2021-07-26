@@ -31,6 +31,10 @@ public:
    Fl_Input command; // input debug command
    Fl_Text_Display ptext; //response display
    Fl_Text_Buffer *pbuff; // response text buffer - use pointer to avoid cb remove error
+   Fl_Text_Display regs;   //register display
+   Fl_Text_Buffer *rbuff; // register display text buffer 
+   Fl_Text_Display mems;   // memory display
+   Fl_Text_Buffer *mbuff; // memory display text buffer 
    communicator *sock;
    spike(int w, int h);
    void open(char *host, char *port);  // open communicator sock
@@ -45,17 +49,28 @@ void cmd_cb(Fl_Widget *, void* v) {
 spike::spike(int w, int h) :
     window(w, h, "RISC-V ISA simulator"),
     command(BORDER, BORDER, 200, 20),
-    ptext(BORDER,50,w-2*BORDER,h-50-BORDER) {
+    ptext(BORDER,50,w-2*BORDER,200),
+    regs(BORDER,250,w-2*BORDER,200),
+    mems(BORDER,450,w-2*BORDER,h-BORDER-450) {
     int i=0;
     do {  // search for an existing mono-space font
       Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
       fl_font(DISPLAY_FONT, DISPLAY_FONT_SIZE);
     } while( fl_width('W') != fl_width('i') && strlen(mono_fonts[i]) );   
     ptext.textfont(DISPLAY_FONT);
-    command.callback(cmd_cb, &window);
+    regs.textfont(DISPLAY_FONT);
+    mems.textfont(DISPLAY_FONT);
     pbuff = new Fl_Text_Buffer();
-    pbuff->text("Oi");
+    pbuff->text("Oip");
     ptext.buffer(pbuff);
+    rbuff = new Fl_Text_Buffer();
+    rbuff->text("Oir");
+    regs.buffer(rbuff);
+    mbuff = new Fl_Text_Buffer();
+    mbuff->text("Oim");
+    mems.buffer(mbuff);
+    command.callback(cmd_cb, &window);
+    command.when(FL_WHEN_ENTER_KEY|FL_WHEN_NOT_CHANGED);
     window.end();
 }   
 
@@ -84,7 +99,7 @@ int main(int argc, char** argv, char** env) {
        argc_offset = 2;
     }
 
-    spike_ptr = new spike(600, 300);
+    spike_ptr = new spike(600, 600);
     spike_ptr->open(host, port);
     spike_ptr->window.show(argc-argc_offset,argv+argc_offset);  // dirty argv[0] :-(
 
