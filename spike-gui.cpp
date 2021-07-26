@@ -8,13 +8,22 @@
 // This program is based in part on the work of the FLTK project (http://www.fltk.org) and
 // https://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/example/cpp03/echo/blocking_tcp_echo_client.cpp
 
-// g++  spike-gui.cpp -o spike-gui.bin -std=c++11 communicator.o -lboost_system -lpthread -lfltk
-
 #include "communicator.h"
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Input.H>
+
+#define DISPLAY_FONT ((Fl_Font)55)
+#define DISPLAY_FONT_SIZE 13
+#define BORDER 10
+const char *mono_fonts[] = { "Noto Mono",
+                             "Consolas",
+                             "Monospace",
+                             "Droid Sans Mono",
+                             "Lucida Console",
+			     "DejaVu Sans Mono",
+			     "FreeMono", "" };
 
 class spike {
 public:
@@ -33,12 +42,16 @@ void cmd_cb(Fl_Widget *, void* v) {
   spike_ptr->pbuff->text(spike_ptr->sock->send_and_rec(spike_ptr->command.value()));
 }
 
-#define BORDER 10
-
 spike::spike(int w, int h) :
     window(w, h, "RISC-V ISA simulator"),
     command(BORDER, BORDER, 200, 20),
     ptext(BORDER,50,w-2*BORDER,h-50-BORDER) {
+    int i=0;
+    do {  // search for an existing mono-space font
+      Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
+      fl_font(DISPLAY_FONT, DISPLAY_FONT_SIZE);
+    } while( fl_width('W') != fl_width('i') && strlen(mono_fonts[i]) );   
+    ptext.textfont(DISPLAY_FONT);
     command.callback(cmd_cb, &window);
     pbuff = new Fl_Text_Buffer();
     pbuff->text("Oi");
