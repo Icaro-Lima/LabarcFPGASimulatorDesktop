@@ -58,6 +58,9 @@ default: $(HDL_SIM) sim_socket.o remote.bin
 remote.bin: remote.cpp communicator.o gui.o
 	$(CXX) $(CFLTK) remote.cpp communicator.o gui.o -o remote.bin $(BOOST) $(LFLTK)
 
+spike-gui.bin: spike-gui.cpp communicator.o 
+	$(CXX) $(CFLTK) -o spike-gui.bin $< communicator.o $(BOOST) $(LFLTK)
+
 sim_socket.o: sim_socket.cpp
 	$(CXX) -std=c++11 $(CTHREAD) -c $<
 
@@ -65,7 +68,7 @@ gui.o: gui.cpp gui.h
 	$(CXX) $(CFLTK) -c $<
 
 communicator.o: communicator.cpp communicator.h
-	$(CXX) -std=c++11 -c communicator.cpp
+	$(CXX) -std=c++11  $(CTHREAD) -c communicator.cpp
 
 # from binary to object dump
 %.objdump : a.out
