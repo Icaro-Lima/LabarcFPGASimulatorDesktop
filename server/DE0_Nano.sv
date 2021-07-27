@@ -89,7 +89,7 @@ always_ff @(posedge CLOCK_50) begin
 end
 
 logic [NBITS_LCD-1:0] lcd_a, lcd_b;
-logic [NINSTR_BITS-1:0] lcd_instruction;
+logic [NBITS_INSTR-1:0] lcd_instruction;
 logic [NBITS_TOP-1:0] lcd_registrador [0:NREGS_TOP-1];
 logic [NBITS_TOP-1:0] lcd_pc, lcd_SrcA, lcd_SrcB,
                       lcd_ALUResult, lcd_Result, lcd_WriteData, lcd_ReadData;

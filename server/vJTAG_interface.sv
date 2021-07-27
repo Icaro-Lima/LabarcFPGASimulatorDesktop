@@ -6,7 +6,7 @@ module vJTAG_interface (
         input logic [NBITS_TOP-1:0] SEG,
         input logic [NBITS_TOP-1:0] lcd_registrador [0:NREGS_TOP-1],
         input logic [NBITS_LCD-1:0] lcd_a, lcd_b,
-        input logic [NINSTR_BITS-1:0] lcd_instruction,
+        input logic [NBITS_INSTR-1:0] lcd_instruction,
         input logic [NBITS_TOP-1:0] lcd_pc, lcd_SrcA, lcd_SrcB,
            lcd_ALUResult, lcd_Result, lcd_WriteData, lcd_ReadData, 
         input logic lcd_MemWrite, lcd_Branch, lcd_MemtoReg, lcd_RegWrite);
