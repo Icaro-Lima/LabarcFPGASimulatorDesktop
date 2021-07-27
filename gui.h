@@ -30,9 +30,9 @@ using std::string;
 #define YMARGIN 10
 #define NSWIS 8
 #define SWIS_OFFSET 64
-#define LCD_OFFSET 290
+#define LCD_OFFSET 270
 #define NLEDS 8
-#define LEDS_VERTICAL_OFFSET 230
+#define LEDS_VERTICAL_OFFSET 212
 #define CLOCK_PERIOD_WIDTH 50
 #define LCD_FONT ((Fl_Font)56)
 #define LCD_FONT_SIZE 32
