@@ -16,6 +16,8 @@
 
 #define DISPLAY_FONT ((Fl_Font)55)
 #define DISPLAY_FONT_SIZE 13
+#define DISPLAY_FONT_WIDTH 8
+#define DISPLAY_FONT_HEIGHT 18
 #define BORDER 10
 const char *mono_fonts[] = { "Noto Mono",
                              "Consolas",
@@ -44,19 +46,23 @@ spike *spike_ptr;
 
 void cmd_cb(Fl_Widget *, void* v) {
   spike_ptr->pbuff->text(spike_ptr->sock->send_and_rec(spike_ptr->command.value()));
+  string pc = spike_ptr->sock->send_and_rec("pc 0");
+  string rg = spike_ptr->sock->send_and_rec("reg 0");
+  rg.erase( rg.end()-1 );
+  spike_ptr->rbuff->text(("  pc: " + pc + rg).c_str());
 }
 
 spike::spike(int w, int h) :
     window(w, h, "RISC-V ISA simulator"),
     command(BORDER, BORDER, 200, 20),
     ptext(BORDER,50,w-2*BORDER,200),
-    regs(BORDER,250,w-2*BORDER,200),
+    regs(BORDER,250,w-2*BORDER,DISPLAY_FONT_HEIGHT*9),
     mems(BORDER,450,w-2*BORDER,h-BORDER-450) {
     int i=0;
     do {  // search for an existing mono-space font
       Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
       fl_font(DISPLAY_FONT, DISPLAY_FONT_SIZE);
-    } while( fl_width('W') != fl_width('i') && strlen(mono_fonts[i]) );   
+    } while( fl_width('W') != fl_width('i') && strlen(mono_fonts[i]) );
     ptext.textfont(DISPLAY_FONT);
     regs.textfont(DISPLAY_FONT);
     mems.textfont(DISPLAY_FONT);
@@ -99,7 +105,7 @@ int main(int argc, char** argv, char** env) {
        argc_offset = 2;
     }
 
-    spike_ptr = new spike(600, 600);
+    spike_ptr = new spike(2*BORDER+((6+2+8)*4+2)*DISPLAY_FONT_WIDTH, 600);
     spike_ptr->open(host, port);
     spike_ptr->window.show(argc-argc_offset,argv+argc_offset);  // dirty argv[0] :-(
 

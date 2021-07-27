@@ -1,3 +1,3 @@
 #!/bin/bash
-( rm -f q.log; while ! test -f q.log; do sleep 1; done; p=$(cut -d' ' -f8 q.log); ./spike-gui.bin $p ) &
-spike -s -d pk ~/try/riscv_c/lupi_pc 7 2 &> >(tee q.log)
+( rm -f q.log; while ! test -f q.log; do sleep 1; done; sleep 1; p=$(cut -d' ' -f8 q.log); ./spike-gui.bin $p ) &
+spike -s -d $@ &> >(tee q.log)
