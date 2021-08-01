@@ -77,9 +77,6 @@ always_comb {GPIO_0[27],GPIO_0[ 3],GPIO_0[ 1],GPIO_0[ 0],
 
 // clock lento 
 // O parameter divide_by esta no top.sv e no .sdc
-// obs.: divide_by=1 nao funciona,
-//       neste caso use CLOCK_50 diretamente no lugar de CLOCK_DIV
-//       e verifique o setup slack no arquivo DE0_Nano.sta.summary
 logic [$clog2(divide_by)-1:0] clock_count;  // contador para o divisor de clock
 logic CLOCK_DIV;  // sinal de clock divido para ser referenciado no arquivo .sdc
 always_ff @(posedge CLOCK_50) begin
@@ -87,6 +84,11 @@ always_ff @(posedge CLOCK_50) begin
   else clock_count <= clock_count + 1; 
   CLOCK_DIV <= clock_count[$clog2(divide_by)-1];
 end
+logic clk_2;
+always_comb
+   // verifique slack de CLOCK_DIV ou CLOCK_50 no .sta.summary
+   if(divide_by==1) clk_2 <= CLOCK_50;
+   else             clk_2 <= CLOCK_DIV;
 
 logic [NBITS_LCD-1:0] lcd_a, lcd_b;
 logic [NBITS_INSTR-1:0] lcd_instruction;
@@ -106,7 +108,7 @@ always_comb begin
 end
 
 vJTAG_interface(.*);
-top (.clk_2(CLOCK_DIV), .*);
+top (.*);
 
 endmodule
 
