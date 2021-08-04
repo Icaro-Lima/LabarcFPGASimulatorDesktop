@@ -53,10 +53,10 @@ public:
 spike *spike_ptr;
 
 void spike::update() {
-   string pc = spike_ptr->sock->send_and_rec("pc 0");
-   string rg = spike_ptr->sock->send_and_rec("reg 0");
+   string pc = sock->send_and_rec("pc 0");
+   string rg = sock->send_and_rec("reg 0");
    rg.erase( rg.end()-1 );
-   spike_ptr->rbuff->text(("  pc: " + pc + rg).c_str());
+   rbuff->text(("  pc: " + pc + rg).c_str());
 }
 
 void spike::help() {
@@ -69,8 +69,12 @@ void spike::help() {
 }
 
 void cmd_cb(Fl_Widget *, void* v) {
-   if (spike_ptr->command.value()[0] == 'h') {
+   if (spike_ptr->command.value()[0] == 'h') {  // help
       spike_ptr->help();
+   } else if (spike_ptr->command.value()[0] == 'q') {  // quit
+      spike_ptr->sock->send_and_rec(spike_ptr->command.value());
+      delete spike_ptr;
+      exit(0);
    } else {
       spike_ptr->pbuff->text(spike_ptr->sock->send_and_rec(spike_ptr->command.value()));
       spike_ptr->update();
