@@ -57,12 +57,23 @@ void cmd_cb(Fl_Widget *, void* v) {
   spike_ptr->update();
 }
 
+#define COMMAND_WIDTH 200
+#define COMMAND_HEIGHT 20
+#define PTEXT_OFFSET 2*BORDER+COMMAND_HEIGHT
+#define PTEXT_LINES 8
+#define REGS_OFFSET PTEXT_OFFSET+DISPLAY_FONT_HEIGHT*PTEXT_LINES+BORDER
+#define REGS_LINES 9
+#define MEMS_OFFSET REGS_OFFSET+DISPLAY_FONT_HEIGHT*REGS_LINES+BORDER
+#define MEMS_LINES 5
+#define WINDOW_HEIGHT MEMS_OFFSET+DISPLAY_FONT_HEIGHT*MEMS_LINES+BORDER
+#define WINDOW_WIDTH 2*BORDER+((6+2+8)*4+2)*DISPLAY_FONT_WIDTH
+
 spike::spike(int w, int h) :
     window(w, h, "RISC-V ISA simulator"),
-    command(BORDER, BORDER, 200, 20),
-    ptext(BORDER,50,w-2*BORDER,200),
-    regs(BORDER,250,w-2*BORDER,DISPLAY_FONT_HEIGHT*9),
-    mems(BORDER,450,w-2*BORDER,h-BORDER-450) {
+    command(BORDER, BORDER, COMMAND_WIDTH, COMMAND_HEIGHT),
+    ptext(BORDER,PTEXT_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*PTEXT_LINES),
+    regs(BORDER,REGS_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*REGS_LINES),
+    mems(BORDER,MEMS_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*MEMS_LINES) {
     int i=0;
     do {  // search for an existing mono-space font
       Fl::set_font(DISPLAY_FONT, mono_fonts[i++]);
@@ -110,7 +121,7 @@ int main(int argc, char** argv, char** env) {
        argc_offset = 2;
     }
 
-    spike_ptr = new spike(2*BORDER+((6+2+8)*4+2)*DISPLAY_FONT_WIDTH, 600);
+    spike_ptr = new spike(WINDOW_WIDTH, WINDOW_HEIGHT);
     spike_ptr->open(host, port);
     spike_ptr->update();
     spike_ptr->window.show(argc-argc_offset,argv+argc_offset);  // dirty argv[0] :-(
