@@ -6,7 +6,6 @@
 // Icaro Dantas de Araujo Lima and Elmar Melcher at UFCG, 2021
 
 // This program is based in part on the work of the FLTK project (http://www.fltk.org) and
-// https://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/example/cpp03/echo/blocking_tcp_echo_client.cpp
 
 #include "communicator.h"
 #include <FL/Fl.H>

@@ -1,4 +1,5 @@
 #include "communicator.h"
+// https://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/example/cpp03/echo/blocking_tcp_echo_client.cpp
 
 communicator::communicator(char *host, char *port) :
    sock(io_serve),
