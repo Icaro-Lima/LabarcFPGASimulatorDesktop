@@ -37,19 +37,24 @@ public:
    Fl_Text_Buffer *rbuff; // register display text buffer 
    Fl_Text_Display mems;   // memory display
    Fl_Text_Buffer *mbuff; // memory display text buffer 
-   communicator *sock;
+   communicator *sock;  // socket comunicator with spike
    spike(int w, int h);
-   void open(char *host, char *port);  // open communicator sock
+   void open(char *host, char *port);  // open communicator socket
+   void update(); // update register window
 };
 
 spike *spike_ptr;
 
-void cmd_cb(Fl_Widget *, void* v) {
-  spike_ptr->pbuff->text(spike_ptr->sock->send_and_rec(spike_ptr->command.value()));
+void spike::update() {
   string pc = spike_ptr->sock->send_and_rec("pc 0");
   string rg = spike_ptr->sock->send_and_rec("reg 0");
   rg.erase( rg.end()-1 );
   spike_ptr->rbuff->text(("  pc: " + pc + rg).c_str());
+}
+
+void cmd_cb(Fl_Widget *, void* v) {
+  spike_ptr->pbuff->text(spike_ptr->sock->send_and_rec(spike_ptr->command.value()));
+  spike_ptr->update();
 }
 
 spike::spike(int w, int h) :
@@ -107,6 +112,7 @@ int main(int argc, char** argv, char** env) {
 
     spike_ptr = new spike(2*BORDER+((6+2+8)*4+2)*DISPLAY_FONT_WIDTH, 600);
     spike_ptr->open(host, port);
+    spike_ptr->update();
     spike_ptr->window.show(argc-argc_offset,argv+argc_offset);  // dirty argv[0] :-(
 
     Fl::run();   // run the graphical interface which calls cmd_cb()
