@@ -31,7 +31,12 @@ const char *mono_fonts[] = { "Noto Mono",
 
 class spike {
 public:
+   spike(int w, int h);
+   communicator *sock;  // socket comunicator with spike
+   void update(); // update register window
+   void cmd_caba(); // function called by callback
    Fl_Window window; // Window representing ISA simulator
+private:
    Fl_Input command; // input debug command
    Fl_Text_Display ptext; //response display
    Fl_Text_Buffer *pbuff; // response text buffer - use pointer to avoid cb remove error
@@ -42,11 +47,7 @@ public:
    Fl_Window help_window; // help window
    Fl_Text_Display htext; // help text display
    Fl_Text_Buffer *hbuff; // help text buffer
-   communicator *sock;  // socket comunicator with spike
-   spike(int w, int h);
-   void open(char *host, char *port);  // open communicator socket
-   void update(); // update register window
-   void help();
+   void help(); // show help window
 };
 
 spike *spike_ptr;
@@ -67,17 +68,21 @@ void spike::help() {
    help_window.show();
 }
 
-void cmd_cb(Fl_Widget *, void* v) {
-   if (spike_ptr->command.value()[0] == 'h') {  // help
-      spike_ptr->help();
-   } else if (spike_ptr->command.value()[0] == 'q') {  // quit
-      spike_ptr->sock->send_and_rec(spike_ptr->command.value());
+void spike::cmd_caba() {
+   if (command.value()[0] == 'h') {  // help
+      help();
+   } else if (command.value()[0] == 'q') {  // quit
+      sock->send_and_rec(command.value());
       delete spike_ptr;
       exit(0);
    } else {
-      spike_ptr->pbuff->text(spike_ptr->sock->send_and_rec(spike_ptr->command.value()));
-      spike_ptr->update();
+      pbuff->text(sock->send_and_rec(command.value()));
+      update();
    }
+}
+
+void cmd_cb(Fl_Widget *, void* v) {
+   spike_ptr->cmd_caba();
 }
 
 #define COMMAND_WIDTH 200
@@ -126,10 +131,6 @@ spike::spike(int w, int h) :
     window.end();
 }   
 
-void spike::open(char *host, char *port) {
-   sock = new communicator(host, port);
-}
-
 int main(int argc, char** argv, char** env) {
 
     if (argc < 2)
@@ -152,7 +153,7 @@ int main(int argc, char** argv, char** env) {
     }
 
     spike_ptr = new spike(WINDOW_WIDTH, WINDOW_HEIGHT);
-    spike_ptr->open(host, port);
+    spike_ptr->sock = new communicator(host, port);
     spike_ptr->update();
     spike_ptr->window.show(argc-argc_offset,argv+argc_offset);  // dirty argv[0] :-(
 
