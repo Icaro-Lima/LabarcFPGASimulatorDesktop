@@ -13,7 +13,7 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Input.H>
 
-#define BORDER 10
+#define MAX_MEMS 10 // maximum active memory positions
 
 #define DISPLAY_FONT ((Fl_Font)55)
 #define DISPLAY_FONT_SIZE 13
@@ -28,6 +28,18 @@ const char *mono_fonts[] = { "Noto Mono",
                              "Lucida Console",
 			                    "DejaVu Sans Mono",
 			                    "FreeMono", "" };
+
+#define BORDER 10
+#define COMMAND_WIDTH 200
+#define COMMAND_HEIGHT 20
+#define PTEXT_OFFSET 2*BORDER+COMMAND_HEIGHT
+#define PTEXT_LINES 5
+#define REGS_OFFSET PTEXT_OFFSET+DISPLAY_FONT_HEIGHT*PTEXT_LINES+BORDER
+#define REGS_LINES 9
+#define MEMS_OFFSET REGS_OFFSET+DISPLAY_FONT_HEIGHT*REGS_LINES+BORDER
+#define MEMS_LINES 5
+#define WINDOW_HEIGHT MEMS_OFFSET+DISPLAY_FONT_HEIGHT*MEMS_LINES+BORDER
+#define WINDOW_WIDTH 2*BORDER+((6+2+8)*4+2)*DISPLAY_FONT_WIDTH
 
 class spike {
 public:
@@ -48,54 +60,15 @@ private:
    Fl_Text_Display htext; // help text display
    Fl_Text_Buffer *hbuff; // help text buffer
    void help(); // show help window
+   string memcmds[MAX_MEMS] = { "",  "", "", "", "", "", "", "", "", ""};
+   // memory commands to be shown
 };
 
 spike *spike_ptr;
 
-void spike::update() {
-   string pc = sock->send_and_rec("pc 0");
-   string rg = sock->send_and_rec("reg 0");
-   rg.erase( rg.end()-1 );
-   rbuff->text(("  pc: " + pc + rg).c_str());
-}
-
-void spike::help() {
-   hbuff = new Fl_Text_Buffer();
-   hbuff->text(sock->send_and_rec(command.value()));
-   fl_font(HELP_FONT, HELP_FONT_SIZE);
-   htext.textfont(HELP_FONT);
-   htext.buffer(hbuff);
-   help_window.show();
-}
-
-void spike::cmd_caba() {
-   if (command.value()[0] == 'h') {  // help
-      help();
-   } else if (command.value()[0] == 'q') {  // quit
-      sock->send_and_rec(command.value());
-      delete spike_ptr;
-      exit(0);
-   } else {
-      pbuff->text(sock->send_and_rec(command.value()));
-      update();
-   }
-}
-
 void cmd_cb(Fl_Widget *, void* v) {
    spike_ptr->cmd_caba();
 }
-
-#define COMMAND_WIDTH 200
-#define COMMAND_HEIGHT 20
-#define PTEXT_OFFSET 2*BORDER+COMMAND_HEIGHT
-#define PTEXT_LINES 5
-#define REGS_OFFSET PTEXT_OFFSET+DISPLAY_FONT_HEIGHT*PTEXT_LINES+BORDER
-#define REGS_LINES 9
-#define MEMS_OFFSET REGS_OFFSET+DISPLAY_FONT_HEIGHT*REGS_LINES+BORDER
-#define MEMS_LINES 5
-#define WINDOW_HEIGHT MEMS_OFFSET+DISPLAY_FONT_HEIGHT*MEMS_LINES+BORDER
-#define WINDOW_WIDTH 2*BORDER+((6+2+8)*4+2)*DISPLAY_FONT_WIDTH
-#define HELP_LINES (PTEXT_LINES+REGS_LINES+MEMS_LINES)
 
 spike::spike(int w, int h) :
     window(w, h, "RISC-V ISA simulator"),
@@ -122,14 +95,56 @@ spike::spike(int w, int h) :
     rbuff = new Fl_Text_Buffer();
     regs.buffer(rbuff);
     mbuff = new Fl_Text_Buffer();
-    mbuff->text("Memory - use mem command");
     mems.buffer(mbuff);
     command.align(FL_ALIGN_RIGHT);
     command.label("h for help");
     command.callback(cmd_cb, &window);
     command.when(FL_WHEN_ENTER_KEY|FL_WHEN_NOT_CHANGED);
     window.end();
-}   
+}
+
+void spike::update() {
+   string pc = sock->send_and_rec("pc 0");
+   string rg = sock->send_and_rec("reg 0");
+   rg.erase( rg.end()-1 );
+   rbuff->text(("  pc: " + pc + rg).c_str());
+   string m;
+   if (memcmds[0].c_str()[0]==0) m = "Memory - use mem command"; // hint if empty
+   for (int i=0; memcmds[i].c_str()[0]; i++)  // for all slots which are not empty
+      m += memcmds[i] + ": " + sock->send_and_rec(memcmds[i]);
+   mbuff->text(m.c_str());
+}
+
+void spike::help() {
+   hbuff = new Fl_Text_Buffer();
+   hbuff->text(sock->send_and_rec(command.value()));
+   fl_font(HELP_FONT, HELP_FONT_SIZE);
+   htext.textfont(HELP_FONT);
+   htext.buffer(hbuff);
+   help_window.show();
+}
+
+void spike::cmd_caba() {
+   if (command.value()[0] == 'h') {  // help
+      help();
+   } else if (command.value()[0] == 'q') {  // quit
+      sock->send_and_rec(command.value());
+      delete spike_ptr;
+      exit(0);
+   } else if (strncmp(command.value(), "mem", 3)==0) {
+      int i;
+      for (i=0; memcmds[i].c_str()[0]; i++); // find first empty slot
+      if (i==MAX_MEMS-1) {  // last position reached
+         for (i=0; i<MAX_MEMS-1; i++) memcmds[i] = memcmds[i+1]; // shift up
+         i = MAX_MEMS-2;
+      }
+      memcmds[i] = command.value();
+      update();
+   } else {
+      pbuff->text(sock->send_and_rec(command.value()));
+      update();
+   }
+}
 
 int main(int argc, char** argv, char** env) {
 
