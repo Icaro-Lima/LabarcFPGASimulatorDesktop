@@ -1,4 +1,4 @@
 #!/bin/bash
 rm -f q.log
-( while [ $(cat q.log 2>/dev/null | wc -l) -eq 0 ]; do sleep 0.2; done; p=$(cut -d' ' -f8 q.log); ./spike-gui.bin $p ) &
-spike -s -d $@ > q.log
+( while [ $(cat q.log 2>/dev/null | wc -l) -eq 0 ]; do sleep 0.2; done; ./spike-gui.bin $(cut -d' ' -f8 q.log) ) &
+spike -s -d $@ | tee q.log

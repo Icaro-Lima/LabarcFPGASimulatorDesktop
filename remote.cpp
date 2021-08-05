@@ -197,7 +197,7 @@ int main(int argc, char** argv, char** env) {
 
    Fl::run();   // run the graphical interface which calls callback()
 
-   sock->send_and_rec("exit");
+   sock->send_and_rec("exit");  // when window is closed, send exit command
 
    delete_gui();
 

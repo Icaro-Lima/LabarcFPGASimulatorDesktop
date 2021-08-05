@@ -5,7 +5,7 @@
 // Version 2.1.
 // Icaro Dantas de Araujo Lima and Elmar Melcher at UFCG, 2021
 
-// This program is based in part on the work of the FLTK project (http://www.fltk.org) and
+// This program is based in part on the work of the FLTK project (http://www.fltk.org)
 
 #include "communicator.h"
 #include <FL/Fl.H>
@@ -60,7 +60,7 @@ private:
    Fl_Text_Display htext; // help text display
    Fl_Text_Buffer *hbuff; // help text buffer
    void help(); // show help window
-   string memcmds[MAX_MEMS] = { "",  "", "", "", "", "", "", "", "", ""};
+   string memcmds[MAX_MEMS];
    // memory commands to be shown
 };
 
@@ -96,6 +96,7 @@ spike::spike(int w, int h) :
     regs.buffer(rbuff);
     mbuff = new Fl_Text_Buffer();
     mems.buffer(mbuff);
+    for(int i; i<MAX_MEMS; i++) memcmds[i] = "";
     command.align(FL_ALIGN_RIGHT);
     command.label("h for help");
     command.callback(cmd_cb, &window);

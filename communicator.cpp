@@ -1,4 +1,5 @@
 #include "communicator.h"
+// This program is based in part on
 // https://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/example/cpp03/echo/blocking_tcp_echo_client.cpp
 
 communicator::communicator(char *host, char *port) :
@@ -20,15 +21,11 @@ char *communicator::send_and_rec(string r) {
   try
   {
     connect(sock, host_port);
-    // send request string - i.e. a debug command
+    // send request string
     string req = r + "\n";
     const char *request = req.c_str();
     size_t request_length = std::strlen(request);
     boost::asio::write(sock, boost::asio::buffer(request, request_length));
-
-    if (request[0] == 'q') {
-       exit(0); // exit after sending quit command
-    }
 
     // reveive a string of characters  
     error_code error;
