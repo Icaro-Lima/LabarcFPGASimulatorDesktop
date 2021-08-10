@@ -31,12 +31,9 @@ char *communicator::send_and_rec(string r) {
     error_code error;
     streambuf response;
 
-    // Read until EOF, writing data to output as we go.
-    while (boost::asio::read(sock, response,
-           boost::asio::transfer_at_least(1), error)) {
-      ss << &response;
-    }
-    if (error != boost::asio::error::eof)
+    boost::asio::read_until(sock, response, "\r\n", error);
+    ss << &response;
+    if (error != boost::system::errc::success && error != boost::asio::error::eof)
        throw boost::system::system_error(error);
   }
   catch (std::exception& e)
