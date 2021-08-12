@@ -117,8 +117,16 @@ void read_handler(const error_code& err, size_t bytes_transferred)  {
 
 void write_handler(const error_code& err, size_t bytes_transferred) {
     if (!err) {
+// For compatibility with web server socket client,
+// the connection is opened and closed for each send_and_receive.
+// However, in Windows opening a connection takes an excessive amount of time
+// (7 seconds have been reported), so in Windows the connection is opened only once.
+#ifdef MINGW
+       async_read_until(sock, binp, '\n', read_handler);
+#else
        sock.close();
        acceptor_ptr->async_accept(sock, accept_handler);  // accept next connection
+#endif
     } else {
        cerr << "write error: " << err.message() << endl;
        exit_all();

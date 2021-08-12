@@ -2,12 +2,20 @@
 // This program is based in part on
 // https://www.boost.org/doc/libs/1_55_0/doc/html/boost_asio/example/cpp03/echo/blocking_tcp_echo_client.cpp
 
+// For compatibility with web server socket client,
+// the connection is opened and closed for each send_and_receive.
+// However, in Windows opening a connection takes an excessive amount of time
+// (7 seconds have been reported), so in Windows the connection is opened only once.
+
 communicator::communicator(char *host, char *port) :
    sock(io_serve),
    resolver(io_serve) {
    try
    {
      host_port =  resolver.resolve({host, port});
+#ifdef MINGW
+     connect(sock, host_port);
+#endif
    }
    catch (exception& e)
    {
@@ -20,7 +28,9 @@ char *communicator::send_and_rec(string r) {
   stringstream ss;
   try
   {
+#ifndef MINGW
     connect(sock, host_port);
+#endif
     // send request string
     string req = r + "\n";
     const char *request = req.c_str();
@@ -38,7 +48,7 @@ char *communicator::send_and_rec(string r) {
   }
   catch (std::exception& e)
   {
-    std::cerr << "Exception: " << e.what() << "\n";
+    std::cerr << "send_and_rec exception: " << e.what() << "\n";
     exit(9); // exit in case of connection error
   }
 
