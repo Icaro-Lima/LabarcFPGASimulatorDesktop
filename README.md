@@ -47,6 +47,13 @@ git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
 
+### Android
+
+Instale VNC Viewer e Userland. Dentro do Userland, escolhe Ubuntu.
+Dentro do Ubuntu, siga as instruções acima para Ubuntu 18.04.
+
+Limitação: variáveis de no máximo 32 bits. Do LCD (lcd_a e lcd_b), só funcionam os 8 dígitos hexadecimais da direita.
+
 ### Windows 10
 
 Baixe o MSYS2 através do link: https://www.msys2.org/
