@@ -77,6 +77,8 @@ git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
 
+Limitação: variáveis de no máximo 32 bits. Do LCD (lcd_a e lcd_b), só funcionam os 8 dígitos hexadecimais da direita.
+
 ### Mac OS (Testado no High Sierra)
 Baixe o _homebrew_ na sua máquina (se já tiver, não precisa baixar novamente)
 ```
