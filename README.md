@@ -147,3 +147,12 @@ Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-l
 O vídeo mostra a utilização do simulador no desktop seguida da utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação e utilização de FPGA remota. 
 
 http://lad.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
+
+# Publicações
+
+Í. Lima and E. Melcher, “Um Simulador Didático para o Ensino de SystemVerilog”, Workshop sobre Educação em Arquitetura de Computadores, 2018
+
+Anais do WCAS 20211 com artigo "Remote FPGA Lab for Distance Learning" nas páginas 27-30:
+https://bit.ly/wcas21
+
+Vídeo da apresentação: https://youtu.be/PMbBgx9OTNU
