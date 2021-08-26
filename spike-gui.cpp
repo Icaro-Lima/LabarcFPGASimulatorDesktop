@@ -46,7 +46,8 @@ public:
    spike(int w, int h);
    communicator *sock;  // socket comunicator with spike
    void update(); // update register window
-   void cmd_caba(); // function called by callback
+   static void cmd_cb(Fl_Widget *, void *); // static function called by callback
+   void cmd_caba(); // normal function called by callback function
    Fl_Window window; // Window representing ISA simulator
 private:
    Fl_Input command; // input debug command
@@ -63,12 +64,6 @@ private:
    string memcmds[MAX_MEMS];
    // memory commands to be shown
 };
-
-spike *spike_ptr;
-
-void cmd_cb(Fl_Widget *, void* v) {
-   spike_ptr->cmd_caba();
-}
 
 spike::spike(int w, int h) :
     window(w, h, "RISC-V ISA simulator"),
@@ -99,7 +94,7 @@ spike::spike(int w, int h) :
     for(int i; i<MAX_MEMS; i++) memcmds[i] = "";
     command.align(FL_ALIGN_RIGHT);
     command.label("h for help");
-    command.callback(cmd_cb, &window);
+    command.callback(cmd_cb, (void *)this);
     command.when(FL_WHEN_ENTER_KEY|FL_WHEN_NOT_CHANGED);
     window.end();
 }
@@ -125,12 +120,15 @@ void spike::help() {
    help_window.show();
 }
 
+void spike::cmd_cb(Fl_Widget *, void *ptr) {
+   ((spike *)ptr)->cmd_caba();
+}
+
 void spike::cmd_caba() {
    if (command.value()[0] == 'h') {  // help
       help();
    } else if (command.value()[0] == 'q') {  // quit
       sock->send_and_rec(command.value());
-      delete spike_ptr;
       exit(0);
    } else if (strncmp(command.value(), "mem", 3)==0) {
       int i;
@@ -168,7 +166,7 @@ int main(int argc, char** argv, char** env) {
        argc_offset = 2;
     }
 
-    spike_ptr = new spike(WINDOW_WIDTH, WINDOW_HEIGHT);
+    spike *spike_ptr = new spike(WINDOW_WIDTH, WINDOW_HEIGHT);
     spike_ptr->sock = new communicator(host, port);
     spike_ptr->update();
     spike_ptr->window.show(argc-argc_offset,argv+argc_offset);  // dirty argv[0] :-(
