@@ -150,7 +150,8 @@ http://lad.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
 
 # Publicações
 
-Í. Lima and E. Melcher, “Um Simulador Didático para o Ensino de SystemVerilog”, Workshop sobre Educação em Arquitetura de Computadores, 2018
+Í. Lima and E. Melcher, “Um Simulador Didático para o Ensino de SystemVerilog”, Workshop sobre Educação em Arquitetura de Computadores, 2018:
+http://lad.dsc.ufcg.edu.br/lad/uploads/Lad/WEAC_2018.pdf
 
 Anais do WCAS 20211 com artigo "Remote FPGA Lab for Distance Learning" nas páginas 27-30:
 https://bit.ly/wcas21
