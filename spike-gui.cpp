@@ -19,6 +19,7 @@
 #define DISPLAY_FONT_SIZE 13
 #define DISPLAY_FONT_WIDTH 8
 #define DISPLAY_FONT_HEIGHT 18
+#define NSTYLES 3
 #define HELP_FONT ((Fl_Font)56)
 #define HELP_FONT_SIZE 10
 const char *mono_fonts[] = { "Noto Mono",
@@ -53,6 +54,13 @@ private:
    Fl_Input command; // input debug command
    Fl_Text_Display ptext; //response display
    Fl_Text_Buffer *pbuff; // response text buffer - use pointer to avoid cb remove error
+   Fl_Text_Buffer *stylebuf;
+   Fl_Text_Display::Style_Table_Entry
+                   styletable[NSTYLES] = {     // Style table
+                     { FL_BLACK,    DISPLAY_FONT, DISPLAY_FONT_SIZE }, // A - Plain
+                     { FL_DARK_RED, DISPLAY_FONT, DISPLAY_FONT_SIZE }, // B - PC position
+                     { FL_DARK3,    DISPLAY_FONT, DISPLAY_FONT_SIZE }  // C - not PC position
+                   };   
    Fl_Text_Display regs;   //register display
    Fl_Text_Buffer *rbuff; // register display text buffer 
    Fl_Text_Display mems;   // memory display
@@ -85,8 +93,11 @@ spike::spike(int w, int h) :
     regs.textfont(DISPLAY_FONT);
     mems.textfont(DISPLAY_FONT);
     pbuff = new Fl_Text_Buffer();
-    pbuff->text("Command output");
+    pbuff->text(   "Command output");
+    stylebuf = new Fl_Text_Buffer();
+    stylebuf->text("BBBBBBBCCCCCCC");
     ptext.buffer(pbuff);
+    ptext.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
     rbuff = new Fl_Text_Buffer();
     regs.buffer(rbuff);
     mbuff = new Fl_Text_Buffer();
