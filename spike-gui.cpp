@@ -8,18 +8,24 @@
 // This program is based in part on the work of the FLTK project (http://www.fltk.org)
 
 #include "communicator.h"
+#include <fstream>
 #include <FL/Fl.H>
 #include <FL/Fl_Window.H>
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Input.H>
 
+using std::string;
+using std::vector;
+using std::ifstream;
+
 #define MAX_MEMS 10 // maximum active memory positions
+#define NCHRS_DA_LINE 60 // number of characters in a dissassembly line
 
 #define DISPLAY_FONT ((Fl_Font)55)
 #define DISPLAY_FONT_SIZE 13
 #define DISPLAY_FONT_WIDTH 8
 #define DISPLAY_FONT_HEIGHT 18
-#define NSTYLES 3
+#define NSTYLES 4
 #define HELP_FONT ((Fl_Font)56)
 #define HELP_FONT_SIZE 10
 const char *mono_fonts[] = { "Noto Mono",
@@ -34,7 +40,7 @@ const char *mono_fonts[] = { "Noto Mono",
 #define COMMAND_WIDTH 200
 #define COMMAND_HEIGHT 20
 #define PTEXT_OFFSET 2*BORDER+COMMAND_HEIGHT
-#define PTEXT_LINES 5
+#define PTEXT_LINES 6
 #define REGS_OFFSET PTEXT_OFFSET+DISPLAY_FONT_HEIGHT*PTEXT_LINES+BORDER
 #define REGS_LINES 9
 #define MEMS_OFFSET REGS_OFFSET+DISPLAY_FONT_HEIGHT*REGS_LINES+BORDER
@@ -57,10 +63,11 @@ private:
    Fl_Text_Buffer *stylebuf;
    Fl_Text_Display::Style_Table_Entry
                    styletable[NSTYLES] = {     // Style table
-                     { FL_BLACK,    DISPLAY_FONT, DISPLAY_FONT_SIZE }, // A - Plain
-                     { FL_DARK_RED, DISPLAY_FONT, DISPLAY_FONT_SIZE }, // B - PC position
-                     { FL_DARK3,    DISPLAY_FONT, DISPLAY_FONT_SIZE }  // C - not PC position
-                   };   
+                     { FL_BLACK,    DISPLAY_FONT, DISPLAY_FONT_SIZE+1 }, // A - Plain
+                     { FL_DARK_RED, DISPLAY_FONT, DISPLAY_FONT_SIZE+1 }, // B - PC position
+                     { FL_DARK3,    DISPLAY_FONT, DISPLAY_FONT_SIZE+1 }, // C - not PC position
+                     { FL_BLACK,    DISPLAY_FONT, DISPLAY_FONT_SIZE+1 }  // D - do not use
+                   };                                    // +1 makes font size equal do default
    Fl_Text_Display regs;   //register display
    Fl_Text_Buffer *rbuff; // register display text buffer 
    Fl_Text_Display mems;   // memory display
@@ -76,9 +83,9 @@ private:
 spike::spike(int w, int h) :
     window(w, h, "RISC-V ISA simulator"),
     command(BORDER, BORDER, COMMAND_WIDTH, COMMAND_HEIGHT),
-    ptext(BORDER,PTEXT_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*PTEXT_LINES),
-    regs(BORDER,REGS_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*REGS_LINES),
-    mems(BORDER,MEMS_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*MEMS_LINES),
+    ptext(BORDER,PTEXT_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*PTEXT_LINES+1),
+    regs(BORDER,REGS_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*REGS_LINES+1),
+    mems(BORDER,MEMS_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*MEMS_LINES+1),
     help_window(w,h, "Spike Help"),
     htext(BORDER,BORDER,w-2*BORDER,h-2*BORDER) {
     int i=0;
@@ -92,10 +99,31 @@ spike::spike(int w, int h) :
     ptext.textfont(DISPLAY_FONT);
     regs.textfont(DISPLAY_FONT);
     mems.textfont(DISPLAY_FONT);
+    // read disassembly file into string vector
+    vector<string> da_lines;
+    ifstream da_file ("da.txt");
+    if (da_file.is_open()) {
+      string li;
+      while (getline (da_file, li)) {
+        li.append(NCHRS_DA_LINE - li.length(), ' ');
+        da_lines.push_back(li);
+      }
+      da_file.close();
+    } else {
+       cerr << "Unable to open file da.txt";
+    }
     pbuff = new Fl_Text_Buffer();
-    pbuff->text(   "Command output");
+    string lis;
+    for(int i=0; i<PTEXT_LINES-1; i++) {
+      lis += da_lines[i];
+      if(i<PTEXT_LINES-2) lis += '\n';
+    }
+    pbuff->text(lis.c_str());
+    char style_str[(NCHRS_DA_LINE+1)*PTEXT_LINES];
+    memset(style_str, 'C', (NCHRS_DA_LINE+1)*PTEXT_LINES-1);
+    memset(style_str+NCHRS_DA_LINE+1, 'B', NCHRS_DA_LINE);    
     stylebuf = new Fl_Text_Buffer();
-    stylebuf->text("BBBBBBBCCCCCCC");
+    stylebuf->text(style_str);
     ptext.buffer(pbuff);
     ptext.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
     rbuff = new Fl_Text_Buffer();
