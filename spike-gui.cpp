@@ -14,10 +14,14 @@
 #include <FL/Fl_Text_Display.H>
 #include <FL/Fl_Input.H>
 
+using std::cerr;
 using std::string;
 using std::vector;
 using std::ifstream;
 using std::find_if;
+using std::size_t;
+using std::distance;
+using std::begin;
 
 #define MAX_MEMS 10 // maximum active memory positions
 #define NCHRS_DA_LINE 60 // number of characters in a dissassembly line
@@ -43,7 +47,8 @@ const char *mono_fonts[] = { "Noto Mono",
 #define PTEXT_OFFSET 2*BORDER+COMMAND_HEIGHT
 #define PTEXT_LINES 5
 #define DISA_OFFSET PTEXT_OFFSET+DISPLAY_FONT_HEIGHT*PTEXT_LINES+BORDER
-#define DISA_LINES 6
+#define DISA_LINES 7
+#define DISA_PC_LINE 2
 #define REGS_OFFSET DISA_OFFSET+DISPLAY_FONT_HEIGHT*DISA_LINES+BORDER
 #define REGS_LINES 9
 #define MEMS_OFFSET REGS_OFFSET+DISPLAY_FONT_HEIGHT*REGS_LINES+BORDER
@@ -80,7 +85,7 @@ private:
    Fl_Text_Display htext; // help text display
    Fl_Text_Buffer *hbuff; // help text buffer
    vector<string> disa_lines; // disassembled code, line by line  
-   char style_str[(NCHRS_DA_LINE+1)*PTEXT_LINES];  // style buffer content
+   char style_str[(NCHRS_DA_LINE+1)*DISA_LINES];  // style buffer content
    string memcmds[MAX_MEMS]; // memory commands to be shown in memory window
    void cmd_caba(); // normal function called by callback function
    void disa_file(); // read disassembled code from file
@@ -122,8 +127,9 @@ spike::spike(int w, int h) :
     disa_file();
     dbuff = new Fl_Text_Buffer();
     stylebuf = new Fl_Text_Buffer();
-    memset(style_str, 'C', (NCHRS_DA_LINE+1)*PTEXT_LINES-1);
-    memset(style_str+NCHRS_DA_LINE+1, 'B', NCHRS_DA_LINE);    
+    memset(style_str, 'C', (NCHRS_DA_LINE+1)*DISA_LINES-1);
+    // only line no DISA_PC_LINE will be highlighted
+    memset(style_str+(NCHRS_DA_LINE+1)*DISA_PC_LINE, 'B', NCHRS_DA_LINE);    
     stylebuf->text(style_str);
     disa.buffer(dbuff);
 
@@ -147,9 +153,9 @@ void spike::disa_file() { // read disassembly file into string vector
   ifstream disa_file (DISA_FILE);
   if (disa_file.is_open()) {
     string li;
-    // first line is an empty line so we can always show the line before
+    // first lines are empty, so we can always show the line before PC
     li.append(NCHRS_DA_LINE, ' ');
-    disa_lines.push_back(li);    
+    for(int i=0; i<DISA_PC_LINE; i++) disa_lines.push_back(li);
     while (getline (disa_file, li)) {
       li.append(NCHRS_DA_LINE - li.length(), ' ');
       disa_lines.push_back(li);
@@ -157,7 +163,7 @@ void spike::disa_file() { // read disassembly file into string vector
     disa_file.close();
     li = "";  // append enough empty lines
     li.append(NCHRS_DA_LINE, ' ');
-    for(int i=0; i<DISA_LINES; i++) disa_lines.push_back(li);    
+    for(int i=0; i<DISA_LINES; i++) disa_lines.push_back(li);
   } else {
      cerr << "Unable to open file " DISA_FILE;
   }
@@ -170,16 +176,16 @@ void spike::update() {
    string pcd = pc.substr(2,8) + ":"; // search for disassmbly line starting with pc
    vector<string>::iterator it = find_if(disa_lines.begin(),
                                          disa_lines.end(),
-                                         [pcd](const std::string& str) {
+                                         [pcd](const string& str) {
                                             return str.substr(0,9) == pcd;
                                          }
                                         );
    if(it != disa_lines.end()) { // if found
-      std::size_t i = std::distance(std::begin(disa_lines), it); // i>0 always
+      size_t i = distance(begin(disa_lines), it); // i>0 always
       string lis;
-      for(int j=-1; j<DISA_LINES-2; j++) { // collect lines arround pc
+      for(int j=-DISA_PC_LINE; j<DISA_LINES-DISA_PC_LINE; j++) { // collect lines arround pc
         lis += disa_lines[i+j];
-        if(j<DISA_LINES-3) lis += '\n';
+        if(j<DISA_LINES-DISA_PC_LINE-1) lis += '\n';
       }
       dbuff->text(lis.c_str());
       disa.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
@@ -236,7 +242,7 @@ int main(int argc, char** argv, char** env) {
 
     if (argc < 2)
     {
-      std::cerr << "Usage: " << argv[0] << " [<host>] <port>\n";
+      cerr << "Usage: " << argv[0] << " [<host>] <port>\n";
       return 1;
     }
 
