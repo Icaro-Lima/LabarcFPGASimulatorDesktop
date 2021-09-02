@@ -25,7 +25,7 @@ using std::ifstream;
 #define DISPLAY_FONT_SIZE 13
 #define DISPLAY_FONT_WIDTH 8
 #define DISPLAY_FONT_HEIGHT 18
-#define NSTYLES 4
+#define NSTYLES 4 // number of styles used for disassembly
 #define HELP_FONT ((Fl_Font)56)
 #define HELP_FONT_SIZE 10
 const char *mono_fonts[] = { "Noto Mono",
@@ -35,13 +35,15 @@ const char *mono_fonts[] = { "Noto Mono",
                              "Lucida Console",
 			                    "DejaVu Sans Mono",
 			                    "FreeMono", "" };
-
+// define sub-windows geometries
 #define BORDER 10
 #define COMMAND_WIDTH 200
 #define COMMAND_HEIGHT 20
 #define PTEXT_OFFSET 2*BORDER+COMMAND_HEIGHT
-#define PTEXT_LINES 6
-#define REGS_OFFSET PTEXT_OFFSET+DISPLAY_FONT_HEIGHT*PTEXT_LINES+BORDER
+#define PTEXT_LINES 5
+#define DISA_OFFSET PTEXT_OFFSET+DISPLAY_FONT_HEIGHT*PTEXT_LINES+BORDER
+#define DISA_LINES 6
+#define REGS_OFFSET DISA_OFFSET+DISPLAY_FONT_HEIGHT*DISA_LINES+BORDER
 #define REGS_LINES 9
 #define MEMS_OFFSET REGS_OFFSET+DISPLAY_FONT_HEIGHT*REGS_LINES+BORDER
 #define MEMS_LINES 5
@@ -60,6 +62,8 @@ private:
    Fl_Input command; // input debug command
    Fl_Text_Display ptext; //response display
    Fl_Text_Buffer *pbuff; // response text buffer - use pointer to avoid cb remove error
+   Fl_Text_Display disa;  // disassembly display
+   Fl_Text_Buffer *dbuff; // disassembly text buffer
    Fl_Text_Buffer *stylebuf;
    Fl_Text_Display::Style_Table_Entry
                    styletable[NSTYLES] = {     // Style table
@@ -84,6 +88,7 @@ spike::spike(int w, int h) :
     window(w, h, "RISC-V ISA simulator"),
     command(BORDER, BORDER, COMMAND_WIDTH, COMMAND_HEIGHT),
     ptext(BORDER,PTEXT_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*PTEXT_LINES+1),
+    disa(BORDER,DISA_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*DISA_LINES+1),
     regs(BORDER,REGS_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*REGS_LINES+1),
     mems(BORDER,MEMS_OFFSET,w-2*BORDER,DISPLAY_FONT_HEIGHT*MEMS_LINES+1),
     help_window(w,h, "Spike Help"),
@@ -97,8 +102,12 @@ spike::spike(int w, int h) :
     if (strlen(mono_fonts[i])) Fl::set_font(HELP_FONT, mono_fonts[i]);
     else                       Fl::set_font(HELP_FONT, mono_fonts[i-1]);
     ptext.textfont(DISPLAY_FONT);
+    disa.textfont(DISPLAY_FONT);
     regs.textfont(DISPLAY_FONT);
     mems.textfont(DISPLAY_FONT);
+    pbuff = new Fl_Text_Buffer();
+    pbuff->text("Command response");
+    ptext.buffer(pbuff);
     // read disassembly file into string vector
     vector<string> da_lines;
     ifstream da_file ("da.txt");
@@ -112,20 +121,20 @@ spike::spike(int w, int h) :
     } else {
        cerr << "Unable to open file da.txt";
     }
-    pbuff = new Fl_Text_Buffer();
+    dbuff = new Fl_Text_Buffer();
     string lis;
-    for(int i=0; i<PTEXT_LINES-1; i++) {
+    for(int i=0; i<DISA_LINES-1; i++) {
       lis += da_lines[i];
-      if(i<PTEXT_LINES-2) lis += '\n';
+      if(i<DISA_LINES-2) lis += '\n';
     }
-    pbuff->text(lis.c_str());
+    dbuff->text(lis.c_str());
     char style_str[(NCHRS_DA_LINE+1)*PTEXT_LINES];
     memset(style_str, 'C', (NCHRS_DA_LINE+1)*PTEXT_LINES-1);
     memset(style_str+NCHRS_DA_LINE+1, 'B', NCHRS_DA_LINE);    
     stylebuf = new Fl_Text_Buffer();
     stylebuf->text(style_str);
-    ptext.buffer(pbuff);
-    ptext.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
+    disa.buffer(dbuff);
+    disa.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
     rbuff = new Fl_Text_Buffer();
     regs.buffer(rbuff);
     mbuff = new Fl_Text_Buffer();
