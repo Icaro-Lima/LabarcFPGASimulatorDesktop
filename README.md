@@ -130,7 +130,7 @@ e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na j
 
 Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
 
-## Utilização de uma placa FPGA remotamente
+# Remote FPGA Lab
 
 Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:  
 <img src="http://lad.ufcg.edu.br/loac/uploads/OAC/nano.jpg" width="400">
@@ -147,6 +147,27 @@ Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-l
 O vídeo mostra a utilização do simulador no desktop seguida da utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação e utilização de FPGA remota. 
 
 http://lad.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
+
+# RISC-V ISA Simulator
+
+## Instalação do simulador ISA
+
+É necessário instalar primeiro a toolchain RISC-V.
+
+```
+make spike-gui.bin
+```
+
+## Utilização do simulador ISA
+
+```
+riscv-gcc -nostartfiles -T$RISCV/link.ld inst.s
+./spike-gui
+```
+
+## Utilização do simulador ISA remotamente
+
+Navegue para http://lad.ufcg.edu.br/isa/spike.php
 
 # Publicações
 
