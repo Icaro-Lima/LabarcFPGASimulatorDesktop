@@ -122,6 +122,9 @@ spike::spike(int w, int h) :
     disa_file();
     dbuff = new Fl_Text_Buffer();
     stylebuf = new Fl_Text_Buffer();
+    memset(style_str, 'C', (NCHRS_DA_LINE+1)*PTEXT_LINES-1);
+    memset(style_str+NCHRS_DA_LINE+1, 'B', NCHRS_DA_LINE);    
+    stylebuf->text(style_str);
     disa.buffer(dbuff);
 
     // Registers
@@ -144,11 +147,17 @@ void spike::disa_file() { // read disassembly file into string vector
   ifstream disa_file (DISA_FILE);
   if (disa_file.is_open()) {
     string li;
+    // first line is an empty line so we can always show the line before
+    li.append(NCHRS_DA_LINE, ' ');
+    disa_lines.push_back(li);    
     while (getline (disa_file, li)) {
       li.append(NCHRS_DA_LINE - li.length(), ' ');
       disa_lines.push_back(li);
     }
     disa_file.close();
+    li = "";  // append enough empty lines
+    li.append(NCHRS_DA_LINE, ' ');
+    for(int i=0; i<DISA_LINES; i++) disa_lines.push_back(li);    
   } else {
      cerr << "Unable to open file " DISA_FILE;
   }
@@ -158,24 +167,21 @@ void spike::update() {
    string pc = sock->send_and_rec("pc 0");
 
    // Disassembly
-   string pcd = pc.substr(2,8) + ":";
+   string pcd = pc.substr(2,8) + ":"; // search for disassmbly line starting with pc
    vector<string>::iterator it = find_if(disa_lines.begin(),
                                          disa_lines.end(),
                                          [pcd](const std::string& str) {
                                             return str.substr(0,9) == pcd;
                                          }
                                         );
-   if(it != disa_lines.end()) {
-      std::size_t i = std::distance(std::begin(disa_lines), it);
+   if(it != disa_lines.end()) { // if found
+      std::size_t i = std::distance(std::begin(disa_lines), it); // i>0 always
       string lis;
-      for(int j=-1; j<DISA_LINES-2; j++) {
+      for(int j=-1; j<DISA_LINES-2; j++) { // collect lines arround pc
         lis += disa_lines[i+j];
-        if(i<DISA_LINES-3) lis += '\n';
+        if(j<DISA_LINES-3) lis += '\n';
       }
       dbuff->text(lis.c_str());
-      memset(style_str, 'C', (NCHRS_DA_LINE+1)*PTEXT_LINES-1);
-      memset(style_str+NCHRS_DA_LINE+1, 'B', NCHRS_DA_LINE);    
-      stylebuf->text(style_str);
       disa.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
    } else dbuff->text("");
 
