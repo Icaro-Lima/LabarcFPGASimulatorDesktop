@@ -17,6 +17,7 @@
 using std::string;
 using std::vector;
 using std::ifstream;
+using std::find_if;
 
 #define MAX_MEMS 10 // maximum active memory positions
 #define NCHRS_DA_LINE 60 // number of characters in a dissassembly line
@@ -157,18 +158,26 @@ void spike::update() {
    string pc = sock->send_and_rec("pc 0");
 
    // Disassembly
-   string pcd = pc.substr(2) + ":";
-   cout << pcd << endl;
-   string lis;
-   for(int i=0; i<DISA_LINES-1; i++) {
-     lis += disa_lines[i];
-     if(i<DISA_LINES-2) lis += '\n';
-   }
-   dbuff->text(lis.c_str());
-   memset(style_str, 'C', (NCHRS_DA_LINE+1)*PTEXT_LINES-1);
-   memset(style_str+NCHRS_DA_LINE+1, 'B', NCHRS_DA_LINE);    
-   stylebuf->text(style_str);
-   disa.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
+   string pcd = pc.substr(2,8) + ":";
+   vector<string>::iterator it = find_if(disa_lines.begin(),
+                                         disa_lines.end(),
+                                         [pcd](const std::string& str) {
+                                            return str.substr(0,9) == pcd;
+                                         }
+                                        );
+   if(it != disa_lines.end()) {
+      std::size_t i = std::distance(std::begin(disa_lines), it);
+      string lis;
+      for(int j=-1; j<DISA_LINES-2; j++) {
+        lis += disa_lines[i+j];
+        if(i<DISA_LINES-3) lis += '\n';
+      }
+      dbuff->text(lis.c_str());
+      memset(style_str, 'C', (NCHRS_DA_LINE+1)*PTEXT_LINES-1);
+      memset(style_str+NCHRS_DA_LINE+1, 'B', NCHRS_DA_LINE);    
+      stylebuf->text(style_str);
+      disa.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
+   } else dbuff->text("");
 
    // Registers
    string rg = sock->send_and_rec("reg 0");
