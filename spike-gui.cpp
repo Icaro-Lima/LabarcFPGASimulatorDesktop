@@ -56,7 +56,6 @@ public:
    communicator *sock;  // socket comunicator with spike
    void update(); // update register window
    static void cmd_cb(Fl_Widget *, void *); // static function called by callback
-   void cmd_caba(); // normal function called by callback function
    Fl_Window window; // Window representing ISA simulator
 private:
    Fl_Input command; // input debug command
@@ -79,9 +78,12 @@ private:
    Fl_Window help_window; // help window
    Fl_Text_Display htext; // help text display
    Fl_Text_Buffer *hbuff; // help text buffer
+   vector<string> disa_lines; // disassembled code, line by line  
+   char style_str[(NCHRS_DA_LINE+1)*PTEXT_LINES];  // style buffer content
+   string memcmds[MAX_MEMS]; // memory commands to be shown in memory window
+   void cmd_caba(); // normal function called by callback function
+   void disa_file(); // read disassembled code from file
    void help(); // show help window
-   string memcmds[MAX_MEMS];
-   // memory commands to be shown
 };
 
 spike::spike(int w, int h) :
@@ -101,57 +103,77 @@ spike::spike(int w, int h) :
     // set help font to a different font if there is another one
     if (strlen(mono_fonts[i])) Fl::set_font(HELP_FONT, mono_fonts[i]);
     else                       Fl::set_font(HELP_FONT, mono_fonts[i-1]);
-    ptext.textfont(DISPLAY_FONT);
-    disa.textfont(DISPLAY_FONT);
-    regs.textfont(DISPLAY_FONT);
-    mems.textfont(DISPLAY_FONT);
-    pbuff = new Fl_Text_Buffer();
-    pbuff->text("Command response");
-    ptext.buffer(pbuff);
-    // read disassembly file into string vector
-    vector<string> da_lines;
-    ifstream da_file ("da.txt");
-    if (da_file.is_open()) {
-      string li;
-      while (getline (da_file, li)) {
-        li.append(NCHRS_DA_LINE - li.length(), ' ');
-        da_lines.push_back(li);
-      }
-      da_file.close();
-    } else {
-       cerr << "Unable to open file da.txt";
-    }
-    dbuff = new Fl_Text_Buffer();
-    string lis;
-    for(int i=0; i<DISA_LINES-1; i++) {
-      lis += da_lines[i];
-      if(i<DISA_LINES-2) lis += '\n';
-    }
-    dbuff->text(lis.c_str());
-    char style_str[(NCHRS_DA_LINE+1)*PTEXT_LINES];
-    memset(style_str, 'C', (NCHRS_DA_LINE+1)*PTEXT_LINES-1);
-    memset(style_str+NCHRS_DA_LINE+1, 'B', NCHRS_DA_LINE);    
-    stylebuf = new Fl_Text_Buffer();
-    stylebuf->text(style_str);
-    disa.buffer(dbuff);
-    disa.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
-    rbuff = new Fl_Text_Buffer();
-    regs.buffer(rbuff);
-    mbuff = new Fl_Text_Buffer();
-    mems.buffer(mbuff);
-    for(int i; i<MAX_MEMS; i++) memcmds[i] = "";
+
+    // Command
     command.align(FL_ALIGN_RIGHT);
     command.label("h for help");
     command.callback(cmd_cb, (void *)this);
     command.when(FL_WHEN_ENTER_KEY|FL_WHEN_NOT_CHANGED);
+
+    // Response
+    ptext.textfont(DISPLAY_FONT);
+    pbuff = new Fl_Text_Buffer();
+    pbuff->text("Command response");
+    ptext.buffer(pbuff);
+
+    // Disassmbly
+    disa.textfont(DISPLAY_FONT);
+    disa_file();
+    dbuff = new Fl_Text_Buffer();
+    stylebuf = new Fl_Text_Buffer();
+    disa.buffer(dbuff);
+
+    // Registers
+    regs.textfont(DISPLAY_FONT);
+    rbuff = new Fl_Text_Buffer();
+    regs.buffer(rbuff);
+
+    // Memory
+    mems.textfont(DISPLAY_FONT);
+    mbuff = new Fl_Text_Buffer();
+    mems.buffer(mbuff);
+    for(int i; i<MAX_MEMS; i++) memcmds[i] = "";
+
     window.end();
+}
+
+
+void spike::disa_file() { // read disassembly file into string vector
+#define DISA_FILE "disa.txt"
+  ifstream disa_file (DISA_FILE);
+  if (disa_file.is_open()) {
+    string li;
+    while (getline (disa_file, li)) {
+      li.append(NCHRS_DA_LINE - li.length(), ' ');
+      disa_lines.push_back(li);
+    }
+    disa_file.close();
+  } else {
+     cerr << "Unable to open file " DISA_FILE;
+  }
 }
 
 void spike::update() {
    string pc = sock->send_and_rec("pc 0");
+
+   // Disassembly
+   string lis;
+   for(int i=0; i<DISA_LINES-1; i++) {
+     lis += disa_lines[i];
+     if(i<DISA_LINES-2) lis += '\n';
+   }
+   dbuff->text(lis.c_str());
+   memset(style_str, 'C', (NCHRS_DA_LINE+1)*PTEXT_LINES-1);
+   memset(style_str+NCHRS_DA_LINE+1, 'B', NCHRS_DA_LINE);    
+   stylebuf->text(style_str);
+   disa.highlight_data(stylebuf, styletable, NSTYLES, 'D', NULL, NULL);
+
+   // Registers
    string rg = sock->send_and_rec("reg 0");
    rg.erase( rg.end()-1 );
    rbuff->text(("  pc: " + pc + rg).c_str());
+
+   // Memory
    string m;
    if (memcmds[0].c_str()[0]==0) m = "Memory - use mem command"; // hint if empty
    for (int i=0; memcmds[i].c_str()[0]; i++)  // for all slots which are not empty
