@@ -157,6 +157,8 @@ void spike::update() {
    string pc = sock->send_and_rec("pc 0");
 
    // Disassembly
+   string pcd = pc.substr(2) + ":";
+   cout << pcd << endl;
    string lis;
    for(int i=0; i<DISA_LINES-1; i++) {
      lis += disa_lines[i];
