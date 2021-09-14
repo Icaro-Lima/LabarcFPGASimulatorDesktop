@@ -66,7 +66,7 @@ isa: a.out spike-gui.bin
 	@echo "****** chamar o simulador spike"
 	rm -f q.log
 	( while [ $$(cat q.log 2>/dev/null | wc -l) -eq 0 ]; do sleep 0.2; done; ./spike-gui.bin $$(cut -d' ' -f8 q.log) ) &
-	spike -d -s --cmd=a.cmd $(PK) a.out $(PROG_ARGS) | tee q.log
+	spike -d -s --cmd=a.cmd $(PK) a.out $(ARGS) | tee q.log
 	echo $$?
 
 # from assembly to elf
@@ -81,7 +81,8 @@ a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	riscv32-unknown-elf-gcc -O1 -S $<
 	@echo "****** conteúdo do arquivo assembly $@:"
 	grep -v "^[[:space:]]\." $@
-
+	$(eval RVLDFL := )
+	$(eval PK := pk)
 
 remote.bin: remote.cpp communicator.o gui.o
 	$(CXX) $(CFLTK) remote.cpp communicator.o gui.o -o remote.bin $(BOOST) $(LFLTK)

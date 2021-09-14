@@ -157,6 +157,9 @@ void spike::disa_file() { // read disassembly file into string vector
     li.append(NCHRS_DA_LINE, ' ');
     for(int i=0; i<DISA_PC_LINE; i++) disa_lines.push_back(li);
     while (getline (disa_file, li)) {
+      if (li[8] == ':')  // replace leading spaces of memory address by 0's
+         for(int i=0; i<8; i++)
+            if (li[i] == ' ') li[i] = '0';
       li.append(NCHRS_DA_LINE - li.length(), ' ');
       disa_lines.push_back(li);
     }
