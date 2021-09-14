@@ -29,7 +29,7 @@ cd LabarcFPGASimulatorDesktop
 #### Vídeo mostrando o passo a passo
 http://lad.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
 
-### Ubuntu 20.04 e acima
+### Ubuntu 20.04
 
 ```
 sudo apt-get update
@@ -37,6 +37,17 @@ sudo apt-get install verilator libfltk1.3-dev make g++ libpng-dev zlib1g-dev git
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
+
+### Ubuntu 21.04
+
+```
+sudo apt-get update
+sudo apt-get install verilator?? libfltk1.3-dev?? make g++ libpng-dev zlib1g-dev git flex bison libfl-dev libboost-dev
+git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
+cd LabarcFPGASimulatorDesktop
+```
+
+
 
 ### CentOS 7
 
