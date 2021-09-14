@@ -84,6 +84,17 @@ a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	$(eval RVLDFL := )
 	$(eval PK := pk)
 
+# from .101 to elf
+binary : $(wildcard *.101) binmake
+	@echo "****** remover comentario e espaço e converter as cadeias de 0s e 1s em valores binários"
+	grep ^\ *[01] $< | sed 's/;.*//g' | sed 's/ //g' | ./binmake
+	@echo "****** Os valores binários estão agora dentro do arquivo bare metal a.bin ."
+	@echo "****** criar um arquivo executável a.out, copiando outro (riscv.out) e inserindo a.bin depois do main"
+	riscv32-unknown-elf-objcopy --update-section .text=a.bin --strip-symbol=_end server/riscv.out a.out
+
+binmake: binmake.cc
+	gcc -o binmake binmake.cc
+
 remote.bin: remote.cpp communicator.o gui.o
 	$(CXX) $(CFLTK) remote.cpp communicator.o gui.o -o remote.bin $(BOOST) $(LFLTK)
 
@@ -109,4 +120,7 @@ communicator.o: communicator.cpp communicator.h
 maintainer-copy::
 clean mostlyclean distclean maintainer-clean::
 	-rm -rf obj_dir *.h.gch *.o *.bin *.log *.dmp *.vpd core a.out *.objdump
+
+isa-clean::
+	-rm -f a.out *.s *.c
 

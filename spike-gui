@@ -1,5 +1,0 @@
-#!/bin/bash
-riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | sed '/<exit>:/d' | sed "s/  *\t/\t/g" >disa.txt
-rm -f q.log
-( while [ $(cat q.log 2>/dev/null | wc -l) -eq 0 ]; do sleep 0.2; done; ./spike-gui.bin $(cut -d' ' -f8 q.log) ) &
-spike -s -d a.out | tee q.log

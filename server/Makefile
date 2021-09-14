@@ -74,7 +74,7 @@ binary : $(wildcard *.101)
 	@echo "<span style="color:blue">remover comentario e espaço e converter as cadeias de 0s e 1s em valores binários</span>"
 	grep ^\ *[01] $< | sed 's/;.*//g' | sed 's/ //g' | binmake
 	@echo "<span style="color:blue">Os valores binários estão agora dentro do arquivo <i>bare metal</i> a.bin .</span>"
-	@echo "<span style="color:blue">criar um arquivo executável a,out, copiando outro (riscv.out) e inserindo a.bin depois do <i>main</i></span>"
+	@echo "<span style="color:blue">criar um arquivo executável a.out, copiando outro (riscv.out) e inserindo a.bin depois do <i>main</i></span>"
 	riscv32-unknown-elf-objcopy --update-section .text=a.bin --strip-symbol=_end /labarc/util/riscv.out a.out
 	@echo "<span style="color:blue">listagem do arquivo executável, em hexadecimal e disassembly:</span>"
 	@echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | head -n -1 | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
