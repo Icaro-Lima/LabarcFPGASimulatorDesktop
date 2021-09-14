@@ -57,6 +57,11 @@ default: $(HDL_SIM) sim_socket.o remote.bin
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
 	obj_dir/Vtop $(DIVIDE_BY)
 
+# from elf to object dump
+%.objdump : a.out
+	@echo "****** criar, a partir do arquivo executável a.out, um arquivo chamado $@ só com as instruções em hexadecimal"
+	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@
+
 isa: a.out spike-gui.bin
 	@echo "****** gravar um arquivo de comando a.cmd para avançar o pc até o main"
 	echo -n "until pc 0 " >a.cmd
@@ -110,10 +115,6 @@ gui.o: gui.cpp gui.h
 communicator.o: communicator.cpp communicator.h
 	$(CXX) -std=c++11  $(CTHREAD) -c communicator.cpp
 
-# from binary to object dump
-%.objdump : a.out
-	riscv32-unknown-elf-objdump -s -j .text | egrep "( [0-9a-f]{8}){5}" | cut -b11-45 > $@
-
 
 ######################################################################
 
@@ -122,5 +123,5 @@ clean mostlyclean distclean maintainer-clean::
 	-rm -rf obj_dir *.h.gch *.o *.bin *.log *.dmp *.vpd core a.out *.objdump
 
 isa-clean::
-	-rm -f a.out *.s *.c
+	-rm -f a.out *.s *.c *.objdump *.101
 
