@@ -41,8 +41,9 @@ cd LabarcFPGASimulatorDesktop
 ### Ubuntu 21.04
 
 ```
+sudo add-apt-repository universe
 sudo apt-get update
-sudo apt-get install verilator?? libfltk1.3-dev?? make g++ libpng-dev zlib1g-dev git flex bison libfl-dev libboost-dev
+sudo apt-get install verilator libfltk1.3-dev make g++ libpng-dev zlib1g-dev git flex bison libfl-dev libboost-dev
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
