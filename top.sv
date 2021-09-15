@@ -36,46 +36,8 @@ module top(input  logic clk_2,
     for(int i=0; i<NREGS_TOP; i++)
        if(i != NREGS_TOP/2-1) lcd_registrador[i] <= i+i*16;
        else                   lcd_registrador[i] <= ~SWI;
+    lcd_a <= {56'h1234567890ABCD, SWI};
+    lcd_b <= {SWI, 56'hFEDCBA09876543};
   end
-
-  parameter NBITS=4;
-  parameter NBITS_SEL=3;
-  parameter NCOUNT=4;
-  parameter INCR=3;
-  logic [NBITS-1:0] a;
-  // atribuição da entrada
-  always_comb a <= SWI[7:4];
-
-  logic reset;
-  logic [NBITS-1:0] counter;
-  // atribuição da entrada de reset
-  always_comb reset <= SWI[0];
-  // entrada do inicio da contagem
-  always_comb a <= SWI[7:4];
-
-  always_ff @(posedge clk_2)
-     if (reset) begin
-        counter <= a;
-     end else begin
-        counter <= counter + INCR;
-     end
-
-  logic [NBITS-1:0] va [1:NCOUNT];
-  logic [NBITS_SEL-1:0] seletor;
-  // atribuição da entrada
-  always_comb seletor <=SWI[3:1];
-
-  always_comb begin
-     va[1] <= a  + 3;
-     for(int i=1; i<NCOUNT; i++) va[i+1] <= va[i] + INCR;
-  end
-
-  // atribuição da saída
-  always_comb begin
-     lcd_a <= a;
-     if(seletor>0 && NCOUNT>=seletor) lcd_b <= va[seletor];
-     else if(seletor==0)              lcd_b <= counter;
-     else                             lcd_b <= 0;
-   end
 
 endmodule
