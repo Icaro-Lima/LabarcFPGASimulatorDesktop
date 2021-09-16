@@ -52,6 +52,13 @@ DIVIDE_BY=$(shell grep parameter top.sv | grep divide_by | grep -oP '(?<!\d)\d*(
 
 RVLDFL=-nostartfiles -T/usr/local/riscv/link.ld
 
+# if there is a .101 file, use that one to create a.out instead of C or assembly
+ifeq ($(wildcard *.101),)
+aout_exe = aout_s
+else
+aout_exe = aout_101
+endif
+
 default: $(HDL_SIM) sim_socket.o remote.bin
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv veri.cpp ../sim_socket.o $(VBOOST)
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
@@ -74,11 +81,22 @@ isa: a.out spike-gui.bin
 	spike -d -s --cmd=a.cmd $(PK) a.out $(ARGS) | tee q.log
 	echo $$?
 
+a.out:
+	@make $(aout_exe)
+
 # from assembly to elf
-a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
+aout_s : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	@echo "****** chamar assembler para transformar arquivo(s) assembly em arquivo executável a.out"
 	riscv32-unknown-elf-gcc $(RVLDFL) $^
 	@if ! [ -z "$(RVLDFL)" ]; then echo "****** A opção -nostartfiles serve para excluir do executável arquivos necessários somente para rodar o executável com Linux. A opção -T\$RISCV/link.ld serve para colocar o main no endereço 0x80000000, ao agrado do spike."; fi
+
+# from .101 to elf
+aout_101 : $(wildcard *.101) binmake
+	@echo "****** remover comentario e espaço e converter as cadeias de 0s e 1s em valores binários"
+	grep ^\ *[01] $< | sed 's/;.*//g' | sed 's/ //g' | ./binmake
+	@echo "****** Os valores binários estão agora dentro do arquivo bare metal a.bin ."
+	@echo "****** criar um arquivo executável a.out, copiando outro (riscv.out) e inserindo a.bin depois do main"
+	riscv32-unknown-elf-objcopy --update-section .text=a.bin --strip-symbol=_end server/riscv.out a.out
 
 # from C to assembly
 %.s : %.c
@@ -88,14 +106,6 @@ a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	grep -v "^[[:space:]]\." $@
 	$(eval RVLDFL := )
 	$(eval PK := pk)
-
-# from .101 to elf
-binary : $(wildcard *.101) binmake
-	@echo "****** remover comentario e espaço e converter as cadeias de 0s e 1s em valores binários"
-	grep ^\ *[01] $< | sed 's/;.*//g' | sed 's/ //g' | ./binmake
-	@echo "****** Os valores binários estão agora dentro do arquivo bare metal a.bin ."
-	@echo "****** criar um arquivo executável a.out, copiando outro (riscv.out) e inserindo a.bin depois do main"
-	riscv32-unknown-elf-objcopy --update-section .text=a.bin --strip-symbol=_end server/riscv.out a.out
 
 binmake: binmake.cc
 	gcc -o binmake binmake.cc
@@ -120,7 +130,7 @@ communicator.o: communicator.cpp communicator.h
 
 maintainer-copy::
 clean mostlyclean distclean maintainer-clean::
-	-rm -rf obj_dir *.h.gch *.o *.bin *.log *.dmp *.vpd core a.out *.objdump
+	-rm -rf obj_dir *.h.gch *.o *.bin *.log *.dmp *.vpd core a.out *.objdump binmake
 
 isa-clean::
 	-rm -f a.out *.s *.c *.objdump *.101

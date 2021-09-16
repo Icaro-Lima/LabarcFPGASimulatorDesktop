@@ -57,7 +57,7 @@ sim: $(HDL_SIM)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
 	$(TMP)/obj/Vtop $(DIVIDE_BY)
 
-# from binary to object dump
+# from elf to object dump
 %.objdump : a.out
 	@echo "<span style="color:blue">criar, a partir do arquivo executável a.out, um arquivo chamado $@ só com as instruções em hexadecimal</span>"
 	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@
