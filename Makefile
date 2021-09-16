@@ -50,13 +50,20 @@ endif
 
 DIVIDE_BY=$(shell grep parameter top.sv | grep divide_by | grep -oP '(?<!\d)\d*(?!\d)' )
 
-RVLDFL=-nostartfiles -T/usr/local/riscv/link.ld
-
 # if there is a .101 file, use that one to create a.out instead of C or assembly
 ifeq ($(wildcard *.101),)
 aout_exe = aout_s
 else
 aout_exe = aout_101
+endif
+
+# if there are program ARGS, we need the proxy kernel
+ifeq ($(ARGS),)
+RVLDFL=-nostartfiles -T/usr/local/riscv/link.ld
+PK =
+else
+RVLDFL =
+PK = pk
 endif
 
 default: $(HDL_SIM) sim_socket.o remote.bin
@@ -66,6 +73,8 @@ default: $(HDL_SIM) sim_socket.o remote.bin
 
 # from elf to object dump
 %.objdump : a.out
+	@echo "****** listagem do arquivo executável de forma disassemblada"
+	riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | sed '/<exit>:/d' | sed "s/  *\t/\t/g"
 	@echo "****** criar, a partir do arquivo executável a.out, um arquivo chamado $@ só com as instruções em hexadecimal"
 	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@
 
@@ -78,10 +87,10 @@ isa: a.out spike-gui.bin
 	@echo "****** chamar o simulador spike"
 	rm -f q.log
 	( while [ $$(cat q.log 2>/dev/null | wc -l) -eq 0 ]; do sleep 0.2; done; ./spike-gui.bin $$(cut -d' ' -f8 q.log) ) &
-	spike -d -s --cmd=a.cmd $(PK) a.out $(ARGS) | tee q.log
+	spike -d -s --debug-cmd=a.cmd $(PK) a.out $(ARGS) | tee q.log
 	echo $$?
 
-a.out:
+a.out:  $(wildcard *.[sc1]*)
 	@make $(aout_exe)
 
 # from assembly to elf
@@ -104,8 +113,6 @@ aout_101 : $(wildcard *.101) binmake
 	riscv32-unknown-elf-gcc -O1 -S $<
 	@echo "****** conteúdo do arquivo assembly $@:"
 	grep -v "^[[:space:]]\." $@
-	$(eval RVLDFL := )
-	$(eval PK := pk)
 
 binmake: binmake.cc
 	gcc -o binmake binmake.cc
