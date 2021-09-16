@@ -150,24 +150,19 @@ http://lad.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
 
 # RISC-V ISA Simulator
 
-## Instalação do simulador ISA
-
-É necessário instalar primeiro a toolchain RISC-V.
-
-```
-make spike-gui.bin
-```
+É necessário ter instalado a toolchain RISC-V. Aparente não é possivel instalar no Windows.
 
 ## Utilização do simulador ISA
 
+Vá até a pasta `LabarcFPGASimulatorDesktop` e coloque arquivos em C (`.c`) ou arquivos em assembly (`.s`), ou um arquivo de código de máquina (`.101`) nele. Dê o comando:
+
 ```
-riscv-gcc -nostartfiles -T$RISCV/link.ld inst.s
-./spike-gui
+make isa
 ```
 
 ## Utilização do simulador ISA remotamente
 
-Navegue para http://lad.ufcg.edu.br/isa/spike.php
+Navegue para http://lad.ufcg.edu.br/isa
 
 # Publicações
 
