@@ -44,6 +44,7 @@ using std::string;
 #define NREG_LINES (NREGS/NREGS_PER_LINE)
 #define CLOCK 0.25
 #define LABEL_SIZE 16
+#define SECONDS_PER_FRAME 0.01666 // Seconds per frame (to reach 60 frames per second)
 
 class SWI : public Fl_Widget {
 	int id;

@@ -12,8 +12,6 @@
 #include "communicator.h"
 #include "gui.h"
 
-// Seconds per frame (to reach 60 frames per second)
-#define SECONDS_PER_FRAME 0.01666
 
 // declare inputs and outputs of module top as struct,
 // similar to what Verilator does automatically
