@@ -39,7 +39,7 @@ while : ; do # infinite loop
        else
          p=RISCV
        fi
-       if quartus_pgm -c$(expr $1 + 1) /labarc/RISCV/$p.cdf | egrep --line-buffered "(Error|Running|successful)" > qq.log ; then
+       if quartus_pgm -c$(expr $1 + 1) /labarc/RISCV/$p.cdf | egrep --line-buffered "(Error|Running|successful)" >> qq.log ; then
            if b=$(compgen -G *.101); then
               qinst $1 $b && qr $1	   
 	   else

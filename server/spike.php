@@ -9,18 +9,22 @@
   <title>LABARC - simulação ISA remota</title>
 </head>
 <body>
+  <h1>LOAC - simulador de instruções RISC-V</h1>
   <form enctype="multipart/form-data" action="spike.php" method="POST">
     <p>Procure seu arquivo
        <a href="inst.101">código de máquina</a>,&nbsp;
-       <a href="inst.s">assembly .s</a>,&nbsp;  
-       <a href="shift.c">C .c</a>,&nbsp; ou
-       um arquivo <a href="lupi-pc.zip">comprimido .zip</a>
+       <a href="inst.s">assembly</a>,&nbsp;  
+       <a href="shift.c"> &nbsp;C </a>,&nbsp; ou
+       um arquivo <a href="lupi-pc.zip">comprimido</a>
        e dê <i>Enter</i> no campo de valores de entrada. </p>
+    <p> O arquivo comprimido pode conter arquivos em C (*.c), arquivos Assembly (*.s),
+        ou uma mistura destes. Não pode ter diretório dentro do arquivo comprimido. </p>
     <input type="file" name="uploaded_file" id=browse></input>
     &nbsp; &nbsp; Valores de entrada:<input type="text" name="args">
   </form>
 <?PHP
   $subdir = "isa";
+  $maxSize = 300000;
   include 'uploaded.php';
 
   if(!empty($path)) {

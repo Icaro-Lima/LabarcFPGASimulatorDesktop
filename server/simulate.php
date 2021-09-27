@@ -9,6 +9,7 @@
   <title>LABARC- simulação remota</title>
 </head>
 <body>
+  <h1>LOAC - simulador de placa FPGA</h1>
   <form enctype="multipart/form-data" action="simulate.php" method="POST">
     <p>Simular FPGA não vale centavos, mas compilação para simulação
        é bem mais rápida do que a síntese do circuito real.</p>
@@ -16,8 +17,8 @@
        <a href="top.sv">Systemverilog</a>,&nbsp;
        <a href="inst.101">código de máquina</a>,&nbsp;
        <a href="inst.s">assembly</a>,&nbsp;
-       <a href="shift.c">C</a>, ou &nbsp;
-       <a href="riscv1.zip">comprimido .zip</a>.&nbsp;
+       <a href="shift.c"> &nbsp;C&nbsp;</a>, ou&nbsp;
+       <a href="riscv1.zip">comprimido</a>.&nbsp;
        O arquivo comprimido pode conter
        somente arquivos SystemVerilog .sv,
        somente um arquivo de código de máquina inst.101,
@@ -32,6 +33,7 @@
   </form>
 <?PHP
   $subdir = "sim";
+  $maxSize = 300000;
   include 'uploaded.php';
 
   if(!empty($path)) {

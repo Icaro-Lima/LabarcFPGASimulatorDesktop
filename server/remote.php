@@ -17,26 +17,30 @@
        <a href="inst.s">assembly</a>,&nbsp;
        <a href="shift.c"> &nbsp;C&nbsp;</a>, ou&nbsp;
        <a href="riscv1.zip">comprimido</a>.&nbsp;
-       O arquivo comprimido pode conter
+       O arquivo comprimido .zip ode conter
        somente arquivos SystemVerilog .sv,
-       somente um arquivo de código de máquina inst.101,
        somente arquivos .s,
        somente arquivos .c e .h,
-       adicionalmente arquivos .jpeg., .jpg, .pdf,
+       um arquivo inst.101 e arquivos .jpeg., .jpg, .pdf,
        ou uma mistura de todos estes, mas somente destes.</p>
     <p>Para ganhar centavos, você precisa colocar seu nome na primeira linha do arquivo principal.<br>
        No início da linha, você precisa marcar a mesma como comentário.</p>
     <p>Na segunda linha, em comentário, deve constar o nome do seu projeto.</p>
     <p>Não é necessário informar sua matrícula.
        Não coloque matrícula nem na primeira nem na segunda linha.</p>
-    <input type="file" name="uploaded_file" id=browse></input>
+    <p>Se você fizer upload de um só arquivo de código fonte, é ele que deve conter seu nome.
+       Observe a linguagem usada nele para colocar a marca de comentário correta.
+       Se você fizer upload de um .zip. o arquivo principal é o top.sv, caso tenha.
+       Se não tiver, é aquele arquivo .c ou .s que contém o <code>main</code>.</p>
     <input type="radio" name="display" value="LCD"> LCD
     <input type="radio" name="display" value="RISC"> RISC-V
+    <input type="file" name="uploaded_file" id=browse></input>
     <br style="line-height:180%">
     <input type="submit" value="Upload" id=upload></input>
   </form>
 <?PHP
   $subdir = "syn";
+  $maxSize = 300000000;
   include 'uploaded.php';
 
   if(!empty($path)) {

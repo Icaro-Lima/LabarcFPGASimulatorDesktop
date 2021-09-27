@@ -1,6 +1,7 @@
 let name = "";  // computer name string for GET request to JTAG client
 let port = "";  // port number string for GET request to JTAG client
 var si;  // periodic interval timer for GUI refresh
+const period = 500;
 var eSource;  // event dsource for synthesizer output update
 var initial = true;
 var waiting = false;
@@ -27,7 +28,7 @@ function sse_listener(event) {
          swi2.onclick = swi2_click;
          swi1.onclick = swi1_click;
          swi0.onclick = swi0_click;
-         si = setInterval(update, 1000);
+         si = setInterval(update, period);
          window.onbeforeunload = exit_jtag;
          browse.onclick = exit_jtag;
          upload.onclick = exit_jtag;
@@ -156,7 +157,7 @@ function swiReqListener() {
   let r = Number("0x" + this.responseText);
   setLedSeg(r);
   if (display == "LCD" || display == "RISC") update();
-  si = setInterval(update, 1000);
+  si = setInterval(update, period);
   waiting = false;
  }
 }

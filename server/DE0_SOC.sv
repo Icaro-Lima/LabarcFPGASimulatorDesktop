@@ -100,6 +100,8 @@ always_comb { GPIO_0[23], GPIO_0[11], GPIO_0[13], GPIO_0[15],
 
 // clock lento //
 // O parameter divide_by esta no top.sv e no .sdc
+// obs.: divide_by=1
+//       verifique o setup slack no arquivo DE0_SOC.sta.summary
 logic [$clog2(divide_by)-1:0] clock_count;  // contador para o divisor de clock
 logic CLOCK_DIV;  // sinal de clock divido para ser referenciado no arquivo .sdc
 always_ff @(posedge FPGA_CLK1_50) begin
@@ -109,7 +111,6 @@ always_ff @(posedge FPGA_CLK1_50) begin
 end
 logic clk_2;
 always_comb
-   // verifique slack de CLOCK_DIV ou FPGA_CLK1_50 no .sta.summary
    if(divide_by==1) clk_2 <= FPGA_CLK1_50;
    else             clk_2 <= CLOCK_DIV;
 

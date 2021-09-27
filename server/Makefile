@@ -57,7 +57,7 @@ sim: $(HDL_SIM)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
 	$(TMP)/obj/Vtop $(DIVIDE_BY)
 
-# from elf to object dump
+# from binary to object dump
 %.objdump : a.out
 	@echo "<span style="color:blue">criar, a partir do arquivo executável a.out, um arquivo chamado $@ só com as instruções em hexadecimal</span>"
 	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@
@@ -74,7 +74,7 @@ binary : $(wildcard *.101)
 	@echo "<span style="color:blue">remover comentario e espaço e converter as cadeias de 0s e 1s em valores binários</span>"
 	grep ^\ *[01] $< | sed 's/;.*//g' | sed 's/ //g' | binmake
 	@echo "<span style="color:blue">Os valores binários estão agora dentro do arquivo <i>bare metal</i> a.bin .</span>"
-	@echo "<span style="color:blue">criar um arquivo executável a.out, copiando outro (riscv.out) e inserindo a.bin depois do <i>main</i></span>"
+	@echo "<span style="color:blue">criar um arquivo executável a,out, copiando outro (riscv.out) e inserindo a.bin depois do <i>main</i></span>"
 	riscv32-unknown-elf-objcopy --update-section .text=a.bin --strip-symbol=_end /labarc/util/riscv.out a.out
 	@echo "<span style="color:blue">listagem do arquivo executável, em hexadecimal e disassembly:</span>"
 	@echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | head -n -1 | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
