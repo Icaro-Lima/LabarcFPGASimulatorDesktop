@@ -1,16 +1,19 @@
 # Labarc FPGA Simulator
 <img src="http://lad.ufcg.edu.br/loac/uploads/OAC/MainWindow.png">
 
-## Instalação do simulador no desktop
+The simulator can be installed on Your PC (no internet link needed after installation)
+or accessed by means of a web browser interface (no installation required).
 
-### Para todos os sistemas operacionais
+## How to install the simulator on Your desktop
 
-Recomenda-se a instalação desta fonte tipográfica:
+### For all operating systems
+
+Installation of this typefont is recomended:
 http://lad.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
 
-### Ubuntu 18.04 até 19.10
+### Ubuntu 18.04 to 19.10
 
-Execute o seguinte, no terminal:
+Execute the following commands in a terminal window:
 
 ```
 sudo apt-get update
@@ -26,10 +29,12 @@ git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
 
-#### Vídeo mostrando o passo a passo
+#### Video showing step by step
 http://lad.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
 
-### Ubuntu 20.04 e acima
+### Ubuntu 20.04 and above
+
+Execute the following commands in a terminal window:
 
 ```
 sudo apt-get update
@@ -40,7 +45,8 @@ cd LabarcFPGASimulatorDesktop
 
 ### CentOS 7
 
-Execute o seguinte, no terminal:
+Execute the following commands in a terminal window:
+
 ```
 yum -y --enablerepo=epel install verilator fltk-devel make gcc-c++ libpng-devel zlib-devel boost-devel
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
@@ -49,16 +55,18 @@ cd LabarcFPGASimulatorDesktop
 
 ### Android
 
-Instale VNC Viewer e Userland. Dentro do Userland, escolhe Ubuntu.
-Dentro do Ubuntu, siga as instruções acima para Ubuntu 18.04.
+Install *VNC Viewer* and *Userland*. Inside *Userland*, choose *Ubuntu*.
+Inside Ubuntu, follow instruction above for Ubuntu 18.04.
 
-Limitação: variáveis de no máximo 32 bits. Do LCD (lcd_a e lcd_b), só funcionam os 8 dígitos hexadecimais da direita.
+Restrictions: maximum 32 bit variables.
+Only the rightmost 8 digits of the LCD display (`lcd_a` and `lcd_b`) are working.
 
 ### Windows 10
 
-Baixe o MSYS2 através do link: https://www.msys2.org/
+Download MSYS2 from https://www.msys2.org/
+and install.
 
-Após concluir a instalação, abra o terminal MSYS2 e execute os seguintes comandos:
+Open an MSYS2 terminal window and execute the following commands:
 ```
 pacman -Syu
 pacman -Sy
@@ -66,18 +74,20 @@ pacman -Su
 pacman -S --needed base-devel mingw-w64-x86_64-toolchain
 ```
 
-No passo anterior, quando questionado quais pacotes do MinGW deseja instalar, digite: "1-19", ao invés de "all".
+When asked which packages of MinGW You want to install, answer "1-19". Do not answer "all".
 
-Após concluído, feche o terminal e abra um novo, agora do **MinGW**, e execute os seguintes comandos:
+When finished, close the MSYS2 terminal window and open a new MinGW terminal window.
+Execute the following commands:
 
-**Nota: perceba que o terminal não é o mesmo em que você executou os últimos comandos, o Msys2.**
+**Caution: You must change the terminal window from MSYS2 to MinGW**
 ```
 pacman -S git make mingw-w64-x86_64-verilator mingw-w64-x86_64-fltk mingw-w64-x86_64-boost
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
 
-Limitação: variáveis de no máximo 32 bits. Do LCD (lcd_a e lcd_b), só funcionam os 8 dígitos hexadecimais da direita.
+Restrictions: maximum 32 bit variables.
+Only the rightmost 8 digits of the LCD display (`lcd_a` and `lcd_b`) are working.
 
 ### Mac OS (Testado no High Sierra)
 Baixe o _homebrew_ na sua máquina (se já tiver, não precisa baixar novamente)
@@ -110,7 +120,7 @@ Existe uma issue na biblioteca fltk no macOS Mojave, em que o simulador fica com
 
 OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote disponível no Homebrew com o fix dessa issue.
 
-## Utilização do simulador no desktop
+## How to use the dektop simulator
 
 Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar `make`.
 
