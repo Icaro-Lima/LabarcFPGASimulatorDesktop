@@ -51,7 +51,7 @@ default: $(HDL_SIM)
 	@sintetize $(TMP) $(CABLE)
 
 sim: $(HDL_SIM)
-	@echo "<span style=color:blue>compilar e simular Systemverilog</span>" 1>&2
+	@echo "<span style=color:blue>compile and simulate Systemverilog</span>" 1>&2
 	mkdir -p $(TMP)/obj
 	$(VERILATOR) --Mdir $(TMP)/obj $(WARN) -cc --exe +1800-2012ext+sv -I/labarc/util/sim $(HDL_SIM) /labarc/util/veri.cpp /labarc/util/sim_socket.o $(FLTK) $(VBOOST)
 	$(MAKE) -j 2 -C $(TMP)/obj -f Vtop.mk
@@ -59,39 +59,39 @@ sim: $(HDL_SIM)
 
 # from binary to object dump
 %.objdump : a.out
-	@echo "<span style="color:blue">criar, a partir do arquivo executável a.out, um arquivo chamado $@ só com as instruções em hexadecimal</span>"
+	@echo "<span style="color:blue">from the executable file called a.out, create a file called $@ which contains only RISC-V instruction as hexadecimal numbers</span>"
 	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@
 
 isa: a.out
-	@echo "<span style="color:blue">gravar um arquivo de comando a.cmd para avançar o pc até o <i>main</i></span>"
+	@echo "<span style="color:blue">create a spike command file called a.cmd which will advance the pc until <i>main</i> at the start of the simulation</span>"
 	echo -n "until pc 0 " >a.cmd
 	riscv32-unknown-elf-objdump -j .text -t a.out | grep " main" | cut -d' ' -f1 >>a.cmd
-	@echo "<span style="color:blue">chamar o simulador spike, limitando o uso da CPU do servidor de simulação a 5 segundos</span>"
+	@echo "<span style="color:blue">call RISC-V ISA simulator <i>spike</i>. Limit server CPU usage to 5 seconds.</span>"
 	prlimit --cpu=5 spike -d -s --cmd=a.cmd $(PK) a.out $(PROG_ARGS); echo $$?
 
 # from .101 to elf
 binary : $(wildcard *.101)
-	@echo "<span style="color:blue">remover comentario e espaço e converter as cadeias de 0s e 1s em valores binários</span>"
+	@echo "<span style="color:blue">remove comment and space from $^ and transform the strings of 0's and 1's to binary values</span>"
 	grep ^\ *[01] $< | sed 's/;.*//g' | sed 's/ //g' | binmake
-	@echo "<span style="color:blue">Os valores binários estão agora dentro do arquivo <i>bare metal</i> a.bin .</span>"
-	@echo "<span style="color:blue">criar um arquivo executável a,out, copiando outro (riscv.out) e inserindo a.bin depois do <i>main</i></span>"
+	@echo "<span style="color:blue">The binary values are now in a  <i>bare metal</i> file called a.bin .</span>"
+	@echo "<span style="color:blue">create an executable file called a.out, copying from another file (riscv.out) while inserting a.bin after <i>main</i></span>"
 	riscv32-unknown-elf-objcopy --update-section .text=a.bin --strip-symbol=_end /labarc/util/riscv.out a.out
-	@echo "<span style="color:blue">listagem do arquivo executável, em hexadecimal e disassembly:</span>"
+	@echo "<span style="color:blue">listing of the executable file a.out, in hexadecimal and disassembly:</span>"
 	@echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | head -n -1 | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
 
 # from assembly to elf
 a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
-	@echo "<span style="color:blue">assembler para transformar arquivo(s) assembly em arquivo executável a.out</span>"
+	@echo "<span style="color:blue">call assembler to transform assembly file(s) $^ into one executable file called a.out</span>"
 	riscv32-unknown-elf-gcc $(RVLDFL) $^
-	@if ! [ -z "$(RVLDFL)" ]; then echo "<span style="color:blue">A opção -nostartfiles serve para excluir do executável arquivos necessários somente para rodar o executável com Linux. A opção -T\$RISCV/link.ld serve para colocar o <i>main</i> no endereço 0x80000000, ao agrado do spike.</span>"; fi
-	@echo "<span style="color:blue">listagem do arquivo executável a.out, em hexadecimal e disassembly:</span>"
+	@if ! [ -z "$(RVLDFL)" ]; then echo "<span style="color:blue">The option -nostartfiles excludes code that is only necessary to run the executable file on Linux. The option -T\$(RISCV)/link.ld puts <i>main</i> at address 0x80000000, as spike demands.</span>"; fi
+	@echo "<span style="color:blue">listing of the executable file a.out, in hexadecimal and disassembly:</span>"
 	@echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | sed '/<exit>:/d' | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
 
 # from C to assembly
 %.s : %.c
-	@echo "<span style="color:blue">compilar arquivo $< para arquivo assembly</span>"
+	@echo "<span style="color:blue">compile the file called $< to an assembly file called $@</span>"
 	riscv32-unknown-elf-gcc -O1 -S $<
-	@echo "<span style="color:blue">conteúdo do arquivo assembly $@:</span>"
+	@echo "<span style="color:blue">listing of the assembly file $@:</span>"
 	@echo \<pre\>; grep -v "^[[:space:]]\." $@ | sed 's/^\t/\&nbsp;\t/g'; echo \</pre\>
 
 maintainer-copy::
