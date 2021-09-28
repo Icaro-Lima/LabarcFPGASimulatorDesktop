@@ -87,7 +87,7 @@ private:
    vector<string> disa_lines; // disassembled code, line by line  
    char style_str[(NCHRS_DA_LINE+1)*DISA_LINES];  // style buffer content
    string memcmds[MAX_MEMS]; // memory commands to be shown in memory window
-   void cmd_caba(); // normal function called by callback function
+   void cmd_caba(); // normal function called by callback function through cmd_cb()
    void disa_file(); // read disassembled code from file
    void help(); // show help window
 };
@@ -113,7 +113,7 @@ spike::spike(int w, int h) :
     // Command
     command.align(FL_ALIGN_RIGHT);
     command.label("h for help");
-    command.callback(cmd_cb, (void *)this);
+    command.callback(cmd_cb, (void *)this);  // static function needed here
     command.when(FL_WHEN_ENTER_KEY|FL_WHEN_NOT_CHANGED);
 
     // Response
@@ -216,14 +216,17 @@ void spike::help() {
    help_window.show();
 }
 
-void spike::cmd_cb(Fl_Widget *, void *ptr) {
-   ((spike *)ptr)->cmd_caba();
+void spike::cmd_cb(Fl_Widget *, void *ptr) { // static function needed for callback 
+   ((spike *)ptr)->cmd_caba();  // which calls a normal function
 }
 
 void spike::cmd_caba() {
    if (command.value()[0] == 'h') {  // help
       help();
-   } else if (command.value()[0] == 'q') {  // quit
+   } else if ( command.value()[0] == 'q' ||    // quit
+               (command.value()[0] == 'r' &&   // rs without argument
+                command.value()[1] == 's' &&
+                command.value()[2] == 0 )    ) {
       sock->send_and_rec(command.value());
       exit(0);
    } else if (strncmp(command.value(), "mem", 3)==0) {

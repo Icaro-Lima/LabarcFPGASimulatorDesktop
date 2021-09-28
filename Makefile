@@ -73,43 +73,42 @@ default: $(HDL_SIM) sim_socket.o remote.bin
 
 # from elf to object dump
 %.objdump : a.out
-	@echo "****** listagem do arquivo executável de forma disassemblada"
+	@echo "****** disassembly listing of executable file?"
 	riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | sed '/<exit>:/d' | sed "s/  *\t/\t/g"
-	@echo "****** criar, a partir do arquivo executável a.out, um arquivo chamado $@ só com as instruções em hexadecimal"
+	@echo "****** from the executable file called a.out, create a file called $@ which contains only RISC-V instruction as hexadecimal numbers"
 	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@
 
 isa: a.out spike-gui.bin
-	@echo "****** gravar um arquivo de comando a.cmd para avançar o pc até o main"
+	@echo "****** create a spike command file called a.cmd which will advance the pc until main at the start of the simulation"
 	echo -n "until pc 0 " >a.cmd
 	riscv32-unknown-elf-objdump -j .text -t a.out | grep " main" | cut -d' ' -f1 >>a.cmd
-	@echo "****** gravar um arquivo com o executável disassemblado"
+	@echo "****** write disassembly listing of executable file to a file called disa.txt, which will be read by spike GUI"
 	riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | sed '/<exit>:/d' | sed "s/  *\t/\t/g" >disa.txt
-	@echo "****** chamar o simulador spike"
+	@echo "****** call RISC-V ISA simulator spike with GUI"
 	rm -f q.log
 	( while [ $$(cat q.log 2>/dev/null | wc -l) -eq 0 ]; do sleep 0.2; done; ./spike-gui.bin $$(cut -d' ' -f8 q.log) ) &
-	spike -d -s --debug-cmd=a.cmd $(PK) a.out $(ARGS) | tee q.log
-	echo $$?
+	(spike -d -s --debug-cmd=a.cmd $(PK) a.out $(ARGS); echo $$? ) | tee q.log
 
 a.out:  $(wildcard *.[sc1]*)
 	@make $(aout_exe)
 
 # from assembly to elf
 aout_s : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
-	@echo "****** chamar assembler para transformar arquivo(s) assembly em arquivo executável a.out"
+	@echo "****** call assembler to transform assembly file(s) $^ into one executable file called a.out"
 	riscv32-unknown-elf-gcc $(RVLDFL) $^
-	@if ! [ -z "$(RVLDFL)" ]; then echo "****** A opção -nostartfiles serve para excluir do executável arquivos necessários somente para rodar o executável com Linux. A opção -T\$RISCV/link.ld serve para colocar o main no endereço 0x80000000, ao agrado do spike."; fi
+	@if ! [ -z "$(RVLDFL)" ]; then echo "****** The option -nostartfiles excludes code that is only necessary to run the executable file on Linux. The option -T\$(RISCV)/link.ld puts main at address 0x80000000, as spike demands."; fi
 
 # from .101 to elf
 aout_101 : $(wildcard *.101) binmake
-	@echo "****** remover comentario e espaço e converter as cadeias de 0s e 1s em valores binários"
+	@echo "****** remove comment and space from $^ and transform the strings of 0's and 1's to binary values"
 	grep ^\ *[01] $< | sed 's/;.*//g' | sed 's/ //g' | ./binmake
-	@echo "****** Os valores binários estão agora dentro do arquivo bare metal a.bin ."
-	@echo "****** criar um arquivo executável a.out, copiando outro (riscv.out) e inserindo a.bin depois do main"
+	@echo "****** The binary values are now in a bare metal file called a.bin ."
+	@echo "****** create an executable file called a.out, copying from another file (riscv.out) while inserting a.bin after main"
 	riscv32-unknown-elf-objcopy --update-section .text=a.bin --strip-symbol=_end server/riscv.out a.out
 
 # from C to assembly
 %.s : %.c
-	@echo "****** compilar arquivo $< para arquivo assembly"
+	@echo "****** compile the file called $< to an assembly file called $@"
 	riscv32-unknown-elf-gcc -O1 -S $<
 	@echo "****** conteúdo do arquivo assembly $@:"
 	grep -v "^[[:space:]]\." $@
