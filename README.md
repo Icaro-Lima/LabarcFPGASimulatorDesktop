@@ -120,46 +120,48 @@ Existe uma issue na biblioteca fltk no macOS Mojave, em que o simulador fica com
 
 OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote disponível no Homebrew com o fix dessa issue.
 
-## How to use the dektop simulator
+## How to use the desktop simulator
 
-Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar `make`.
+Change into the directory  `LabarcFPGASimulatorDesktop` and open the file `top.sv`. Edit it as You wish. In order to run the simulation type `make`.
 
-### Frequencia de atualização do display
+### Display refresh frequency
 
-A GUI se atualiza a cada segundo, independentemente da frequência do sinal `clk_2`. Só se a frequencia do sinal `clk_2` for igual ou menor a 0.5&nbsp;Hz, este sinal pode ser observado corretamente na GUI. Se a frequencia do sinal `clk_2` for maior do que 1&nbsp;Hz, a visualização da GUI pode estar pulando mudanças rápidas que eventualmente poderiam ser vistas no display da placa física.
+The display is updated once per second, indepenetly from the frequency of the `clk_2` input. Only if the frequency of `clk_2` is equal or less than 0.5&nbsp;Hz, it can be observerd correctly. If the frequency of `clk_2` is greater than 1&nbsp;Hz, the display may skip some changes which would be visible on the display of the real FPGA board.
 
-### Sinais de controle do RISC-V
+### RISC-V control signals on LCD
 
-No caso do RISC-V, o caractere mais a direita na primeira linha do LCD visualiza o valor do sinal `Branch`,
-sendo que `_` significa `0` e `*` significa `1`. O caractere imediatamente a esquerda visualiza o sinal `MemWrite`. O caractere mais a direita na segunda  linha visualiza o sinal `RegWrite` e o caractere imediatamente a esquerda deste visualiza o sinal `MemtoReg`. Somente os primeiros 16 registradores aparecem na GUI. Os demais registradores podem ser usados normalmente, mas não são visualizados na GUI.
+The rightmost character of the first line shows the signal called `Branch`. `_` means `0` and `*` means `1`.
+The next character to the left shows `MemWrite`.
+The rightmost character of the second line shows `RegWrite` asnd the adjacent character to the left shows `MemtoReg`.
 
-## Utilização do simulador remotamente
+### RISC-V register file
 
-Navegue para http://lad.ufcg.edu.br/hdl/simulate.php
-e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na janela do browser.
+Only the first 16 registers are shown. The remaining registers can be used but are not shown.
 
-Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
+## How to use the simulador via an internet browser
 
-# Remote FPGA Lab
+Use the link http://lad.ufcg.edu.br/hdl/simulate.php
+and upload Your files. The GUI will appear in the browser.
 
-Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:  
+# How to use the remote FPGA Lab
+
+There are 20 FPGA boards similar to this one, available for simulataneous use: 
 <img src="http://lad.ufcg.edu.br/loac/uploads/OAC/nano.jpg" width="400">
 
-Navegue para http://lad.ufcg.edu.br/hdl/remote.php
-e faça upload do arquivo `top.sv`. No final da síntese, a GUI aparece na janela do browser.
+Use the link http://lad.ufcg.edu.br/hdl/remote.php
+and upload Your files. After completing synthesis, the GUI will appear in the browser.
+The GUI reflects the position of the switches, the LEDs and the LCD of the board You are using. 
 
-Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
+Close the window or tab of the browser to end the session and make the FPGA board available for another users.
+After a timeout of several minutes the FPGA is disconnected from Your session automatically.
 
-Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-la para outro usuário. Caso não fizer isso, depois de alguns minutos a placa FPGA será liberada assim mesmo.
-
-### Vídeo mostrando o passo a passo
-
-O vídeo mostra a utilização do simulador no desktop seguida da utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação e utilização de FPGA remota. 
+### Video showing simulator and remote access step by step
 
 http://lad.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
 
 # RISC-V ISA Simulator
 
+The RISC-V toolchain 
 É necessário ter instalado a toolchain RISC-V, incluíndo o comando `spike`. Aparentemente não é possivel instalar-lo no Windows.
 
 ## Utilização do simulador ISA
