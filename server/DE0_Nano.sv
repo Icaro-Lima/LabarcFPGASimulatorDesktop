@@ -98,11 +98,22 @@ logic [NBITS_TOP-1:0] lcd_pc, lcd_SrcA, lcd_SrcB,
                       lcd_ALUResult, lcd_Result, lcd_WriteData, lcd_ReadData;
 logic lcd_MemWrite, lcd_Branch, lcd_MemtoReg, lcd_RegWrite;
 
+`ifdef RISCV
+lcd (.clk(CLOCK_50), .reset(~KEY[0]),
+     .pc(lcd_pc), .instruct(lcd_instruction), .d1(lcd_WriteData),
+     .d2a(lcd_SrcA), .d2b(lcd_SrcB), .d2c(lcd_ALUResult), .d2d(lcd_Result), .d2e(lcd_ReadData),
+     .f1(lcd_MemWrite), .f2(lcd_Branch), .f3(lcd_MemtoReg), .f4(lcd_RegWrite),
+     .LCD_RS(GPIO_1[19]), .LCD_E(GPIO_1[15]),
+     .LCD_D({ GPIO_1[ 1], GPIO_1[ 3], GPIO_1[ 5], GPIO_1[ 7],
+              GPIO_1[31], GPIO_1[ 9], GPIO_1[11], GPIO_1[13] }));
+`else
 lcd_64bit (.clk(CLOCK_50), .reset(~KEY[0]),
            .a(lcd_a), .b(lcd_b),
      .LCD_RS(GPIO_1[19]), .LCD_E(GPIO_1[15]),
      .LCD_D({ GPIO_1[ 1], GPIO_1[ 3], GPIO_1[ 5], GPIO_1[ 7],
               GPIO_1[31], GPIO_1[ 9], GPIO_1[11], GPIO_1[13] }));
+`endif
+
 always_comb begin
    GPIO_1[ 0] <= 1; // LCD backlight anode
    GPIO_1[21] <= 0; // LCD RW wired to GND on connector
