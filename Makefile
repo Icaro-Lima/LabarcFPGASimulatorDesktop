@@ -48,6 +48,10 @@ export VERILATOR_ROOT
 VERILATOR = $(VERILATOR_ROOT)/bin/verilator
 endif
 
+TMP=/tmp${subst $(HOME),,${PWD}}
+CUR=${PWD}
+CABLE?=1
+CABLE_1=$(shell expr $(CABLE) - 1)
 DIVIDE_BY=$(shell grep parameter top.sv | grep divide_by | grep -oP '(?<!\d)\d*(?!\d)' )
 
 # if there is a .101 file, use that one to create a.out instead of C or assembly
@@ -70,6 +74,12 @@ default: $(HDL_SIM) sim_socket.o remote.bin
 	$(VERILATOR) $(WARN) -cc --exe +1800-2012ext+sv top.sv veri.cpp ../sim_socket.o $(VBOOST)
 	$(MAKE) -j 2 -C obj_dir -f Vtop.mk
 	obj_dir/Vtop $(DIVIDE_BY)
+
+# this only works on a LABARC workstation with Quartus properly configured 
+syn: $(HDL_SIM) inst.objdump
+	@sintetize $(TMP) $(CABLE)
+	quartus_stp -t /labarc/util/inst.tcl inst.objdump $(CABLE_1) | egrep --line-buffered "(Error|Running|successful)"
+	quartus_stp -t /labarc/util/qr.tcl $(CABLE_1) | egrep --line-buffered "(Error|Running|successful)"
 
 # from elf to object dump
 %.objdump : a.out
