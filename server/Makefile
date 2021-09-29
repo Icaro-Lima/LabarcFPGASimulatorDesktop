@@ -60,7 +60,7 @@ sim: $(HDL_SIM)
 # from binary to object dump
 %.objdump : a.out
 	@echo "<span style="color:blue">from the executable file called a.out, create a file called $@ which contains only RISC-V instruction as hexadecimal numbers</span>"
-	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@
+	riscv32-unknown-elf-objdump -s -j .text | egrep "^( [0-9a-f]{8}){2}" | cut -b11-45 > $@ 
 
 isa: a.out
 	@echo "<span style="color:blue">create a spike command file called a.cmd which will advance the pc until <i>main</i> at the start of the simulation</span>"
@@ -82,7 +82,7 @@ binary : $(wildcard *.101)
 # from assembly to elf
 a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	@echo "<span style="color:blue">call assembler to transform assembly file(s) $^ into one executable file called a.out</span>"
-	riscv32-unknown-elf-gcc $(RVLDFL) $^
+	riscv32-unknown-elf-gcc $(RVLDFL) $^ 2>&1
 	@if ! [ -z "$(RVLDFL)" ]; then echo "<span style="color:blue">The option -nostartfiles excludes code that is only necessary to run the executable file on Linux. The option -T\$(RISCV)/link.ld puts <i>main</i> at address 0x80000000, as spike demands.</span>"; fi
 	@echo "<span style="color:blue">listing of the executable file a.out, in hexadecimal and disassembly:</span>"
 	@echo \<pre\>; riscv32-unknown-elf-objdump -d -j .text | sed -n '/<main>:/,/<exit>:/p' | sed '/<exit>:/d' | sed 's/>/\&\#62/g' | sed 's/</\&\#60/g'; echo \</pre\>
@@ -90,7 +90,7 @@ a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 # from C to assembly
 %.s : %.c
 	@echo "<span style="color:blue">compile the file called $< to an assembly file called $@</span>"
-	riscv32-unknown-elf-gcc -O1 -S $<
+	riscv32-unknown-elf-gcc -O1 -S $< 2>&1
 	@echo "<span style="color:blue">listing of the assembly file $@:</span>"
 	@echo \<pre\>; grep -v "^[[:space:]]\." $@ | sed 's/^\t/\&nbsp;\t/g'; echo \</pre\>
 

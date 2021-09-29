@@ -122,7 +122,7 @@ OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote 
 
 ## How to use the desktop simulator
 
-Change into the directory  `LabarcFPGASimulatorDesktop` and open the file `top.sv`. Edit it as You wish. In order to run the simulation type `make`.
+Change into the directory  `LabarcFPGASimulatorDesktop`. Open the file `top.sv`. Edit it as You wish. In order to run the simulation type `make`.
 
 ### Display refresh frequency
 
@@ -161,35 +161,39 @@ http://lad.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
 
 # RISC-V ISA Simulator
 
-The RISC-V toolchain 
-É necessário ter instalado a toolchain RISC-V, incluíndo o comando `spike`. Aparentemente não é possivel instalar-lo no Windows.
+## How to install the ISA simulator locally
 
-## Utilização do simulador ISA
+The RISC-V toolchain must be installed, including `spike` compiled with boost installed,
+[see instructions here](https://lad.dsc.ufcg.edu.br/loac/index.php?n=OAC.Masm).
+Windows installation apparently is impossible.
 
-Vá até a pasta `LabarcFPGASimulatorDesktop` e coloque arquivos em C (`.c`) ou arquivos em assembly (`.s`), ou um arquivo de código de máquina (`.101`) nele. Exemplos podem ser encontradas na sub-pasta `server`. Dê o comando:
+## How to use the ISA simulator locally
+
+Change into the directory  `LabarcFPGASimulatorDesktop`. 
+Put C files (`.c` and `.h`), assembly files (`.s`), or one binary instruction file (`.101`) into it. Examples can be found in the subdirectory `server`. Type the command:
 
 ```
 make isa
 ```
 
-Ao colocar um arquivo de código de máquina, arquivos em C e arquivos em assembly serão ignorados.
+Whenever there is a binary instruction file, C and assembly files are ignored.
 
-Para limpar todos os arquivos relacionados ao simulador, inclusive arquivos fonte, dê o comando
+To clean up all ISA simulator related files, use the command:
 
 ```
 make isa-clean
 ```
 
-## Utilização do simulador ISA remotamente
+## How to use the ISA simulator web interface
 
-Navegue para http://lad.ufcg.edu.br/isa
+Use the link http://lad.ufcg.edu.br/isa
 
-# Publicações
+# Publications
 
 Í. Lima and E. Melcher, “Um Simulador Didático para o Ensino de SystemVerilog”, Workshop sobre Educação em Arquitetura de Computadores, 2018:
 http://lad.dsc.ufcg.edu.br/lad/uploads/Lad/WEAC_2018.pdf
 
-Anais do WCAS 20211 com artigo "Remote FPGA Lab for Distance Learning" nas páginas 27-30:
+Proceedings WCAS 20211, paper "Remote FPGA Lab for Distance Learning" on pages 27-30:
 https://bit.ly/wcas21
 
-Vídeo da apresentação: https://youtu.be/PMbBgx9OTNU
+presentation video: https://youtu.be/PMbBgx9OTNU

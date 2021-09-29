@@ -32,7 +32,7 @@ while : ; do # infinite loop
            fi
        fi
     else
-       echo "<span style=color:blue>configurar na FPGA o processador completo e pronto já sintetizado</span>" >qq.log
+       echo "<span style=color:blue>configure the FPGA with the complete RISC-V RV32I processor that has already been synthesized</span>" >qq.log
        /usr/local/bin/jtagcheck
        if jtagconfig | grep --quiet SoC; then
          p=RISCV_SOC
@@ -47,7 +47,7 @@ while : ; do # infinite loop
            fi 
        fi
     fi
-    echo "___________________pronto____________________" >> qq.log
+    echo "___________________finished____________________" >> qq.log
     cd
   else
     sleep 5

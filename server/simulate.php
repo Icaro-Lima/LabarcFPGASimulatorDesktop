@@ -6,28 +6,28 @@
       .label { font-family: Courier New; color:red; font-weight: bold; }
       pre { font-size:125%; line-height:60%; }
     </style>
-  <title>LABARC- simulação remota</title>
+  <title>LABARC- remote simulation</title>
 </head>
 <body>
-  <h1>LOAC - simulador de placa FPGA</h1>
+  <h1>LOAC - FPGA board simulator</h1>
   <form enctype="multipart/form-data" action="simulate.php" method="POST">
-    <p>Simular FPGA não vale centavos, mas compilação para simulação
-       é bem mais rápida do que a síntese do circuito real.</p>
-    <p>Por favor, faça upload do seu arquivo
+    <p>Simulating FPGA is not worth any credit, put compilation for simulation
+       is much faster than logic synthesis for the real circuit.</p>
+    <p>Upload Your
        <a href="top.sv">Systemverilog</a>,&nbsp;
-       <a href="inst.101">código de máquina</a>,&nbsp;
+       <a href="inst.101">binary instruction code</a>,&nbsp;
        <a href="inst.s">assembly</a>,&nbsp;
-       <a href="shift.c"> &nbsp;C&nbsp;</a>, ou&nbsp;
-       <a href="riscv1.zip">comprimido</a>.&nbsp;
-       O arquivo comprimido pode conter
-       somente arquivos SystemVerilog .sv,
-       somente um arquivo de código de máquina inst.101,
-       somente arquivos .s,
-       somente arquivos .c e .h,
-       ou uma mistura de todos estes.</p>
-    <input type="file" name="uploaded_file" id=browse></input>
+       <a href="shift-fpga.c"> &nbsp;C&nbsp;</a>, or&nbsp;
+       <a href="riscv1.zip">compressed</a>&nbsp; file.
+       The compressed .zip file may contain
+       only SystemVerilog .sv files,
+       only assembly .s files,
+       only .c and .h C files,
+       a binary instruction code file called inst.101,
+       or a mix of any of those.</p>
     <input type="radio" name="display" value="LCD"> LCD
     <input type="radio" name="display" value="RISC"> RISC-V
+    <input type="file" name="uploaded_file" id=browse></input>
     <br style="line-height:180%">
     <input type="submit" value="Upload" id=upload></input>
   </form>
