@@ -79,8 +79,8 @@ default: $(HDL_SIM) sim_socket.o remote.bin
 # this only works on a LABARC workstation with Quartus properly configured 
 syn: $(HDL_SIM) inst.objdump
 #	@sintetize $(TMP) $(CABLE)
-	qc_RISCV $(CABLE)
-	qs_inst $(CABLE_1)
+	@qc_RISCV $(CABLE)
+	@qs_inst $(CABLE_1)
 	rm -f q.log
 	( while [ $$(cat q.log 2>/dev/null | wc -l) -lt 3 ]; do sleep 0.2; done; ./remote.bin $$(tail -1 q.log | cut -d' ' -f5) ) &
 	source /labarc/util/qr.cmd $(CABLE_1)
@@ -153,5 +153,5 @@ clean mostlyclean distclean maintainer-clean::
 	-rm -rf obj_dir *.h.gch *.o *.bin *.log *.dmp *.vpd core a.out *.objdump binmake
 
 isa-clean::
-	-rm -f a.out *.s *.c *.objdump *.101
+	-rm -f a.out a.bin a.cmd *.s *.c *.objdump *.101
 
