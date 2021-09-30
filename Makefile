@@ -53,6 +53,7 @@ CUR=${PWD}
 CABLE?=1
 CABLE_1=$(shell expr $(CABLE) - 1)
 DIVIDE_BY=$(shell grep parameter top.sv | grep divide_by | grep -oP '(?<!\d)\d*(?!\d)' )
+SHELL=/bin/bash 
 
 # if there is a .101 file, use that one to create a.out instead of C or assembly
 ifeq ($(wildcard *.101),)
@@ -77,9 +78,12 @@ default: $(HDL_SIM) sim_socket.o remote.bin
 
 # this only works on a LABARC workstation with Quartus properly configured 
 syn: $(HDL_SIM) inst.objdump
-	@sintetize $(TMP) $(CABLE)
-	quartus_stp -t /labarc/util/inst.tcl inst.objdump $(CABLE_1) | egrep --line-buffered "(Error|Running|successful)"
-	quartus_stp -t /labarc/util/qr.tcl $(CABLE_1) | egrep --line-buffered "(Error|Running|successful)"
+#	@sintetize $(TMP) $(CABLE)
+	qc_RISCV $(CABLE)
+	qs_inst $(CABLE_1)
+	rm -f q.log
+	( while [ $$(cat q.log 2>/dev/null | wc -l) -lt 3 ]; do sleep 0.2; done; ./remote.bin $$(tail -1 q.log | cut -d' ' -f5) ) &
+	source /labarc/util/qr.cmd $(CABLE_1)
 
 # from elf to object dump
 %.objdump : a.out
