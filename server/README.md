@@ -145,3 +145,7 @@ through the virtual JTAG interface and through the web server to the user's
 browser Javascript GUI.
 
 ![files](files.svg)
+
+Additional information can be found in our [WCAS 2021 paper on pages 27-30](https://bit.ly/wcas21)
+and [the presentation video](https://youtu.be/PMbBgx9OTNU)
+

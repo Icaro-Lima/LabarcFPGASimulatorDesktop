@@ -1,16 +1,19 @@
 # Labarc FPGA Simulator
 <img src="http://lad.ufcg.edu.br/loac/uploads/OAC/MainWindow.png">
 
-## Instalação do simulador no desktop
+The simulator can be installed on Your PC (no internet link needed after installation)
+or accessed by means of a web browser interface (no installation required).
 
-### Para todos os sistemas operacionais
+## How to install the simulator on Your desktop
 
-Recomenda-se a instalação desta fonte tipográfica:
+### For all operating systems
+
+Installation of this typefont is recomended:
 http://lad.ufcg.edu.br/loac/uploads/OAC/led_counter-7.ttf
 
-### Ubuntu 18.04 até 19.10
+### Ubuntu 18.04 to 19.10
 
-Execute o seguinte, no terminal:
+Execute the following commands in a terminal window:
 
 ```
 sudo apt-get update
@@ -26,10 +29,12 @@ git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
 
-#### Vídeo mostrando o passo a passo
+#### Video showing step by step
 http://lad.ufcg.edu.br/loac/uploads/OAC/icaro_install.mp4
 
-### Ubuntu 20.04 e acima
+### Ubuntu 20.04 and above
+
+Execute the following commands in a terminal window:
 
 ```
 sudo apt-get update
@@ -40,7 +45,8 @@ cd LabarcFPGASimulatorDesktop
 
 ### CentOS 7
 
-Execute o seguinte, no terminal:
+Execute the following commands in a terminal window:
+
 ```
 yum -y --enablerepo=epel install verilator fltk-devel make gcc-c++ libpng-devel zlib-devel boost-devel
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
@@ -49,16 +55,18 @@ cd LabarcFPGASimulatorDesktop
 
 ### Android
 
-Instale VNC Viewer e Userland. Dentro do Userland, escolhe Ubuntu.
-Dentro do Ubuntu, siga as instruções acima para Ubuntu 18.04.
+Install *VNC Viewer* and *Userland*. Inside *Userland*, choose *Ubuntu*.
+Inside Ubuntu, follow instruction above for Ubuntu 18.04.
 
-Limitação: variáveis de no máximo 32 bits. Do LCD (lcd_a e lcd_b), só funcionam os 8 dígitos hexadecimais da direita.
+Restrictions: maximum 32 bit variables.
+Only the rightmost 8 digits of the LCD display (`lcd_a` and `lcd_b`) are working.
 
 ### Windows 10
 
-Baixe o MSYS2 através do link: https://www.msys2.org/
+Download MSYS2 from https://www.msys2.org/
+and install.
 
-Após concluir a instalação, abra o terminal MSYS2 e execute os seguintes comandos:
+Open an MSYS2 terminal window and execute the following commands:
 ```
 pacman -Syu
 pacman -Sy
@@ -66,18 +74,20 @@ pacman -Su
 pacman -S --needed base-devel mingw-w64-x86_64-toolchain
 ```
 
-No passo anterior, quando questionado quais pacotes do MinGW deseja instalar, digite: "1-19", ao invés de "all".
+When asked which packages of MinGW You want to install, answer "1-19". Do not answer "all".
 
-Após concluído, feche o terminal e abra um novo, agora do **MinGW**, e execute os seguintes comandos:
+When finished, close the MSYS2 terminal window and open a new MinGW terminal window.
+Execute the following commands:
 
-**Nota: perceba que o terminal não é o mesmo em que você executou os últimos comandos, o Msys2.**
+**Caution: You must change the terminal window from MSYS2 to MinGW**
 ```
 pacman -S git make mingw-w64-x86_64-verilator mingw-w64-x86_64-fltk mingw-w64-x86_64-boost
 git clone https://github.com/Icaro-Lima/LabarcFPGASimulatorDesktop.git
 cd LabarcFPGASimulatorDesktop
 ```
 
-Limitação: variáveis de no máximo 32 bits. Do LCD (lcd_a e lcd_b), só funcionam os 8 dígitos hexadecimais da direita.
+Restrictions: maximum 32 bit variables.
+Only the rightmost 8 digits of the LCD display (`lcd_a` and `lcd_b`) are working.
 
 ### Mac OS (Testado no High Sierra)
 Baixe o _homebrew_ na sua máquina (se já tiver, não precisa baixar novamente)
@@ -110,74 +120,80 @@ Existe uma issue na biblioteca fltk no macOS Mojave, em que o simulador fica com
 
 OBS.: Não há uma previsão de quando haverá uma nova atualização no pacote disponível no Homebrew com o fix dessa issue.
 
-## Utilização do simulador no desktop
+## How to use the desktop simulator
 
-Vá até a pasta `LabarcFPGASimulatorDesktop` e abra o arquivo `top.sv`, edite ele como quiser, para rodar o simulador basta dar `make`.
+Change into the directory  `LabarcFPGASimulatorDesktop`. Open the file `top.sv`. Edit it as You wish. In order to run the simulation type `make`.
 
-### Frequencia de atualização do display
+### Display refresh frequency
 
-A GUI se atualiza a cada segundo, independentemente da frequência do sinal `clk_2`. Só se a frequencia do sinal `clk_2` for igual ou menor a 0.5&nbsp;Hz, este sinal pode ser observado corretamente na GUI. Se a frequencia do sinal `clk_2` for maior do que 1&nbsp;Hz, a visualização da GUI pode estar pulando mudanças rápidas que eventualmente poderiam ser vistas no display da placa física.
+The display is updated once per second, indepenetly from the frequency of the `clk_2` input. Only if the frequency of `clk_2` is equal or less than 0.5&nbsp;Hz, it can be observerd correctly. If the frequency of `clk_2` is greater than 1&nbsp;Hz, the display may skip some changes which would be visible on the display of the real FPGA board.
 
-### Sinais de controle do RISC-V
+### RISC-V control signals on LCD
 
-No caso do RISC-V, o caractere mais a direita na primeira linha do LCD visualiza o valor do sinal `Branch`,
-sendo que `_` significa `0` e `*` significa `1`. O caractere imediatamente a esquerda visualiza o sinal `MemWrite`. O caractere mais a direita na segunda  linha visualiza o sinal `RegWrite` e o caractere imediatamente a esquerda deste visualiza o sinal `MemtoReg`. Somente os primeiros 16 registradores aparecem na GUI. Os demais registradores podem ser usados normalmente, mas não são visualizados na GUI.
+The rightmost character of the first line shows the signal called `Branch`. `_` means `0` and `*` means `1`.
+The next character to the left shows `MemWrite`.
+The rightmost character of the second line shows `RegWrite` asnd the adjacent character to the left shows `MemtoReg`.
 
-## Utilização do simulador remotamente
+### RISC-V register file
 
-Navegue para http://lad.ufcg.edu.br/hdl/simulate.php
-e faça upload do arquivo `top.sv`. No final da compilação, a GUI aparece na janela do browser.
+Only the first 16 registers are shown. The remaining registers can be used but are not shown.
 
-Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
+## How to use the simulador via an internet browser
 
-# Remote FPGA Lab
+Use the link http://lad.ufcg.edu.br/hdl/simulate.php
+and upload Your files. The GUI will appear in the browser.
 
-Temos conectadas atualmente 20 placas FPGA como esta, para uso simultâneo:  
+# How to use the remote FPGA Lab
+
+There are 20 FPGA boards similar to this one, available for simulataneous use: 
 <img src="http://lad.ufcg.edu.br/loac/uploads/OAC/nano.jpg" width="400">
 
-Navegue para http://lad.ufcg.edu.br/hdl/remote.php
-e faça upload do arquivo `top.sv`. No final da síntese, a GUI aparece na janela do browser.
+Use the link http://lad.ufcg.edu.br/hdl/remote.php
+and upload Your files. After completing synthesis, the GUI will appear in the browser.
+The GUI reflects the position of the switches, the LEDs and the LCD of the board You are using. 
 
-Se, além do arquivo `top.sv`, mais arquivos forem necessários, coloque eles, junto com o arquivo `top.sv`, dentro de um arquivo `top.zip` e faça upload do arquivo `top.zip` no lugar do `top.sv`.
+Close the window or tab of the browser to end the session and make the FPGA board available for another users.
+After a timeout of several minutes the FPGA is disconnected from Your session automatically.
 
-Feche a aba ou janela do navegador para encerrar o uso da placa FPGA e liberar-la para outro usuário. Caso não fizer isso, depois de alguns minutos a placa FPGA será liberada assim mesmo.
-
-### Vídeo mostrando o passo a passo
-
-O vídeo mostra a utilização do simulador no desktop seguida da utilização de uma FPGA remota, depois é feita uma alteração do SystemVerilog, com nova simulação e utilização de FPGA remota. 
+### Video showing simulator and remote access step by step
 
 http://lad.ufcg.edu.br/loac/uploads/OAC/remote_FPGA.mp4
 
 # RISC-V ISA Simulator
 
-É necessário ter instalado a toolchain RISC-V, incluíndo o comando `spike`. Aparentemente não é possivel instalar-lo no Windows.
+## How to install the ISA simulator locally
 
-## Utilização do simulador ISA
+The RISC-V toolchain must be installed, including `spike` compiled with boost installed,
+[see instructions here](https://lad.dsc.ufcg.edu.br/loac/index.php?n=OAC.Masm).
+Windows installation apparently is impossible.
 
-Vá até a pasta `LabarcFPGASimulatorDesktop` e coloque arquivos em C (`.c`) ou arquivos em assembly (`.s`), ou um arquivo de código de máquina (`.101`) nele. Exemplos podem ser encontradas na sub-pasta `server`. Dê o comando:
+## How to use the ISA simulator locally
+
+Change into the directory  `LabarcFPGASimulatorDesktop`. 
+Put C files (`.c` and `.h`), assembly files (`.s`), or one binary instruction file (`.101`) into it. Examples can be found in the subdirectory `server`. Type the command:
 
 ```
 make isa
 ```
 
-Ao colocar um arquivo de código de máquina, arquivos em C e arquivos em assembly serão ignorados.
+Whenever there is a binary instruction file, C and assembly files are ignored.
 
-Para limpar todos os arquivos relacionados ao simulador, inclusive arquivos fonte, dê o comando
+To clean up all ISA simulator related files, use the command:
 
 ```
 make isa-clean
 ```
 
-## Utilização do simulador ISA remotamente
+## How to use the ISA simulator web interface
 
-Navegue para http://lad.ufcg.edu.br/isa
+Use the link http://lad.ufcg.edu.br/isa
 
-# Publicações
+# Publications
 
 Í. Lima and E. Melcher, “Um Simulador Didático para o Ensino de SystemVerilog”, Workshop sobre Educação em Arquitetura de Computadores, 2018:
 http://lad.dsc.ufcg.edu.br/lad/uploads/Lad/WEAC_2018.pdf
 
-Anais do WCAS 20211 com artigo "Remote FPGA Lab for Distance Learning" nas páginas 27-30:
+Proceedings WCAS 20211, paper "Remote FPGA Lab for Distance Learning" on pages 27-30:
 https://bit.ly/wcas21
 
-Vídeo da apresentação: https://youtu.be/PMbBgx9OTNU
+presentation video: https://youtu.be/PMbBgx9OTNU

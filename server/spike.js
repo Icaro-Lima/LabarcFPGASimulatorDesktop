@@ -44,7 +44,7 @@ if(typeof(EventSource)!=="undefined") {
 //write the received data to the page, but without "Listening..." string
 function server_HTML_replace(event) {
    serverData.innerHTML = event.data.replace(/Listening for debug commands on [^.]+.<br>/,
-            "<h4 style=\"font-family:serif\">pronto para receber comandos na caixa azul:</h4>");
+            "<h4 style=\"font-family:serif\">ready to accept commands in the blue box:</h4>");
 }
 
 // the requests to spike are sent in the following sequence:

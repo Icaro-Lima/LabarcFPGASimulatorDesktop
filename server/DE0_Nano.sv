@@ -77,6 +77,8 @@ always_comb {GPIO_0[27],GPIO_0[ 3],GPIO_0[ 1],GPIO_0[ 0],
 
 // clock lento 
 // O parameter divide_by esta no top.sv e no .sdc
+// obs.: divide_by=1
+//       e verifique o setup slack no arquivo DE0_Nano.sta.summary
 logic [$clog2(divide_by)-1:0] clock_count;  // contador para o divisor de clock
 logic CLOCK_DIV;  // sinal de clock divido para ser referenciado no arquivo .sdc
 always_ff @(posedge CLOCK_50) begin
@@ -86,7 +88,6 @@ always_ff @(posedge CLOCK_50) begin
 end
 logic clk_2;
 always_comb
-   // verifique slack de CLOCK_DIV ou CLOCK_50 no .sta.summary
    if(divide_by==1) clk_2 <= CLOCK_50;
    else             clk_2 <= CLOCK_DIV;
 
@@ -97,11 +98,22 @@ logic [NBITS_TOP-1:0] lcd_pc, lcd_SrcA, lcd_SrcB,
                       lcd_ALUResult, lcd_Result, lcd_WriteData, lcd_ReadData;
 logic lcd_MemWrite, lcd_Branch, lcd_MemtoReg, lcd_RegWrite;
 
+`ifdef RISCV
+lcd (.clk(CLOCK_50), .reset(~KEY[0]),
+     .pc(lcd_pc), .instruct(lcd_instruction), .d1(lcd_WriteData),
+     .d2a(lcd_SrcA), .d2b(lcd_SrcB), .d2c(lcd_ALUResult), .d2d(lcd_Result), .d2e(lcd_ReadData),
+     .f1(lcd_MemWrite), .f2(lcd_Branch), .f3(lcd_MemtoReg), .f4(lcd_RegWrite),
+     .LCD_RS(GPIO_1[19]), .LCD_E(GPIO_1[15]),
+     .LCD_D({ GPIO_1[ 1], GPIO_1[ 3], GPIO_1[ 5], GPIO_1[ 7],
+              GPIO_1[31], GPIO_1[ 9], GPIO_1[11], GPIO_1[13] }));
+`else
 lcd_64bit (.clk(CLOCK_50), .reset(~KEY[0]),
            .a(lcd_a), .b(lcd_b),
      .LCD_RS(GPIO_1[19]), .LCD_E(GPIO_1[15]),
      .LCD_D({ GPIO_1[ 1], GPIO_1[ 3], GPIO_1[ 5], GPIO_1[ 7],
               GPIO_1[31], GPIO_1[ 9], GPIO_1[11], GPIO_1[13] }));
+`endif
+
 always_comb begin
    GPIO_1[ 0] <= 1; // LCD backlight anode
    GPIO_1[21] <= 0; // LCD RW wired to GND on connector

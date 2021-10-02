@@ -27,7 +27,7 @@ while : ; do # infinite loop
          timeout 3600 /labarc/util/RISCV_sim 2>>qq.log 1>&2 &
       else
          # top.sv was provided by user
-         c=$(grep -h parameter $d/*.sv | grep divide_by | head -1 | grep -oP '(?<!\d)\d*(?!\d)' )
+         c=$(grep -h parameter *.sv | grep divide_by | head -1 | grep -oP '(?<!\d)\d*(?!\d)' )
          DIVIDE_BY=$c timeout 3600 make sim 1>/dev/null 2>>qq.log &
       fi
       cd

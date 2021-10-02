@@ -6,21 +6,29 @@
       .label { font-family: Courier New; color:red; font-weight: bold; }
       pre { line-height:60%; }
     </style>
-  <title>LABARC - simulação ISA remota</title>
+  <title>LABARC - remote RISC-V ISA simulation</title>
 </head>
 <body>
+  <h1>LOAC - RISC-V instruction simulator</h1>
   <form enctype="multipart/form-data" action="spike.php" method="POST">
-    <p>Procure seu arquivo
-       <a href="inst.101">código de máquina</a>,&nbsp;
-       <a href="inst.s">assembly .s</a>,&nbsp;  
-       <a href="shift.c">C .c</a>,&nbsp; ou
-       um arquivo <a href="lupi-pc.zip">comprimido .zip</a>
-       e dê <i>Enter</i> no campo de valores de entrada. </p>
+    <p>Get Your
+       <a href="inst.101">binary instruction code</a>,&nbsp;
+       <a href="inst.s">assembly</a>,&nbsp;
+       <a href="shift-pc.c"> &nbsp;C&nbsp;</a>, or&nbsp;
+       <a href="lupi-pc.zip">compressed</a>&nbsp; file
+       and hit <i>Enter</i> in the input argument field. </p>
+      <p>The compressed .zip file may contain
+       only assembly .s files,
+       only .c and .h C files,
+       a binary instruction code file called inst.101,
+       or a mix of any of those.
+       The .zip file must not contain any directories.</p>
     <input type="file" name="uploaded_file" id=browse></input>
-    &nbsp; &nbsp; Valores de entrada:<input type="text" name="args">
+    &nbsp; &nbsp; Input aguments:<input type="text" name="args">
   </form>
 <?PHP
   $subdir = "isa";
+  $maxSize = 300000;
   include 'uploaded.php';
 
   if(!empty($path)) {
@@ -35,7 +43,7 @@
                        FILE_APPEND);
      echo "<div style=\"font-family:monospace\" id=\"serverData\">The file "
           . basename( $_FILES['uploaded_file']['name']) .
-          " has been uploaded.<br>\n<h4>Solicitando simulação</h4></div>\n";
+          " has been uploaded.<br>\n<h4>Requesting simulation</h4></div>\n";
      echo file_get_contents("spike.html");
      echo "<script type=\"text/javascript\">\n";
      echo "let path = \"". $path ."\";";
