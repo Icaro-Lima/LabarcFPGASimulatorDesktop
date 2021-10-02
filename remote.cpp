@@ -12,7 +12,6 @@
 #include "communicator.h"
 #include "gui.h"
 
-
 // declare inputs and outputs of module top as struct,
 // similar to what Verilator does automatically
 struct top_struct
@@ -76,12 +75,8 @@ void callback(void*) {
   rec_set_lcd();
 
   fpga->redraw();
-   
-  #ifdef LAD // Keep 1 update per second with LAD
-    Fl::repeat_timeout(1, callback);    // retrigger timeout for next clock change
-  #else
-    Fl::repeat_timeout(SECONDS_PER_FRAME, callback); // Local frame rate
-  #endif
+    	
+  Fl::repeat_timeout(1, callback);    // retrigger timeout for next clock change
 }
 
 int SWI::handle(int event) {
