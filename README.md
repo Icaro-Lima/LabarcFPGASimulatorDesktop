@@ -126,7 +126,12 @@ Change into the directory  `LabarcFPGASimulatorDesktop`. Open the file `top.sv`.
 
 ### Display refresh frequency
 
-The display is updated once per second, indepenetly from the frequency of the `clk_2` input. Only if the frequency of `clk_2` is equal or less than 0.5&nbsp;Hz, it can be observerd correctly. If the frequency of `clk_2` is greater than 1&nbsp;Hz, the display may skip some changes which would be visible on the display of the real FPGA board.
+The display is updated by default 30 times per second, independently from the frequency of the `clk_2` input. Only if the frequency of `clk_2` is equal or less than 15&nbsp;Hz, it can be observerd correctly. If the frequency of `clk_2` is greater than 30&nbsp;Hz, the display may skip some changes which would be visible on the display of the real FPGA board.
+
+### Change default GUI frame rate
+
+In order to use a frame rate different than 30 FPS, you need to export that value to a environment variable called FPGA_FRAMERATE, for example, to change to 60 FPS, you need to execute the following bash command:
+`export FPGA_FRAMERATE="60"`.
 
 ### RISC-V control signals on LCD
 

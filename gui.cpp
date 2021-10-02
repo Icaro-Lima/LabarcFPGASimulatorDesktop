@@ -39,6 +39,14 @@ FPGA::FPGA(int x, int y) : Fl_Widget(x, y, image->w(), image->h()) {
         hexv = new hexval(this->x() + image->w() / 2, this->y() + image->h() / 2,
                          (int)(LCD_NCHAR*lcd_char_width));
 	hexv->position(this->x() + image->w() / 2 - hexv->w() / 2, this->y() + LCD_OFFSET );
+
+	// According to frame rate environment variable, calculate GUI seconds per frame
+	char *framerate_env = getenv(FPGA_FRAMERATE_ENV);
+	if (framerate_env != NULL) {
+		seconds_per_frame = 1.0 / atoi(framerate_env);
+	} else {
+		seconds_per_frame = 1.0 / DEFAULT_FRAMERATE;
+	}
 }
 
 void FPGA::draw() {

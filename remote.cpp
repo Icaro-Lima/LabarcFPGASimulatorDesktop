@@ -76,7 +76,7 @@ void callback(void*) {
 
   fpga->redraw();
     	
-  Fl::repeat_timeout(1, callback);    // retrigger timeout for next clock change
+  Fl::repeat_timeout(fpga->seconds_per_frame, callback);    // retrigger timeout for next clock change
 }
 
 int SWI::handle(int event) {

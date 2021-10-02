@@ -8,6 +8,7 @@
 
 #include <sstream>
 #include <iomanip>
+#include <cstdlib>
 #include <FL/Fl.H>
 #include <FL/fl_draw.H>
 #include <FL/Fl_Button.H>
@@ -44,6 +45,8 @@ using std::string;
 #define NREG_LINES (NREGS/NREGS_PER_LINE)
 #define CLOCK 0.25
 #define LABEL_SIZE 16
+#define FPGA_FRAMERATE_ENV "FPGA_FRAMERATE"
+#define DEFAULT_FRAMERATE 30
 
 class SWI : public Fl_Widget {
 	int id;
@@ -142,6 +145,7 @@ public:
         float lcd_char_width;
 	LCD_check *lcd_check;
 	RISCV_check *riscv_check;
+	double seconds_per_frame;
 
 	FPGA(int x, int y);
 	virtual void draw();
