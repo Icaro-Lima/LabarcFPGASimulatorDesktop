@@ -163,10 +163,10 @@ int main(int argc, char** argv, char** env) {
     if (divide_by > 500000000) {
        cerr << "Error: Clock frequency " << f << " Hz is below the allowed 0.1 Hz" << endl;
        exit(1);
-    } else if (divide_by >= 500000 ) {
+    } else if (divide_by >= 100000 ) {
          cerr << setprecision(3) << f << " Hz" << endl;
     }  else {
-       cerr << "Error: Clock frequency " << f << " Hz is higher than the allowed 100 Hz" << endl;
+       cerr << "Error: Clock frequency " << f << " Hz is higher than the allowed 500 Hz" << endl;
        exit(1);
     }        
 
