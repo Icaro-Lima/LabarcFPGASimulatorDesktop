@@ -1,3 +1,13 @@
+This repository offers
+* remote access to physical FPGA board
+* configure the FPGA board remotely using SystemVerilog HDL
+* interact with the FPGA board remotely by graphical browser interface
+* compile C or Assembly to run on a RISC-V processor implemented on the FPGA board
+* write Your own Systemverilog description of a RISC-V processor, implement it, and test it running C or Assembly code
+* simulate all of the above on Your own PC or using a web interface
+* simulate RISC-V ISA from C, Assembly or binary machine code using a graphical interface for the oficial RISC-V toolchain
+* install the RISC-V ISA simulator on Your PC or use a web interface
+
 # Labarc FPGA Simulator
 <img src="http://lad.ufcg.edu.br/loac/uploads/OAC/MainWindow.png">
 
