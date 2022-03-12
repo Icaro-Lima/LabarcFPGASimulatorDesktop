@@ -47,7 +47,6 @@
   if(!empty($path)) {
      // Put enough space characters in front of the IP so that even one-digit IPs
      // can be read grabbing the last 18 characters of the file. 
-	  file_put_contents($file, "\n/*           " . get_client_ip() . " */\n", FILE_APPEND);
      echo "<div style=\"font-size:75%\" id=\"serverData\">The file "
           . basename( $_FILES['uploaded_file']['name']) .
           " has been uploaded.<br>\n<h4>requesting synthesis</h4></div>\n";
