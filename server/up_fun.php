@@ -5,10 +5,11 @@
   function file_signature($fname) {
      exec("chmod g+rw ". $fname ." ; ".
           "echo Certificado de entrega > ". $fname .".sign; ".
+          "ls -l -g -o ". $fname ." | cut -d' ' -f3 >> ". $fname .".sign ; ".
           "md5sum ". $fname ." | cut -d' ' -f1 >> ". $fname .".sign ; ".
           "echo >> ". $fname ." ; ".
           "echo /\* \  \  \  \  \  ". get_client_ip() ." \*/ >> ". $fname ." ; ".
-          "ls -g -o --full-time ". $fname ." | cut -d' ' -f3-5 >> ". $fname .".sign ; ".
+          "ls -g -o --full-time ". $fname ." | cut -d' ' -f4-5 >> ". $fname .".sign ; ".
           "gpg --homedir ../../.gnupg --clearsign ". $fname .".sign", $o, $r);
      // First record the checksum of the original uploaded file,
      // then append the IP to it,
