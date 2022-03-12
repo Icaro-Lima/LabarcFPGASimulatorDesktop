@@ -6,6 +6,8 @@ These files are stored here only for reference.
 #### Web server: HTTP+NFS+MUTEX server
 ```
 /var/www/html/hdl
+   up_fun.php
+   uploaded.php
    simulate.php
    remote.php
    remote.js
@@ -14,25 +16,39 @@ These files are stored here only for reference.
    fpga.html
 
 /labarc/TOP  (these files get copied to a directory in /home/labarc01)
-   DE0_Nano.sv
-   DE0_SOC.sv     and also .qpf .qsf .sdc, /home/labarc01/syn only
-   Makefile    /home/labarc01/syn and /home/labarc01/sim
+   DE0_SOC.qpf   to ~/syn
+   DE0_SOC.qsf   to ~/syn
+   DE0_SOC.sdc   to ~/syn
+   DE0_Nano.qpf  to ~/syn
+   DE0_Nano.qsf  to ~/syn
+   DE0_Nano.sdc  to ~/syn
+   Makefile      to ~/syn and ~/sim
 ```
 #### EDA workstations: NFS clients and JTAG servers where FPGA boards are connected
 ```
 /labarc/util
-   sim_socket.o (compiled from sim_socket.cpp with -DLAD)
-   veri.cpp
+   DE0_Nano.sv
+   DE0_Nano.cdf
+   DE0_SOC.sv
+   DE0_SOC.cdf
+   lcd.sv
+   lcd_64bit.sv
+   sim_socket.o (compiled from ../sim_socket.cpp with -DLAD)
    vJTAG_interface.sv
    qr.tcl
+
+/usr/local/bin
+   sintetize
 ```
 #### NFS mounted /home/labarc01 in Web server and EDA workstations
 ```
+   launch_sim_isa.sh
    launch_sims
    launch.sh
    launch
-   search_copy_TOP
+   search_copy_TOP_server.sh 
    search_copy_TOP_server
+   search_copy_TOP
 ```
 ### How it works
 

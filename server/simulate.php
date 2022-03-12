@@ -42,11 +42,11 @@
      file_put_contents($file, "\n/*           " . get_client_ip() . " */\n", FILE_APPEND);
      echo "<div style=\"font-size:75%\" id=\"serverData\">The file "
           . basename( $_FILES['uploaded_file']['name']) .
-          " has been uploaded.<br>\n<h4>Solicitando simulação</h4></div>\n";
+          " has been uploaded.<br>\n<h4>Requesting simulation</h4></div>\n";
      echo file_get_contents("fpga.html");
      echo "<script type=\"text/javascript\">\n";
      echo "let path = \"". $path ."\";";
-     echo "let process = \"compilação\";";
+     echo "let process = \"compilation\";";
      echo "let display = \"". $_POST["display"] ."\";";
      echo file_get_contents("remote.js");
      echo "</script>\n";

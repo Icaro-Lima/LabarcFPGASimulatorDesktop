@@ -23,7 +23,8 @@
        only .c and .h C files,
        a binary instruction code file called inst.101,
        and .jpeg., .jpg, .pdf files,
-       or a mix of any of those.</p>
+       or a mix of any of those.
+       Do not use any sub-directory.</p>
     <p>In order to get credits, You need to put Your name in the first line of the main file.<br>
        You must put a comment marker at the start of that line.</p>
     <p>In the second line, as comment, put the title of Your project.</p>

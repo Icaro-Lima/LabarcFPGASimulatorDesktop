@@ -94,6 +94,13 @@ a.out : $(wildcard *.s) $(sort $(patsubst %.c,%.s,$(wildcard *.c)))
 	@echo "<span style="color:blue">listing of the assembly file $@:</span>"
 	@echo \<pre\>; grep -v "^[[:space:]]\." $@ | sed 's/^\t/\&nbsp;\t/g'; echo \</pre\>
 
+# from C++ to assembly
+%.s : %.cpp
+	@echo "<span style="color:blue">compile the file called $< to an assembly file called $@</span>"
+	riscv32-unknown-elf-g++ -O1 -S $< 2>&1
+	@echo "<span style="color:blue">listing of the assembly file $@:</span>"
+	@echo \<pre\>; grep -v "^[[:space:]]\." $@ | sed 's/^\t/\&nbsp;\t/g'; echo \</pre\>
+
 maintainer-copy::
 clean mostlyclean distclean maintainer-clean::
 	-rm -rf obj_dir *.s *.o *.log *.dmp *.vpd core a.out *.objdump *.sof *.fit.summary *.objdir

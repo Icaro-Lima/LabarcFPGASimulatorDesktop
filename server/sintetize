@@ -1,0 +1,55 @@
+#!/bin/bash
+/usr/local/bin/jtagcheck
+if jtagconfig | grep --quiet SoC; then
+  p=DE0_SOC
+else
+  p=DE0_Nano
+fi
+d=$(grep -h parameter top.sv $p.sv | grep divide_by | head -1 | grep -oP '(?<!\d)\d*(?!\d)' )
+if [ $d -gt 500000000 ]; then
+  echo "Error: clock frequency below 0.1 Hz"
+  exit 1
+elif [ $d -gt 5000000 ]; then
+  f=$(echo "scale = 1; 50000000 / "$d | bc )
+  u=Hz
+elif [ $d -gt 50000 ]; then
+  f=$(expr 50000000 / $d)
+  u=Hz
+elif [ $d -gt 500 ]; then
+  f=$(echo "scale = 1; 5000 / "$d | bc )
+  u=kHz
+elif [ $d -gt 50 ]; then
+  f=$(expr 50000 / $d)
+  u=kHz
+elif [ $d -gt 5 ]; then
+  f=$(echo "scale = 1; 50 / "$d | bc )
+  u=MHz
+elif [ $d -gt 0 ]; then
+  f=$(expr 50 / $d)
+  u=MHz
+else
+  echo "Error: parameter divide_by undefined or zero"
+  exit 1
+fi
+sed -i 's/-divide_by *[[:digit:]]*/-divide_by '$d'/' $p.sdc
+if [ "${f::1}" = "." ]; then
+  f=0$f
+fi
+echo $p " "$f $u
+mkdir -p $1
+echo 'set_global_assignment -name SEARCH_PATH '$PWD  | cat $p.qsf - > $1/$p.qsf
+cp $p.qpf $1
+hwd=$PWD
+utl=/labarc/util
+(cd $1; quartus_map $p && quartus_fit $p && quartus_asm $p && (quartus_pgm -c$2 $utl/$p.cdf & quartus_sta --sdc=$hwd/$p.sdc --multicorner=off $p) )  | egrep --line-buffered "(Error|Running|successful)"
+egrep '(ogic|memory)' $1/$p.fit.summary
+grep CLOCK_DIV $1/$p.sta.rpt | grep outside >/dev/null && echo "STA Warning: Clock period outside of range of acceptable values."
+c=CLOCK_DIV
+if [ $d -eq 1 ]; then
+   if [[ "$p" = "DE0_SOC" ]]; then
+      c=FPGA_CLK1_50
+   else
+      c=CLOCK_50
+   fi
+fi
+awk "/Setup '$c'/ {printf \"%s\",\$3; getline; printf \"%s %d ns\n\",\" \"\$1,\$3}" $1/$p.sta.summary
