@@ -25,7 +25,7 @@ while : ; do # infinite loop
        if CABLE=$(expr $1 + 1) make > qq.log ; then
            if b=$(compgen -G *.101); then
               qinst $1 $b && qr $1	   
-           elif compgen -G *.[cs]* >/dev/null; then
+           elif (shopt -s extglob;  compgen -G "*.@(c*|s)") >/dev/null; then
               make inst.objdump >> qq.log && qinst $1 inst.objdump && qr $1
            else
               qr $1
@@ -42,7 +42,7 @@ while : ; do # infinite loop
        if quartus_pgm -c$(expr $1 + 1) /labarc/RISCV/$p.cdf | egrep --line-buffered "(Error|Running|successful)" >> qq.log ; then
            if b=$(compgen -G *.101); then
               qinst $1 $b && qr $1	   
-	   elif compgen -G *.[cs]* >/dev/null; then
+	   elif (shopt -s extglob;  compgen -G "*.@(c*|s)") >/dev/null; then
               make inst.objdump >> qq.log && qinst $1 inst.objdump && qr $1
            else
               echo "<span style=color:blue>Fatal error: neither hardware nor software uploaded</span>" >qq.log
