@@ -1,3 +1,10 @@
+# Labarc FPGA Simulator
+
+**Take a look on the web version:** [Website](https://verilog-playground.github.io/) · [Repository](https://github.com/Verilog-playground)
+
+The simulator can be installed on Your PC (no internet link needed after installation)
+or accessed by means of a web browser interface (no installation required).
+
 This repository offers
 * remote access to physical FPGA board
 * configure the FPGA board remotely using SystemVerilog HDL
@@ -7,12 +14,6 @@ This repository offers
 * simulate all of the above on Your own PC or using a web interface
 * simulate RISC-V ISA from C, Assembly or binary machine code using a graphical interface for the oficial RISC-V toolchain
 * install the RISC-V ISA simulator on Your PC or use a web interface
-
-# Labarc FPGA Simulator
-<img src="http://lad.ufcg.edu.br/loac/uploads/OAC/MainWindow.png">
-
-The simulator can be installed on Your PC (no internet link needed after installation)
-or accessed by means of a web browser interface (no installation required).
 
 ## How to install the simulator on Your desktop
 
